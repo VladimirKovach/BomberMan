@@ -1,0 +1,38 @@
+#ifndef RENDERER_HPP
+#define RENDERER_HPP
+
+#include "Map.hpp"
+
+enum ColorPair {
+    CP_NONE,  // corresponds to terminal default color
+    CP_SCREEN,
+    CP_UNBREAKABLE_WALL,
+    CP_PLAYER,
+    CP_ENEMY
+};
+
+class Renderer {
+protected:
+    Position map_start_pos;
+
+    void init_colors();
+
+    void color_screen_black();
+
+    void display_score(int score);
+
+    void display_time(int time);
+
+    char get_cell_view(CellContent content);
+
+    ColorPair get_cell_color(CellContent content);
+
+    void draw_map(Map& map);
+
+public:
+    Renderer();
+
+    void draw_level(Map& map, int score, int time);
+};
+
+#endif
