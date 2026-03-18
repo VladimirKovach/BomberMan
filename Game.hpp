@@ -14,10 +14,10 @@ protected:
     int score;
     int timer;
 
-    Enemy enemy;
     Map map;
-    Player player;
     Renderer renderer;
+    Player player;
+    Enemy enemy;
 
     bool game_over();
 

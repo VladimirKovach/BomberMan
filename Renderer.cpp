@@ -11,7 +11,7 @@ void Renderer::init_colors() {
     init_pair(CP_ENEMY, COLOR_MAGENTA, COLOR_BLACK);
 }
 
-void Renderer::color_screen_black() {
+void Renderer::paint_it_black() {
     for (int y = 0; y < LINES; y++) {
         for (int x = 0; x < COLS; x++) {
             mvaddch(y, x, ' ' | COLOR_PAIR(CP_SCREEN));
@@ -24,7 +24,7 @@ Renderer::Renderer() {
     map_start_pos = {(COLS - MAP_COLS) / 2, (LINES - MAP_ROWS) / 2};
 
     init_colors();
-    color_screen_black();
+    paint_it_black();
 }
 
 

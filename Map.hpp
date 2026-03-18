@@ -8,7 +8,6 @@ enum CellContent {
     PLAYER,
     BOMB,
     ENEMY,
-    SPECIAL_ENEMY,
     ITEM,
     UNKNOWN
 };
@@ -18,8 +17,11 @@ struct Position {
     int y;
 };
 
-const int MAP_ROWS = 30;
+bool positions_equal(Position p, Position q);
+
+const int MAP_ROWS = 25;
 const int MAP_COLS = MAP_ROWS * 2;
+const int MAX_EMPTY_CELLS = MAP_ROWS * MAP_COLS;
 
 
 class Map {
@@ -27,18 +29,32 @@ protected:
     CellContent grid[MAP_ROWS][MAP_COLS];
     Position start_pos;
 
+    Position empty_cells[MAX_EMPTY_CELLS];
+    int empty_cells_count;
+
+    void add_empty_cell(Position pos);
+
+    void remove_empty_cell(Position pos);
+
 public:
     Map();
 
     bool cell_exists(Position pos);
 
+    // Precondition: cell_exists(pos)
     bool is_empty_cell(Position pos);
+
+    bool is_walkable_cell(Position pos);
+
+    Position get_random_empty_cell();
 
     CellContent get_cell_content(Position pos);
 
     void set_cell_content(Position pos, CellContent content);
 
     void clear_cell(Position pos);
+
+    void open_next_level_door();
 };
 
 #endif
