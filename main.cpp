@@ -9,7 +9,7 @@ void init_ncurses() {
     noecho();
     curs_set(0);
     keypad(stdscr, TRUE);
-    nodelay(stdscr, TRUE);
+    timeout(30);  // 30 FPS
 }
 
 int main() {

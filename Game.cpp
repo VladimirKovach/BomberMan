@@ -74,13 +74,10 @@ void Game::run() {
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
     while (!game_over() && !quit) {
-        renderer.draw_level(map, score, timer);
-        
-        enemy.move(map, timer);
-
-        int key = getch();
-        handle_input(key);
-
-        update_timer(start);
+        renderer.draw_level(map, score, timer); // 1. Disegna
+        enemy.move(map, timer);                 // 3. Aggiorna (nemico)
+        int key = getch();                      // 2. Leggi input
+        handle_input(key);                      // 3. Aggiorna (giocatore)
+        update_timer(start);                    // 3. Aggiorna (timer)
     }
 }
