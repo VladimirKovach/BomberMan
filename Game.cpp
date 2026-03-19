@@ -3,10 +3,10 @@
 #include <ncurses.h>
 
 Game::Game() :
-    enemy({MAP_COLS - 30, MAP_ROWS - 15}, 1, 1),
     map(),
+    renderer(),
     player(),
-    renderer()
+    enemy({map.get_random_empty_cell()}, 1, 1)
 {
     quit = false;
     score = 0;  // da implementare
@@ -28,34 +28,42 @@ void Game::update_timer(std::chrono::steady_clock::time_point start) {
     timer = std::max(0, TIMER_START_VALUE - elapsed);  // use max to prevent negative timer
 }
 
+
 void Game::handle_input(int key) {
     switch (key) {
         case 'q':
         case 'Q':
             quit = true;
             break;
+
         case KEY_UP:
         case 'w':
         case 'W':
             player.move(map, UP);
             break;
+
         case KEY_LEFT:
         case 'a':
         case 'A':
             player.move(map, LEFT);
             break;
+
         case KEY_DOWN:
         case 's':
         case 'S':
             player.move(map, DOWN);
             break;
+
         case KEY_RIGHT:
         case 'd':
         case 'D':
             player.move(map, RIGHT);
             break;
+
         case ' ':
             //player.place_bomb(map);
+            break;
+
         default:
             break;
     }

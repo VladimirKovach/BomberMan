@@ -17,7 +17,7 @@ protected:
 
     void init_colors();
 
-    void color_screen_black();
+    void paint_it_black();
 
     void display_score(int score);
 
