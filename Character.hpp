@@ -21,6 +21,10 @@ protected:
 public:
     Character(Position _pos, int _lives, int _speed);
 
+    void gain_life();
+
+    void lose_life();
+
     bool is_dead();
 
     Position get_position();

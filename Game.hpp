@@ -25,6 +25,8 @@ protected:
 
     void handle_input(int key);
 
+    void handle_collision();
+
 public:
     Game();
 

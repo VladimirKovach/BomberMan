@@ -70,6 +70,13 @@ void Game::handle_input(int key) {
 }
 
 
+void Game::handle_collision() {
+    if (positions_equal(player.get_position(), enemy.get_position())) {
+        player.lose_life();
+    }
+}
+
+
 void Game::run() {
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
@@ -80,6 +87,8 @@ void Game::run() {
 
         int key = getch();
         handle_input(key);
+
+        handle_collision();
 
         update_timer(start);
     }

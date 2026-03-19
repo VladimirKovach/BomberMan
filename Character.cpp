@@ -6,6 +6,14 @@ Character::Character(Position _pos, int _lives, int _speed) {
     speed = _speed;  // da implementare
 }
 
+void Character::gain_life() {
+    lives++;
+}
+
+void Character::lose_life() {
+    lives--;
+}
+
 bool Character::is_dead() {
     return lives <= 0;
 }
