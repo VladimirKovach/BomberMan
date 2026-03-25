@@ -1,5 +1,5 @@
-bomberman: main.o Character.o Enemy.o Game.o Map.o Player.o Renderer.o
-	g++ main.o Character.o Enemy.o Game.o Map.o Player.o Renderer.o -lncurses -o bomberman
+bomberman: main.o Character.o DummyEnemy.o Game.o Map.o Player.o Renderer.o
+	g++ main.o Character.o DummyEnemy.o Game.o Map.o Player.o Renderer.o -lncurses -o bomberman
 
 main.o: main.cpp Game.hpp
 	g++ -c main.cpp
@@ -7,8 +7,8 @@ main.o: main.cpp Game.hpp
 Character.o: Character.cpp Character.hpp Map.hpp
 	g++ -c Character.cpp
 
-Enemy.o: Enemy.cpp Enemy.hpp
-	g++ -c Enemy.cpp
+DummyEnemy.o: DummyEnemy.cpp DummyEnemy.hpp
+	g++ -c DummyEnemy.cpp
 
 Game.o: Game.cpp Game.hpp Map.hpp Player.hpp Renderer.hpp
 	g++ -c Game.cpp

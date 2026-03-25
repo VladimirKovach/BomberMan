@@ -1,7 +1,7 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include "Enemy.hpp"
+#include "DummyEnemy.hpp"
 #include "Map.hpp"
 #include "Player.hpp"
 #include "Renderer.hpp"
@@ -17,7 +17,7 @@ protected:
     Map map;
     Renderer renderer;
     Player player;
-    Enemy enemy;
+    DummyEnemy dummy_enemy;
 
     bool game_over();
 

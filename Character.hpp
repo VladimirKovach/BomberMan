@@ -11,15 +11,14 @@ enum Direction {
     NONE
 };
 
-
 class Character {
 protected:
-    Position pos;
+    Position p;
     int lives;
-    int speed;  // cell per move
+    int speed;
 
 public:
-    Character(Position _pos, int _lives, int _speed);
+    Character(Position _p, int _lives, int _speed);
 
     void gain_life();
 
@@ -29,9 +28,9 @@ public:
 
     Position get_position();
 
-    Position get_next_position(Direction dir);
+    Position get_next_position(Direction d);
 
-    void move(Map& map, Direction dir);
+    void move(Map& map, Direction d);
 };
 
 #endif

@@ -5,12 +5,12 @@
 
 class Bomb {
 protected:
-    Position pos;
+    Position p;
     int range;
     int timer;
 
 public:
-    Bomb(Position _pos, int _range = 1, int _timer = 5);
+    Bomb(Position _p, int _range = 1, int _timer = 5);
 
     Position get_position();
 

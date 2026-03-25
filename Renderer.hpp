@@ -14,7 +14,7 @@ enum ColorPair {
 
 class Renderer {
 protected:
-    Position map_start_pos;
+    Position map_start_p;
 
     void init_colors();
 

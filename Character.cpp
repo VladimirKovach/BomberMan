@@ -1,7 +1,7 @@
 #include "Character.hpp"
 
-Character::Character(Position _pos, int _lives, int _speed) {
-    pos = _pos;
+Character::Character(Position _p, int _lives, int _speed) {
+    p = _p;
     lives = _lives;
     speed = _speed;  // da implementare
 }
@@ -19,45 +19,45 @@ bool Character::is_dead() {
 }
 
 Position Character::get_position() {
-    return pos;
+    return p;
 }
 
 
-Position Character::get_next_position(Direction dir) {
-    Position next_pos = pos;
+Position Character::get_next_position(Direction d) {
+    Position next_p = p;
 
-    switch (dir) {
+    switch (d) {
         case UP:
-            (next_pos.y)--;
+            (next_p.y)--;
             break;
 
         case LEFT:
-            (next_pos.x)--;
+            (next_p.x)--;
             break;
 
         case DOWN:
-            (next_pos.y)++;
+            (next_p.y)++;
             break;
 
         case RIGHT:
-            (next_pos.x)++;
+            (next_p.x)++;
             break;
 
         default:  // NONE
             break;
     }
 
-    return next_pos;
+    return next_p;
 }
 
 
-void Character::move(Map& map, Direction dir) {
-    Position next_pos = get_next_position(dir);
+void Character::move(Map& map, Direction d) {
+    Position next_p = get_next_position(d);
 
-    if (map.is_walkable_cell(next_pos)) {
-        CellContent content = map.get_cell_content(pos);
-        map.clear_cell(pos);
-        pos = next_pos;
-        map.set_cell_content(pos, content);
+    if (map.is_walkable_cell(next_p)) {
+        CellContent content = map.get_cell_content(p);
+        map.clear_cell(p);
+        p = next_p;
+        map.set_cell_content(p, content);
     }
 }
