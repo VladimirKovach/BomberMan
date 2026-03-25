@@ -1,8 +1,8 @@
 #include "Map.hpp"
 #include <cstdlib>
 
-bool positions_equal(Position p, Position q) {
-    return (p.x == q.x && p.y == q.y);
+bool positions_equal(Position p1, Position p2) {
+    return p1.x == p2.x && p1.y == p2.y;
 }
 
 
@@ -30,39 +30,39 @@ Map::Map() {
 }
 
 
-bool Map::cell_exists(Position pos) {
+bool Map::cell_exists(Position p) {
     return (
-        pos.x >= 0 && pos.x < MAP_COLS &&
-        pos.y >= 0 && pos.y < MAP_ROWS
+        p.x >= 0 && p.x < MAP_COLS &&
+        p.y >= 0 && p.y < MAP_ROWS
     );
 }
 
-bool Map::is_empty_cell(Position pos) {
-    return grid[pos.y][pos.x] == EMPTY;
+bool Map::is_empty_cell(Position p) {
+    return grid[p.y][p.x] == EMPTY;
 }
 
-bool Map::is_walkable_cell(Position pos) {
+bool Map::is_walkable_cell(Position p) {
     return (
-        cell_exists(pos) &&
-        grid[pos.y][pos.x] != BREAKABLE_WALL &&
-        grid[pos.y][pos.x] != UNBREAKABLE_WALL
+        cell_exists(p) &&
+        grid[p.y][p.x] != BREAKABLE_WALL &&
+        grid[p.y][p.x] != UNBREAKABLE_WALL
     );
 }
 
-void Map::add_empty_cell(Position pos) {
-    if (is_empty_cell(pos)) {
-        empty_cells[empty_cells_count] = pos;
+void Map::add_empty_cell(Position p) {
+    if (is_empty_cell(p)) {
+        empty_cells[empty_cells_count] = p;
         empty_cells_count++;
     }
 }
 
 
-void Map::remove_empty_cell(Position pos) {
+void Map::remove_empty_cell(Position p) {
     bool found = false;
     int i = 0;
 
     while (i < empty_cells_count && !found) {
-        if (positions_equal(empty_cells[i], pos)) {
+        if (positions_equal(empty_cells[i], p)) {
             found = true;
 
             // shift left all the elements at the right of the removed one
@@ -90,26 +90,26 @@ Position Map::get_random_empty_cell() {
     }
 }
 
-CellContent Map::get_cell_content(Position pos) {
-    if (cell_exists(pos)) {
-        return grid[pos.y][pos.x];
+CellContent Map::get_cell_content(Position p) {
+    if (cell_exists(p)) {
+        return grid[p.y][p.x];
     }
     else {
         return UNKNOWN;
     }
 }
 
-void Map::set_cell_content(Position pos, CellContent content) {
-    if (cell_exists(pos) && is_empty_cell(pos)) {
-        grid[pos.y][pos.x] = content;
-        remove_empty_cell(pos);
+void Map::set_cell_content(Position p, CellContent content) {
+    if (cell_exists(p) && is_empty_cell(p)) {
+        grid[p.y][p.x] = content;
+        remove_empty_cell(p);
     }
 }
 
-void Map::clear_cell(Position pos) {
-    if (cell_exists(pos) && !is_empty_cell(pos)) {
-        grid[pos.y][pos.x] = EMPTY;
-        add_empty_cell(pos);
+void Map::clear_cell(Position p) {
+    if (cell_exists(p) && !is_empty_cell(p)) {
+        grid[p.y][p.x] = EMPTY;
+        add_empty_cell(p);
     }
 }
 

@@ -3,14 +3,14 @@
 
 #include "Character.hpp"
 
-class Enemy : public Character {
+class DummyEnemy : public Character {
 protected:
     int last_move_time;
 
     Direction choose_direction();
 
 public:
-    Enemy(Position _pos, int _lives, int _speed);
+    DummyEnemy(Position _p, int _lives, int _speed);
 
     void move(Map& map, int timer);
 };

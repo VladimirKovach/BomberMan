@@ -1,13 +1,13 @@
 #include "Bomb.hpp"
 
-Bomb::Bomb(Position _pos, int _range, int _timer) {
-    pos = _pos;
+Bomb::Bomb(Position _p, int _range, int _timer) {
+    p = _p;
     range = _range;
     timer = _timer;
 }
 
 Position Bomb::get_position() {
-    return pos;
+    return p;
 }
 
 bool Bomb::is_timer_expired() {

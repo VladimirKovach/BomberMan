@@ -6,7 +6,7 @@ Game::Game() :
     map(),
     renderer(),
     player(),
-    enemy({map.get_random_empty_cell()}, 1, 1)
+    dummy_enemy({map.get_random_empty_cell()}, 1, 1)
 {
     quit = false;
     score = 0;  // da implementare
@@ -14,7 +14,7 @@ Game::Game() :
 
     // spawn characters
     map.set_cell_content(player.get_position(), PLAYER);
-    map.set_cell_content(enemy.get_position(), ENEMY);
+    map.set_cell_content(dummy_enemy.get_position(), ENEMY);
 }
 
 
@@ -71,7 +71,7 @@ void Game::handle_input(int key) {
 
 
 void Game::handle_collision() {
-    if (positions_equal(player.get_position(), enemy.get_position())) {
+    if (positions_equal(player.get_position(), dummy_enemy.get_position())) {
         player.lose_life();
     }
 }
@@ -83,7 +83,7 @@ void Game::run() {
     while (!game_over() && !quit) {
         renderer.draw_level(map, score, timer);
         
-        enemy.move(map, timer);
+        dummy_enemy.move(map, timer);
 
         int key = getch();
         handle_input(key);

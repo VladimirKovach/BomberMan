@@ -1,6 +1,6 @@
 #include "Player.hpp"
 
-Player::Player(Position _pos, int _lives, int _speed) : Character(_pos, _lives, _speed) {
+Player::Player(Position _p, int _lives, int _speed) : Character(_p, _lives, _speed) {
     can_place_bomb = true;
 }
 
