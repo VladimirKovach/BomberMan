@@ -2,7 +2,7 @@
 
 class SmartEnemy: DummyEnemy {
 protected:
-    double get_distance(Position p, Position q);
+    double get_distance(Position p1, Position p2);
 
     Direction choose_direction();
 
