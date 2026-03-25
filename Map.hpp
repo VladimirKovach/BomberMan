@@ -36,12 +36,18 @@ protected:
 
     void remove_empty_cell(Position pos);
 
+    bool is_safe_zone(int x, int y);
+
+    void place_unbreakable_walls();
+
+    void place_breakable_walls(int difficulty);
+
 public:
-    Map();
+    // difficulty: da 1 a 5
+    Map(int difficulty = 1);
 
     bool cell_exists(Position pos);
 
-    // Precondition: cell_exists(pos)
     bool is_empty_cell(Position pos);
 
     bool is_walkable_cell(Position pos);
