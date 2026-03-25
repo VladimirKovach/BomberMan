@@ -7,6 +7,7 @@ void Renderer::init_colors() {
     }
     init_pair(CP_SCREEN, COLOR_BLACK, COLOR_BLACK);
     init_pair(CP_UNBREAKABLE_WALL, COLOR_WHITE, COLOR_BLACK);
+    init_pair(CP_BREAKABLE_WALL, COLOR_YELLOW, COLOR_BLACK);
     init_pair(CP_PLAYER, COLOR_CYAN, COLOR_BLACK);
     init_pair(CP_ENEMY, COLOR_MAGENTA, COLOR_BLACK);
 }
@@ -45,9 +46,11 @@ char Renderer::get_cell_view(CellContent content) {
     char view = ' ';
 
     switch (content) {
-        case BREAKABLE_WALL:
         case UNBREAKABLE_WALL:
             view = '#';
+            break;
+        case BREAKABLE_WALL:
+            view = '=';
             break;
         case PLAYER:
             view = '@';
@@ -69,6 +72,9 @@ ColorPair Renderer::get_cell_color(CellContent content) {
     switch (content) {
         case UNBREAKABLE_WALL:
             color = CP_UNBREAKABLE_WALL;
+            break;
+        case BREAKABLE_WALL:
+            color = CP_BREAKABLE_WALL;
             break;
         case PLAYER:
             color = CP_PLAYER;

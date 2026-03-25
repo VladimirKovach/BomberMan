@@ -70,7 +70,6 @@ bool Map::is_safe_zone(int x, int y) {
     return false;
 }
 
-
 // =====================================================
 // place_unbreakable_walls: piazza il pattern FISSO
 // di muri indistruttibili all'interno della mappa.

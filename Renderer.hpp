@@ -7,6 +7,7 @@ enum ColorPair {
     CP_NONE,  // corresponds to terminal default color
     CP_SCREEN,
     CP_UNBREAKABLE_WALL,
+    CP_BREAKABLE_WALL,
     CP_PLAYER,
     CP_ENEMY
 };
