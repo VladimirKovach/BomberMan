@@ -1,4 +1,5 @@
 #include "Renderer.hpp"
+#include "Bomb.hpp"
 #include <ncurses.h>
 
 void Renderer::init_colors() {
@@ -10,6 +11,9 @@ void Renderer::init_colors() {
     init_pair(CP_BREAKABLE_WALL, COLOR_YELLOW, COLOR_BLACK);
     init_pair(CP_PLAYER, COLOR_CYAN, COLOR_BLACK);
     init_pair(CP_ENEMY, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(CP_BOMB, COLOR_RED, COLOR_BLACK);
+    init_pair(CP_EXPLOSION, COLOR_WHITE, COLOR_RED);
+    init_pair(CP_EXPLOSION_FADE, COLOR_YELLOW, COLOR_RED);  // giallo su rosso (sfumatura)
 }
 
 void Renderer::paint_it_black() {
@@ -61,6 +65,14 @@ char Renderer::get_cell_view(CellContent content) {
             view = '$';
             break;
 
+        case BOMB:
+            view = 'o';
+            break;
+
+        case EXPLOSION:
+            view = '*';
+            break;
+
         default:  // EMPTY, UNKNOWN
             break;
     }
@@ -88,6 +100,14 @@ ColorPair Renderer::get_cell_color(CellContent content) {
             color = CP_ENEMY;
             break;
 
+        case BOMB:
+            color = CP_BOMB;
+            break;
+
+        case EXPLOSION:
+            color = CP_EXPLOSION;
+            break;
+
         default:  // EMPTY, UNKNOWN
             break;
     }
@@ -99,13 +119,23 @@ ColorPair Renderer::get_cell_color(CellContent content) {
 void Renderer::draw_map(Map& map) {
     for (int y = 0; y < MAP_ROWS; y++) {
         for (int x = 0; x < MAP_COLS; x++) {
-            char cell_view = get_cell_view(map.get_cell_content({x, y}));
-            ColorPair cell_color = get_cell_color(map.get_cell_content({x, y}));
+            Position pos = {x, y};
+            CellContent content = map.get_cell_content(pos);
+            char cell_view = get_cell_view(content);
+            ColorPair cell_color = get_cell_color(content);
+
+            // Effetto sfumatura: se l'esplosione è nella seconda metà della durata, sfuma
+            if (content == EXPLOSION) {
+                int exp_timer = map.get_explosion_timer(pos);
+                if (exp_timer < EXPLOSION_DURATION / 2) {
+                    cell_color = CP_EXPLOSION_FADE; // sfuma a giallo/arancione
+                }
+            }
+
             mvaddch(y + map_start_p.y, x + map_start_p.x, cell_view | COLOR_PAIR(cell_color));
         }
     }
 }
-
 void Renderer::draw_level(Map& map, int score, int time) {
     display_score(score);
     display_time(time);

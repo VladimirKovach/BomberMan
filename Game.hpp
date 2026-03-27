@@ -1,6 +1,7 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include "Bomb.hpp"
 #include "DummyEnemy.hpp"
 #include "Map.hpp"
 #include "Player.hpp"
@@ -13,11 +14,15 @@ protected:
     bool quit;
     int score;
     int timer;
+    Bomb bombs[MAX_BOMBS];
+    int bomb_count;
 
     Map map;
     Renderer renderer;
     Player player;
     DummyEnemy dummy_enemy;
+
+    void update_bombs();
 
     bool game_over();
 

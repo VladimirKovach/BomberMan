@@ -29,7 +29,7 @@ Map::Map(int difficulty) {
         grid[y][MAP_COLS - 1] = UNBREAKABLE_WALL;
     }
 
-    // PASSO 3: Muri indistruttibili interni (pattern a scacchiera)
+    // PASSO 3: Muri indistrutibili interni (pattern a scacchiera)
     place_unbreakable_walls();
 
     // PASSO 4: Muri distruttibili (quantita' basata sulla difficolta')
@@ -43,6 +43,13 @@ Map::Map(int difficulty) {
             }
         }
     }
+
+	// PASSO 6: Inizializza la tabella di timer di explosione a 0
+	for (int y = 0; y < MAP_ROWS; y++) {
+    for (int x = 0; x < MAP_COLS; x++) {
+        explosion_timer[y][x] = 0;
+    }
+	}
 }
 
 
@@ -205,7 +212,7 @@ void Map::remove_empty_cell(Position p) {
             found = true;
 
             // shift left all the elements at the right of the removed one
-            for (i; i < empty_cells_count - 1; i++) {
+            for (; i < empty_cells_count - 1; i++) {
                 empty_cells[i] = empty_cells[i + 1];
             }
 
@@ -254,4 +261,34 @@ void Map::clear_cell(Position p) {
 
 void Map::open_next_level_door() {
     clear_cell({MAP_COLS - 1, 1});
+}
+
+
+void Map::set_explosion(Position p, int duration) {
+    if (cell_exists(p)) {
+        grid[p.y][p.x] = EXPLOSION;
+        explosion_timer[p.y][p.x] = duration;
+    }
+}
+
+int Map::get_explosion_timer(Position p) {
+    if (cell_exists(p)) {
+        return explosion_timer[p.y][p.x];
+    }
+    return 0;
+}
+
+void Map::update_explosions() {
+    for (int y = 0; y < MAP_ROWS; y++) {
+        for (int x = 0; x < MAP_COLS; x++) {
+            if (grid[y][x] == EXPLOSION) {
+                explosion_timer[y][x]--;
+                if (explosion_timer[y][x] <= 0) {
+                    grid[y][x] = EMPTY;
+                    explosion_timer[y][x] = 0;
+                    add_empty_cell({x, y});
+                }
+            }
+        }
+    }
 }

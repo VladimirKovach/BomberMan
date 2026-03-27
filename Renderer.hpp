@@ -9,7 +9,10 @@ enum ColorPair {
     CP_UNBREAKABLE_WALL,
     CP_BREAKABLE_WALL,
     CP_PLAYER,
-    CP_ENEMY
+    CP_ENEMY,
+    CP_BOMB,
+    CP_EXPLOSION,
+    CP_EXPLOSION_FADE
 };
 
 class Renderer {

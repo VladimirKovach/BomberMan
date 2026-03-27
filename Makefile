@@ -1,5 +1,5 @@
-bomberman: main.o Character.o DummyEnemy.o Game.o Map.o Player.o Renderer.o
-	g++ main.o Character.o DummyEnemy.o Game.o Map.o Player.o Renderer.o -lncurses -o bomberman
+bomberman: main.o Character.o DummyEnemy.o Game.o Map.o Player.o Renderer.o Bomb.o
+	g++ main.o Character.o DummyEnemy.o Game.o Map.o Player.o Renderer.o Bomb.o -lncurses -o bomberman
 
 main.o: main.cpp Game.hpp
 	g++ -c main.cpp
@@ -21,6 +21,9 @@ Player.o: Player.cpp Player.hpp
 
 Renderer.o: Renderer.cpp Renderer.hpp Map.hpp
 	g++ -c Renderer.cpp
+
+Bomb.o: Bomb.cpp Bomb.hpp Map.hpp
+	g++ -c Bomb.cpp
 
 clean:
 	rm -f *.o
