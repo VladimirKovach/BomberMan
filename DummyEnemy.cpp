@@ -1,7 +1,7 @@
 #include "DummyEnemy.hpp"
 #include <cstdlib>
 
-DummyEnemy::DummyEnemy(Position _p, int _lives, int _speed) : Character(_p, _lives, _speed) {
+DummyEnemy::DummyEnemy(Position _p, int _lives, int _speed) : Character(_p, _lives, _speed, ENEMY) {
     last_move_time = 0;  // by convention
 }
 

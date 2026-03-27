@@ -14,6 +14,7 @@ void Renderer::init_colors() {
     init_pair(CP_BOMB, COLOR_RED, COLOR_BLACK);
     init_pair(CP_EXPLOSION, COLOR_WHITE, COLOR_RED);
     init_pair(CP_EXPLOSION_FADE, COLOR_YELLOW, COLOR_RED);  // giallo su rosso (sfumatura)
+    init_pair(CP_BOMB_BLINK, COLOR_YELLOW, COLOR_BLACK);  // giallo su nero per il lampeggio
 }
 
 void Renderer::paint_it_black() {
@@ -117,6 +118,9 @@ ColorPair Renderer::get_cell_color(CellContent content) {
 
 
 void Renderer::draw_map(Map& map) {
+    static int frame_counter = 0;
+    frame_counter++;
+
     for (int y = 0; y < MAP_ROWS; y++) {
         for (int x = 0; x < MAP_COLS; x++) {
             Position pos = {x, y};
@@ -124,11 +128,20 @@ void Renderer::draw_map(Map& map) {
             char cell_view = get_cell_view(content);
             ColorPair cell_color = get_cell_color(content);
 
-            // Effetto sfumatura: se l'esplosione è nella seconda metà della durata, sfuma
+            // Lampeggio bomba
+            if (content == BOMB) {
+                if ((frame_counter / 5) % 2 == 0) {
+                    cell_color = CP_BOMB;
+                } else {
+                    cell_color = CP_BOMB_BLINK;
+                }
+            }
+
+            // Sfumatura esplosione
             if (content == EXPLOSION) {
                 int exp_timer = map.get_explosion_timer(pos);
                 if (exp_timer < EXPLOSION_DURATION / 2) {
-                    cell_color = CP_EXPLOSION_FADE; // sfuma a giallo/arancione
+                    cell_color = CP_EXPLOSION_FADE;
                 }
             }
 
@@ -136,6 +149,7 @@ void Renderer::draw_map(Map& map) {
         }
     }
 }
+
 void Renderer::draw_level(Map& map, int score, int time) {
     display_score(score);
     display_time(time);

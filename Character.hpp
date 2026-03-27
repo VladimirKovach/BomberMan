@@ -16,20 +16,19 @@ protected:
     Position p;
     int lives;
     int speed;
+    CellContent cell_under;  // la cella che c'è sotto al personaggio
+    CellContent my_type;     // PLAYER o ENEMY
 
 public:
-    Character(Position _p, int _lives, int _speed);
+    Character(Position _p, int _lives, int _speed, CellContent _type = PLAYER);
 
     void gain_life();
-
     void lose_life();
-
     bool is_dead();
 
     Position get_position();
-
     Position get_next_position(Direction d);
-
+    void set_cell_under(CellContent content);
     void move(Map& map, Direction d);
 };
 

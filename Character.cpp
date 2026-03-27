@@ -1,9 +1,11 @@
 #include "Character.hpp"
 
-Character::Character(Position _p, int _lives, int _speed) {
+Character::Character(Position _p, int _lives, int _speed, CellContent _type) {
     p = _p;
     lives = _lives;
-    speed = _speed;  // da implementare
+    speed = _speed;
+    cell_under = EMPTY;
+    my_type = _type;
 }
 
 void Character::gain_life() {
@@ -22,6 +24,9 @@ Position Character::get_position() {
     return p;
 }
 
+void Character::set_cell_under(CellContent content) {
+    cell_under = content;
+}
 
 Position Character::get_next_position(Direction d) {
     Position next_p = p;
@@ -30,34 +35,34 @@ Position Character::get_next_position(Direction d) {
         case UP:
             (next_p.y)--;
             break;
-
         case LEFT:
             (next_p.x)--;
             break;
-
         case DOWN:
             (next_p.y)++;
             break;
-
         case RIGHT:
             (next_p.x)++;
             break;
-
-        default:  // NONE
+        default: // NONE
             break;
     }
 
     return next_p;
 }
 
-
 void Character::move(Map& map, Direction d) {
     Position next_p = get_next_position(d);
 
     if (map.is_walkable_cell(next_p)) {
-        CellContent content = map.get_cell_content(p);
-        map.clear_cell(p);
+        // 1. Ripristina quello che c'era sotto (BOMB, EMPTY, ecc.)
+        map.set_cell_content(p, cell_under);
+
+        // 2. Salva cosa c'è nella cella di destinazione
+        cell_under = map.get_cell_content(next_p);
+
+        // 3. Spostati e metti il personaggio
         p = next_p;
-        map.set_cell_content(p, content);
+        map.set_cell_content(p, my_type);
     }
 }

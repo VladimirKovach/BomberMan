@@ -76,8 +76,8 @@ void Game::handle_input(int key) {
 
                 if (!bomb_here) {
                     bombs[bomb_count].place(player_pos, 1, BOMB_DEFAULT_TIMER);
-                    map.set_cell_content(player_pos, BOMB);
-                    bomb_count++;
+ 					player.set_cell_under(BOMB);
+            		bomb_count++;
                 }
             }
             break;

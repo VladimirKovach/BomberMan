@@ -4,7 +4,7 @@
 #include "Map.hpp"
 
 const int MAX_BOMBS = 10;           // max bombe piazzabili contemporaneamente
-const int BOMB_DEFAULT_TIMER = 180; // frame prima dell'esplosione (~3 sec a 60fps)
+const int BOMB_DEFAULT_TIMER = 90; // frame prima dell'esplosione (~3 sec a 60fps)
 const int EXPLOSION_DURATION = 30;  // frame di persistenza del colore esplosione (~0.5 sec)
 
 class Bomb {

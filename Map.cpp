@@ -246,9 +246,12 @@ CellContent Map::get_cell_content(Position p) {
 }
 
 void Map::set_cell_content(Position p, CellContent content) {
-    if (cell_exists(p) && is_empty_cell(p)) {
+    if (cell_exists(p)) {
+        // Se la cella era EMPTY, rimuovila dalla lista empty_cells
+        if (is_empty_cell(p)) {
+            remove_empty_cell(p);
+        }
         grid[p.y][p.x] = content;
-        remove_empty_cell(p);
     }
 }
 
