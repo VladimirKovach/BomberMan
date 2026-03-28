@@ -10,7 +10,7 @@ protected:
     Direction choose_direction();
 
 public:
-    DummyEnemy(Position _p, int _lives, int _speed);
+    DummyEnemy(Position _p = {0, 0}, int _lives = 1, int _speed = 1);
 
     void move(Map& map, int timer);
 };

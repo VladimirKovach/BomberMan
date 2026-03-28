@@ -10,6 +10,8 @@ enum CellContent {
     ENEMY,
     ITEM,
     EXPLOSION,
+    DOOR_NEXT,      // porta per andare al livello successivo (bordo destro)
+    DOOR_PREV,      // porta per tornare al livello precedente (bordo sinistro)
     UNKNOWN
 };
 
@@ -27,10 +29,12 @@ const int MAX_EMPTY_CELLS = MAP_ROWS * MAP_COLS;
 class Map {
 protected:
     CellContent grid[MAP_ROWS][MAP_COLS];
-    int explosion_timer[MAP_ROWS][MAP_COLS]; // countdown frame per esplosione
+    int explosion_timer[MAP_ROWS][MAP_COLS];
     Position start_p;
     Position empty_cells[MAX_EMPTY_CELLS];
     int empty_cells_count;
+    int total_enemies;      // nemici iniziali nel livello
+    int alive_enemies;      // nemici ancora vivi
 
     void add_empty_cell(Position p);
     void remove_empty_cell(Position p);
@@ -48,12 +52,23 @@ public:
     CellContent get_cell_content(Position p);
     void set_cell_content(Position p, CellContent content);
     void clear_cell(Position p);
-    void open_next_level_door();
+
+    // Porte tra livelli
+    void open_next_door();
+    void open_prev_door();
+    void close_next_door();
+    void close_prev_door();
+
+    // Gestione nemici nel livello
+    void set_enemy_count(int count);
+    void enemy_killed();
+    int get_alive_enemies();
+    bool all_enemies_dead();
 
     // metodi di esplosione
     void set_explosion(Position p, int duration);
     int get_explosion_timer(Position p);
-    void update_explosions(); // decrementa tutti i timer, riporta a EMPTY quando scadono
+    void update_explosions();
 };
 
 #endif

@@ -20,7 +20,7 @@ protected:
     CellContent my_type;     // PLAYER o ENEMY
 
 public:
-    Character(Position _p, int _lives, int _speed, CellContent _type = PLAYER);
+    Character(Position _p = {0, 0}, int _lives = 1, int _speed = 1, CellContent _type = PLAYER);
 
     void gain_life();
     void lose_life();

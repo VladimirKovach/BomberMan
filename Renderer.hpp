@@ -13,7 +13,8 @@ enum ColorPair {
     CP_BOMB,
     CP_BOMB_BLINK,
     CP_EXPLOSION,
-    CP_EXPLOSION_FADE
+    CP_EXPLOSION_FADE,
+    CP_DOOR
 };
 
 class Renderer {
@@ -28,6 +29,8 @@ protected:
 
     void display_time(int time);
 
+    void display_level(int level_number);
+
     char get_cell_view(CellContent content);
 
     ColorPair get_cell_color(CellContent content);
@@ -37,7 +40,7 @@ protected:
 public:
     Renderer();
 
-    void draw_level(Map& map, int score, int time);
+    void draw_level(Map& map, int score, int time, int level_number);
 };
 
 #endif

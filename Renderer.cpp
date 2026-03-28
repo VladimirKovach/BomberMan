@@ -1,6 +1,6 @@
 #include "Renderer.hpp"
 #include "Bomb.hpp"
-#include <ncurses.h>
+#include <curses.h>
 
 void Renderer::init_colors() {
     if (has_colors()) {
@@ -14,7 +14,8 @@ void Renderer::init_colors() {
     init_pair(CP_BOMB, COLOR_RED, COLOR_BLACK);
     init_pair(CP_EXPLOSION, COLOR_WHITE, COLOR_RED);
     init_pair(CP_EXPLOSION_FADE, COLOR_YELLOW, COLOR_RED);  // giallo su rosso (sfumatura)
-    init_pair(CP_BOMB_BLINK, COLOR_YELLOW, COLOR_BLACK);  // giallo su nero per il lampeggio
+    init_pair(CP_BOMB_BLINK, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(CP_DOOR, COLOR_GREEN, COLOR_BLACK);
 }
 
 void Renderer::paint_it_black() {
@@ -74,6 +75,14 @@ char Renderer::get_cell_view(CellContent content) {
             view = '*';
             break;
 
+        case DOOR_NEXT:
+            view = '>';
+            break;
+
+        case DOOR_PREV:
+            view = '<';
+            break;
+
         default:  // EMPTY, UNKNOWN
             break;
     }
@@ -107,6 +116,11 @@ ColorPair Renderer::get_cell_color(CellContent content) {
 
         case EXPLOSION:
             color = CP_EXPLOSION;
+            break;
+
+        case DOOR_NEXT:
+        case DOOR_PREV:
+            color = CP_DOOR;
             break;
 
         default:  // EMPTY, UNKNOWN
@@ -150,8 +164,16 @@ void Renderer::draw_map(Map& map) {
     }
 }
 
-void Renderer::draw_level(Map& map, int score, int time) {
+void Renderer::display_level(int level_number) {
+    // Mostra il numero del livello al centro della barra superiore
+    int center_x = map_start_p.x + MAP_COLS / 2 - 4;
+    move(map_start_p.y - 2, center_x);
+    printw("LVL: %d", level_number);
+}
+
+void Renderer::draw_level(Map& map, int score, int time, int level_number) {
     display_score(score);
+    display_level(level_number);
     display_time(time);
     draw_map(map);
     refresh();
