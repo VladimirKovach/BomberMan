@@ -22,7 +22,7 @@ struct Position {
 
 bool positions_equal(Position p1, Position p2);
 
-const int MAP_ROWS = 25;
+const int MAP_ROWS = 20;
 const int MAP_COLS = MAP_ROWS * 2;
 const int MAX_EMPTY_CELLS = MAP_ROWS * MAP_COLS;
 

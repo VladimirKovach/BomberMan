@@ -5,7 +5,7 @@ Character::Character(Position _p, int _lives, int _speed, CellContent _type) {
     lives = _lives;
     speed = _speed;
     cell_under = EMPTY;
-    my_type = _type;
+    type = _type;
 }
 
 void Character::gain_life() {
@@ -24,9 +24,6 @@ Position Character::get_position() {
     return p;
 }
 
-void Character::set_cell_under(CellContent content) {
-    cell_under = content;
-}
 
 Position Character::get_next_position(Direction d) {
     Position next_p = p;
@@ -35,21 +32,31 @@ Position Character::get_next_position(Direction d) {
         case UP:
             (next_p.y)--;
             break;
+
         case LEFT:
             (next_p.x)--;
             break;
+
         case DOWN:
             (next_p.y)++;
             break;
+
         case RIGHT:
             (next_p.x)++;
             break;
+
         default: // NONE
             break;
     }
 
     return next_p;
 }
+
+
+void Character::set_cell_under(CellContent content) {
+    cell_under = content;
+}
+
 
 void Character::move(Map& map, Direction d) {
     Position next_p = get_next_position(d);
@@ -63,6 +70,6 @@ void Character::move(Map& map, Direction d) {
 
         // 3. Spostati e metti il personaggio
         p = next_p;
-        map.set_cell_content(p, my_type);
+        map.set_cell_content(p, type);
     }
 }

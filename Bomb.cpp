@@ -36,7 +36,7 @@ bool Bomb::is_active() {
     return active;
 }
 
-bool Bomb::has_exploded() {
+bool Bomb::is_exploded() {
     return exploded;
 }
 
@@ -51,41 +51,41 @@ void Bomb::update_timer() {
 }
 
 void Bomb::explode(Map& map) {
-    if (!active || exploded) return;
+    if (active && !exploded) {
+        exploded = true;
+        active = false;
 
-    exploded = true;
-    active = false;
+        // Esplosione al centro
+        map.set_explosion(p, EXPLOSION_DURATION);
 
-    // Esplosione al centro
-    map.set_explosion(p, EXPLOSION_DURATION);
+        // Esplosione nelle 4 direzioni (croce)
+        // dx/dy: le 4 direzioni cardinali
+        int dx[] = {0, 0, -1, 1};
+        int dy[] = {-1, 1, 0, 0};
 
-    // Esplosione nelle 4 direzioni (croce)
-    // dx/dy: le 4 direzioni cardinali
-    int dx[] = {0, 0, -1, 1};
-    int dy[] = {-1, 1, 0, 0};
+        for (int dir = 0; dir < 4; dir++) {
+            for (int i = 1; i <= range; i++) {
+                Position target = {p.x + dx[dir] * i, p.y + dy[dir] * i};
 
-    for (int dir = 0; dir < 4; dir++) {
-        for (int i = 1; i <= range; i++) {
-            Position target = {p.x + dx[dir] * i, p.y + dy[dir] * i};
+                if (!map.cell_exists(target)) break;
 
-            if (!map.cell_exists(target)) break;
+                CellContent content = map.get_cell_content(target);
 
-            CellContent content = map.get_cell_content(target);
+                if (content == UNBREAKABLE_WALL) {
+                    break;
+                }
 
-            if (content == UNBREAKABLE_WALL) {
-                break;
-            }
+                if (content == BREAKABLE_WALL) {
+                    map.set_explosion(target, EXPLOSION_DURATION);
+                    break;
+                }
 
-            if (content == BREAKABLE_WALL) {
+                // EMPTY, PLAYER, BOMB, ENEMY, ITEM —> l'esplosione passa
                 map.set_explosion(target, EXPLOSION_DURATION);
-                break;
+
+                // Se colpisce un'altra bomba, la fa esplodere a catena
+                // (gestito dal game loop)
             }
-
-            // EMPTY, PLAYER, ENEMY, ITEM, BOMB — l'esplosione passa
-            map.set_explosion(target, EXPLOSION_DURATION);
-
-            // Se colpisce un'altra bomba, la farà esplodere a catena
-            // (gestito dal Game loop)
         }
     }
 }

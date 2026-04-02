@@ -17,8 +17,8 @@
 // cosi' puo' sapere quando sono tutti morti (per aprire la porta).
 // =====================================================
 void Game::spawn_enemies() {
-    Map& map = levels.get_current_map();
-    int difficulty = levels.get_current_difficulty();
+    Map& map = level_manager.get_current_map();
+    int difficulty = level_manager.get_current_difficulty();
 
     // Numero di nemici in base alla difficolta'
     enemy_count = difficulty;
@@ -50,7 +50,7 @@ void Game::spawn_enemies() {
 // rispawniamo - la mappa e' rimasta come l'aveva lasciata.
 // =====================================================
 void Game::enter_level(bool from_prev) {
-    Map& map = levels.get_current_map();
+    Map& map = level_manager.get_current_map();
 
     // Pulisci le bombe dal livello precedente
     bomb_count = 0;
@@ -72,7 +72,7 @@ void Game::enter_level(bool from_prev) {
 
     // LIVELLO
     // Se il livello non ha nemici vivi (prima visita), spawnali
-    if (map.get_alive_enemies() <= 0 && !levels.is_current_completed()) {
+    if (map.get_alive_enemies() <= 0 && !level_manager.is_current_completed()) {
         spawn_enemies();
     }
     else {
@@ -96,25 +96,25 @@ void Game::enter_level(bool from_prev) {
 // su una porta e gestisce il cambio livello.
 // =====================================================
 void Game::check_door_transition() {
-    Map& map = levels.get_current_map();
+    Map& map = level_manager.get_current_map();
     Position player_pos = player.get_position();
     CellContent cell = map.get_cell_content(player_pos);
 
-    if (cell == DOOR_NEXT && levels.has_next_level()) {
+    if (cell == DOOR_NEXT && level_manager.has_next_level()) {
         // Rimuovi il giocatore dalla mappa corrente
         map.clear_cell(player_pos);
 
         // Vai al livello successivo
-        levels.go_to_next_level();
+        level_manager.go_to_next_level();
 
         // Entra nel nuovo livello (arriva da sinistra)
         enter_level(true);
     }
-    else if (cell == DOOR_PREV && levels.has_prev_level()) {
+    else if (cell == DOOR_PREV && level_manager.has_prev_level()) {
         // Rimuovi il giocatore dalla mappa corrente
         map.clear_cell(player_pos);
 
-        levels.go_to_previous_level();
+        level_manager.go_to_previous_level();
 
         // Entra nel nuovo livello (arriva da destra)
         enter_level(false);
@@ -122,16 +122,12 @@ void Game::check_door_transition() {
 }
 
 
-// =====================================================
-// Costruttore
-// =====================================================
 Game::Game() :
-    levels(),
+    level_manager(),
     renderer(),
     player()
 {
     quit = false;
-    victory = false;
     score = 0;
     timer = TIMER_START_VALUE;
     bomb_count = 0;
@@ -143,20 +139,27 @@ Game::Game() :
 
 
 bool Game::game_over() {
-    return (timer <= 0 || player.is_dead() || victory);
+    return timer <= 0 || player.is_dead();
+}
+
+bool Game::win() {
+    return level_manager.all_levels_completed();
 }
 
 void Game::update_timer(std::chrono::steady_clock::time_point start) {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     int elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
     timer = TIMER_START_VALUE - elapsed;
-    if (timer < 0) timer = 0;
+    if (timer < 0) {
+        timer = 0;
+    }
 }
 
 
-void Game::handle_input(int key) {
-    Map& map = levels.get_current_map();
+void Game::handle_input() {
+    Map& map = level_manager.get_current_map();
 
+    int key = getch();
     switch (key) {
         case 'q':
         case 'Q':
@@ -187,7 +190,7 @@ void Game::handle_input(int key) {
             player.move(map, RIGHT);
             break;
 
-        case ' ': {
+        case ' ':
             if (bomb_count < MAX_BOMBS) {
                 Position player_pos = player.get_position();
 
@@ -207,7 +210,6 @@ void Game::handle_input(int key) {
                 }
             }
             break;
-        }
 
         default:
             break;
@@ -216,7 +218,7 @@ void Game::handle_input(int key) {
 
 
 void Game::update_bombs() {
-    Map& map = levels.get_current_map();
+    Map& map = level_manager.get_current_map();
 
     for (int i = 0; i < bomb_count; i++) {
         if (bombs[i].is_active()) {
@@ -230,7 +232,7 @@ void Game::update_bombs() {
 
     int write = 0;
     for (int i = 0; i < bomb_count; i++) {
-        if (!bombs[i].has_exploded()) {
+        if (!bombs[i].is_exploded()) {
             if (write != i) {
                 bombs[write] = bombs[i];
             }
@@ -241,35 +243,45 @@ void Game::update_bombs() {
 }
 
 
-void Game::handle_collision() {
-    Map& map = levels.get_current_map();
-    Position player_pos = player.get_position();
+void Game::handle_enemy_movement() {
+    Map& map = level_manager.get_current_map();
+    for (int i = 0; i < enemy_count; i++) {
+        if (!enemies[i].is_dead()) {
+            enemies[i].move(map, timer);
+        }
+    }
+}
+
+
+void Game::handle_collisions() {
+    Map& map = level_manager.get_current_map();
+    Position player_p = player.get_position();
 
     // Collisione player con nemici
     for (int i = 0; i < enemy_count; i++) {
         if (!enemies[i].is_dead() &&
-            positions_equal(player_pos, enemies[i].get_position())) {
+            positions_equal(player_p, enemies[i].get_position())) {
             player.lose_life();
         }
     }
 
     // Collisione player con esplosione
-    if (map.get_cell_content(player_pos) == EXPLOSION) {
+    if (map.get_cell_content(player_p) == EXPLOSION) {
         player.lose_life();
     }
 
     // Collisione nemici con esplosione
     for (int i = 0; i < enemy_count; i++) {
         if (!enemies[i].is_dead()) {
-            Position enemy_pos = enemies[i].get_position();
-            if (map.get_cell_content(enemy_pos) == EXPLOSION) {
+            Position enemy_p = enemies[i].get_position();
+            if (map.get_cell_content(enemy_p) == EXPLOSION) {
                 score += 100;
                 enemies[i].lose_life();
                 map.enemy_killed();
 
                 // Se tutti i nemici sono morti, segna il livello come completato
                 if (map.all_enemies_dead()) {
-                    levels.mark_current_completed();
+                    level_manager.mark_current_completed();
                 }
             }
         }
@@ -277,50 +289,26 @@ void Game::handle_collision() {
 }
 
 
-// =====================================================
-// run: il game loop principale.
-// =====================================================
 void Game::run() {
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
-    while (!game_over() && !quit) {
-        Map& map = levels.get_current_map();
+    while (!game_over() && !win() && !quit) {
+        Map& map = level_manager.get_current_map();
 
-        // 1) Aggiorna bombe
+        handle_input();
+
         update_bombs();
-
-        // 2) Aggiorna esplosioni
         map.update_explosions();
 
-        // 3) Aggiorna porte
-        levels.update_doors();
+        handle_enemy_movement();
 
-        // 4) Rendering
-        renderer.draw_level(map, score, timer, levels.get_current_level_number());
+        handle_collisions();
 
-        // 5) Muovi nemici
-        for (int i = 0; i < enemy_count; i++) {
-            if (!enemies[i].is_dead()) {
-                enemies[i].move(map, timer);
-            }
-        }
-
-        // 6) Input giocatore
-        int key = getch();
-        handle_input(key);
-
-        // 7) Collisioni
-        handle_collision();
-
-        // 8) Controlla porte (cambio livello)
         check_door_transition();
+        level_manager.update_doors();
 
-        // 9) Controlla vittoria
-        if (levels.all_levels_completed()) {
-            victory = true;
-        }
-
-        // 10) Timer
         update_timer(start);
+
+        renderer.draw_level(map, score, timer, level_manager.get_current_level_number());
     }
 }

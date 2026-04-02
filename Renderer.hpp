@@ -4,7 +4,7 @@
 #include "Map.hpp"
 
 enum ColorPair {
-    CP_NONE,  // corresponds to terminal default color
+    CP_NONE,  // terminal default color
     CP_SCREEN,
     CP_UNBREAKABLE_WALL,
     CP_BREAKABLE_WALL,
@@ -26,13 +26,10 @@ protected:
     void paint_it_black();
 
     void display_score(int score);
-
     void display_time(int time);
-
-    void display_level(int level_number);
+    void display_level_number(int level_number);
 
     char get_cell_view(CellContent content);
-
     ColorPair get_cell_color(CellContent content);
 
     void draw_map(Map& map);

@@ -3,8 +3,7 @@
 
 #include "Map.hpp"
 
-const int MAX_BOMBS = 10;           // max bombe piazzabili contemporaneamente
-const int BOMB_DEFAULT_TIMER = 90; // frame prima dell'esplosione
+const int BOMB_DEFAULT_TIMER = 90;  // frame prima dell'esplosione
 const int EXPLOSION_DURATION = 30;  // frame di persistenza del colore esplosione
 
 class Bomb {
@@ -19,15 +18,23 @@ public:
     Bomb();
     Bomb(Position _p, int _range, int _timer);
 
-    void place(Position _p, int _range, int _timer);
     Position get_position();
+
     int get_range();
+
     bool is_active();
-    bool has_exploded();
+
+    bool is_exploded();
+
     bool is_timer_expired();
+
     void update_timer();
-    void explode(Map& map);  // esegue l'esplosione sulla mappa
-    void reset();            // resetta la bomba per riuso
+
+    void place(Position _p, int _range, int _timer);
+
+    void explode(Map& map);
+
+    void reset();
 };
 
 #endif

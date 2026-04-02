@@ -7,16 +7,21 @@ void Renderer::init_colors() {
         start_color();
     }
     init_pair(CP_SCREEN, COLOR_BLACK, COLOR_BLACK);
-    init_pair(CP_UNBREAKABLE_WALL, COLOR_WHITE, COLOR_BLACK);
-    init_pair(CP_BREAKABLE_WALL, COLOR_YELLOW, COLOR_BLACK);
+
+    init_pair(CP_UNBREAKABLE_WALL, COLOR_WHITE, COLOR_WHITE);
+    init_pair(CP_BREAKABLE_WALL, 244, 244);  // 244 = grey
+
     init_pair(CP_PLAYER, COLOR_CYAN, COLOR_BLACK);
     init_pair(CP_ENEMY, COLOR_MAGENTA, COLOR_BLACK);
+
     init_pair(CP_BOMB, COLOR_RED, COLOR_BLACK);
-    init_pair(CP_EXPLOSION, COLOR_WHITE, COLOR_RED);
-    init_pair(CP_EXPLOSION_FADE, COLOR_YELLOW, COLOR_RED);  // giallo su rosso (sfumatura)
     init_pair(CP_BOMB_BLINK, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(CP_EXPLOSION, COLOR_WHITE, COLOR_RED);
+    init_pair(CP_EXPLOSION_FADE, COLOR_YELLOW, COLOR_RED);
+
     init_pair(CP_DOOR, COLOR_GREEN, COLOR_BLACK);
 }
+
 
 void Renderer::paint_it_black() {
     for (int y = 0; y < LINES; y++) {
@@ -29,11 +34,9 @@ void Renderer::paint_it_black() {
 Renderer::Renderer() {
     // Set map at the center of the screen
     map_start_p = {(COLS - MAP_COLS) / 2, (LINES - MAP_ROWS) / 2};
-
     init_colors();
     paint_it_black();
 }
-
 
 void Renderer::display_score(int score) {
     move(map_start_p.y - 2, map_start_p.x);
@@ -42,9 +45,17 @@ void Renderer::display_score(int score) {
 
 void Renderer::display_time(int time) {
     const int TIME_MAX_LENGTH = 4;  // length(1000) = 4
-    const int TIME_LABEL_MAX_LENGTH = 10;  // length(Time: 1000) = 10
-    move(map_start_p.y - 2, map_start_p.x + MAP_COLS - TIME_LABEL_MAX_LENGTH);
+    const int TIME_LABEL_MAX_LENGTH = 10;  // length(TIME: 1000) = 10
+    int px = map_start_p.x + MAP_COLS - TIME_LABEL_MAX_LENGTH;
+    move(map_start_p.y - 2, px);
     printw("TIME: %-*d", TIME_MAX_LENGTH, time);
+}
+
+void Renderer::display_level_number(int level_number) {
+    const int LEVEL_LABEL_MAX_LENGTH = 8;  // length(LEVEL: 5) = 8
+    int px = map_start_p.x + ((MAP_COLS - LEVEL_LABEL_MAX_LENGTH) / 2);
+    move(map_start_p.y - 4, px);
+    printw("LEVEL: %d", level_number);
 }
 
 
@@ -52,13 +63,6 @@ char Renderer::get_cell_view(CellContent content) {
     char view = ' ';
 
     switch (content) {
-        case UNBREAKABLE_WALL:
-            view = '#';
-            break;
-        case BREAKABLE_WALL:
-            view = '=';
-            break;
-
         case PLAYER:
             view = '@';
             break;
@@ -68,7 +72,7 @@ char Renderer::get_cell_view(CellContent content) {
             break;
 
         case BOMB:
-            view = 'o';
+            view = 'O';
             break;
 
         case EXPLOSION:
@@ -83,7 +87,7 @@ char Renderer::get_cell_view(CellContent content) {
             view = '<';
             break;
 
-        default:  // EMPTY, UNKNOWN
+        default:  // BREAKABLE_WALL, UNBREAKABLE_WALL, EMPTY, UNKNOWN
             break;
     }
 
@@ -95,11 +99,12 @@ ColorPair Renderer::get_cell_color(CellContent content) {
     ColorPair color = CP_SCREEN;
 
     switch (content) {
-        case UNBREAKABLE_WALL:
-            color = CP_UNBREAKABLE_WALL;
-            break;
         case BREAKABLE_WALL:
             color = CP_BREAKABLE_WALL;
+            break;
+
+        case UNBREAKABLE_WALL:
+            color = CP_UNBREAKABLE_WALL;
             break;
 
         case PLAYER:
@@ -132,13 +137,12 @@ ColorPair Renderer::get_cell_color(CellContent content) {
 
 
 void Renderer::draw_map(Map& map) {
-    static int frame_counter = 0;
+    int frame_counter = 0;
     frame_counter++;
 
     for (int y = 0; y < MAP_ROWS; y++) {
         for (int x = 0; x < MAP_COLS; x++) {
-            Position pos = {x, y};
-            CellContent content = map.get_cell_content(pos);
+            CellContent content = map.get_cell_content({x, y});
             char cell_view = get_cell_view(content);
             ColorPair cell_color = get_cell_color(content);
 
@@ -146,15 +150,16 @@ void Renderer::draw_map(Map& map) {
             if (content == BOMB) {
                 if ((frame_counter / 5) % 2 == 0) {
                     cell_color = CP_BOMB;
-                } else {
+                }
+                else {
                     cell_color = CP_BOMB_BLINK;
                 }
             }
 
             // Sfumatura esplosione
             if (content == EXPLOSION) {
-                int exp_timer = map.get_explosion_timer(pos);
-                if (exp_timer < EXPLOSION_DURATION / 2) {
+                int explosion_timer = map.get_explosion_timer({x, y});
+                if (explosion_timer < EXPLOSION_DURATION / 2) {
                     cell_color = CP_EXPLOSION_FADE;
                 }
             }
@@ -164,17 +169,11 @@ void Renderer::draw_map(Map& map) {
     }
 }
 
-void Renderer::display_level(int level_number) {
-    // Mostra il numero del livello al centro della barra superiore
-    int center_x = map_start_p.x + MAP_COLS / 2 - 4;
-    move(map_start_p.y - 2, center_x);
-    printw("LVL: %d", level_number);
-}
 
 void Renderer::draw_level(Map& map, int score, int time, int level_number) {
     display_score(score);
-    display_level(level_number);
     display_time(time);
+    display_level_number(level_number);
     draw_map(map);
     refresh();
 }

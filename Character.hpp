@@ -16,8 +16,8 @@ protected:
     Position p;
     int lives;
     int speed;
-    CellContent cell_under;  // la cella che c'è sotto al personaggio
-    CellContent my_type;     // PLAYER o ENEMY
+    CellContent cell_under;  // EMPTY or BOMB
+    CellContent type;
 
 public:
     Character(Position _p = {0, 0}, int _lives = 1, int _speed = 1, CellContent _type = PLAYER);
@@ -28,7 +28,9 @@ public:
 
     Position get_position();
     Position get_next_position(Direction d);
+
     void set_cell_under(CellContent content);
+
     void move(Map& map, Direction d);
 };
 
