@@ -310,5 +310,7 @@ void Game::run() {
         update_timer(start);
 
         renderer.draw_level(map, score, timer, level_manager.get_current_level_number());
+
+        napms(50);  // ~20 FPS
     }
 }

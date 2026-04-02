@@ -3,8 +3,8 @@
 
 #include "Map.hpp"
 
-const int BOMB_DEFAULT_TIMER = 90;  // frame prima dell'esplosione
-const int EXPLOSION_DURATION = 30;  // frame di persistenza del colore esplosione
+const int BOMB_DEFAULT_TIMER = 100;  // frame prima dell'esplosione
+const int EXPLOSION_DURATION = 30;   // frame di persistenza del colore esplosione
 
 class Bomb {
 protected:
