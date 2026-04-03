@@ -165,7 +165,7 @@ Position Map::get_random_empty_cell() {
         return empty_cells[i];
     }
     else {
-        return {-1, -1};
+        return {-1, -1};  // da gestire
     }
 }
 

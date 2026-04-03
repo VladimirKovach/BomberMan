@@ -1,7 +1,7 @@
 #include "Game.hpp"
 #include <cstdlib>
 #include <ctime>
-#include <curses.h>
+#include <ncurses.h>
 
 void init_ncurses() {
     initscr();

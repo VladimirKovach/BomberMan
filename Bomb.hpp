@@ -3,8 +3,8 @@
 
 #include "Map.hpp"
 
-const int BOMB_DEFAULT_TIMER = 100;  // frame prima dell'esplosione
-const int EXPLOSION_DURATION = 30;   // frame di persistenza del colore esplosione
+const int DEFAULT_TIMER = 100;       // frame prima dell'esplosione
+const int EXPLOSION_DURATION = 30;   // frame di persistenza dell'esplosione
 
 class Bomb {
 protected:
@@ -15,8 +15,7 @@ protected:
     bool exploded;
 
 public:
-    Bomb();
-    Bomb(Position _p, int _range, int _timer);
+    Bomb(Position _p = {-1, -1}, int _range = 1, int _timer = DEFAULT_TIMER);
 
     Position get_position();
 

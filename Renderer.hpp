@@ -11,9 +11,7 @@ enum ColorPair {
     CP_PLAYER,
     CP_ENEMY,
     CP_BOMB,
-    CP_BOMB_BLINK,
     CP_EXPLOSION,
-    CP_EXPLOSION_FADE,
     CP_DOOR
 };
 

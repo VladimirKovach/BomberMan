@@ -15,9 +15,7 @@ void Renderer::init_colors() {
     init_pair(CP_ENEMY, COLOR_MAGENTA, COLOR_BLACK);
 
     init_pair(CP_BOMB, COLOR_RED, COLOR_BLACK);
-    init_pair(CP_BOMB_BLINK, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(CP_EXPLOSION, COLOR_WHITE, COLOR_RED);
-    init_pair(CP_EXPLOSION_FADE, COLOR_YELLOW, COLOR_RED);
+    init_pair(CP_EXPLOSION, COLOR_YELLOW, COLOR_RED);
 
     init_pair(CP_DOOR, COLOR_GREEN, COLOR_BLACK);
 }
@@ -52,10 +50,10 @@ void Renderer::display_time(int time) {
 }
 
 void Renderer::display_level_number(int level_number) {
-    const int LEVEL_LABEL_MAX_LENGTH = 8;  // length(LEVEL: 5) = 8
+    const int LEVEL_LABEL_MAX_LENGTH = 7;  // length(LEVEL 5) = 7
     int px = map_start_p.x + ((MAP_COLS - LEVEL_LABEL_MAX_LENGTH) / 2);
     move(map_start_p.y - 4, px);
-    printw("LEVEL: %d", level_number);
+    printw("LEVEL %d", level_number);
 }
 
 
@@ -145,24 +143,6 @@ void Renderer::draw_map(Map& map) {
             CellContent content = map.get_cell_content({x, y});
             char cell_view = get_cell_view(content);
             ColorPair cell_color = get_cell_color(content);
-
-            // Lampeggio bomba
-            if (content == BOMB) {
-                if ((frame_counter / 5) % 2 == 0) {
-                    cell_color = CP_BOMB;
-                }
-                else {
-                    cell_color = CP_BOMB_BLINK;
-                }
-            }
-
-            // Sfumatura esplosione
-            if (content == EXPLOSION) {
-                int explosion_timer = map.get_explosion_timer({x, y});
-                if (explosion_timer < EXPLOSION_DURATION / 2) {
-                    cell_color = CP_EXPLOSION_FADE;
-                }
-            }
 
             mvaddch(y + map_start_p.y, x + map_start_p.x, cell_view | COLOR_PAIR(cell_color));
         }

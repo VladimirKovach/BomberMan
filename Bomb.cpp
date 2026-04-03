@@ -1,18 +1,10 @@
 #include "Bomb.hpp"
 
-Bomb::Bomb() {
-    p = {0, 0};
-    range = 1;
-    timer = BOMB_DEFAULT_TIMER;
-    active = false;
-    exploded = false;
-}
-
 Bomb::Bomb(Position _p, int _range, int _timer) {
     p = _p;
     range = _range;
     timer = _timer;
-    active = true;
+    active = false;
     exploded = false;
 }
 
@@ -93,5 +85,5 @@ void Bomb::explode(Map& map) {
 void Bomb::reset() {
     active = false;
     exploded = false;
-    timer = BOMB_DEFAULT_TIMER;
+    timer = DEFAULT_TIMER;
 }

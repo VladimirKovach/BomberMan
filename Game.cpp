@@ -67,7 +67,7 @@ void Game::enter_level(bool from_prev) {
     // creiamo un Player nuovo da zero. Ma cosi perdiamo l'informazione sulle
     // sue vite.
     // TODO: fare un metodo nella classe Player tipo 'set_position'
-    player = Player(spawn, 1, 1);
+    player = Player(spawn, 1);
     map.set_cell_content(spawn, PLAYER);
 
     // LIVELLO
@@ -122,11 +122,7 @@ void Game::check_door_transition() {
 }
 
 
-Game::Game() :
-    level_manager(),
-    renderer(),
-    player()
-{
+Game::Game() {
     quit = false;
     score = 0;
     timer = TIMER_START_VALUE;
@@ -192,19 +188,19 @@ void Game::handle_input() {
 
         case ' ':
             if (bomb_count < MAX_BOMBS) {
-                Position player_pos = player.get_position();
+                Position player_p = player.get_position();
 
                 bool bomb_here = false;
                 for (int i = 0; i < bomb_count; i++) {
                     if (bombs[i].is_active() &&
-                        positions_equal(bombs[i].get_position(), player_pos)) {
+                        positions_equal(bombs[i].get_position(), player_p)) {
                         bomb_here = true;
                         break;
                     }
                 }
 
                 if (!bomb_here) {
-                    bombs[bomb_count].place(player_pos, 1, BOMB_DEFAULT_TIMER);
+                    bombs[bomb_count].place(player_p, 1, DEFAULT_TIMER);
                     player.set_cell_under(BOMB);
                     bomb_count++;
                 }
