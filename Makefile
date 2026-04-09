@@ -1,11 +1,5 @@
-ifeq ($(OS),Windows_NT)
-    CURSES_LIB = -lpdcurses
-else
-    CURSES_LIB = -lncurses
-endif
-
 bomberman: main.o Character.o DummyEnemy.o Game.o Map.o Player.o Renderer.o Bomb.o LevelManager.o
-	g++ main.o Character.o DummyEnemy.o Game.o Map.o Player.o Renderer.o Bomb.o LevelManager.o $(CURSES_LIB) -o bomberman
+	g++ main.o Character.o DummyEnemy.o Game.o Map.o Player.o Renderer.o Bomb.o LevelManager.o -lncurses -o bomberman
 
 main.o: main.cpp Game.hpp
 	g++ -c main.cpp

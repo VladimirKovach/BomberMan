@@ -7,16 +7,17 @@
 #include "Player.hpp"
 #include "Renderer.hpp"
 #include <chrono>
+using namespace std;
 
 const int MAX_ENEMIES = 10;  // Numero massimo di nemici per livello
-const int MAX_BOMBS = 3;     // Numero massimo di bombe piazzabili contemporaneamente
+const int MAX_BOMBS = 5;     // Numero massimo di bombe piazzabili contemporaneamente
 
 class Game {
 protected:
-    const int TIMER_START_VALUE = 1000;  // seconds
+    const double TIMER_START_VALUE = 1000.0;  // secondi
     bool quit;
     int score;
-    int timer;
+    double timer;
 
     // Array di bombe attive per il livello corrente
     Bomb bombs[MAX_BOMBS];
@@ -40,7 +41,7 @@ protected:
     bool game_over();
     bool win();
 
-    void update_timer(std::chrono::steady_clock::time_point start);
+    void update_timer(chrono::steady_clock::time_point start);
 
     void handle_input();
 

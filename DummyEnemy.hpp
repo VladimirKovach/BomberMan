@@ -3,17 +3,23 @@
 
 #include "Character.hpp"
 
+const int DIRECTION_COUNT = 4;
+
 class DummyEnemy : public Character {
 protected:
+    Direction directions[DIRECTION_COUNT];
     int speed;
-    int last_move_time;
+    double move_timer;
+    double last_move_time;
 
-    Direction choose_direction();
+    void init_directions();
+
+    void shuffle(Direction a[], int length);
 
 public:
     DummyEnemy(Position _p = {-1, -1}, int _lives = 1, int _speed = 1);
 
-    void move(Map& map, int timer);
+    void move(Map& map, double timer);
 };
 
 #endif

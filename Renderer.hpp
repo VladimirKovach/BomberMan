@@ -24,7 +24,7 @@ protected:
     void paint_it_black();
 
     void display_score(int score);
-    void display_time(int time);
+    void display_time(double time);
     void display_level_number(int level_number);
 
     char get_cell_view(CellContent content);

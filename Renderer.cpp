@@ -41,12 +41,12 @@ void Renderer::display_score(int score) {
     printw("SCORE: %d", score);
 }
 
-void Renderer::display_time(int time) {
-    const int TIME_MAX_LENGTH = 4;  // length(1000) = 4
+void Renderer::display_time(double time) {
+    const int TIME_MAX_LENGTH = 4;         // length(1000) = 4
     const int TIME_LABEL_MAX_LENGTH = 10;  // length(TIME: 1000) = 10
     int px = map_start_p.x + MAP_COLS - TIME_LABEL_MAX_LENGTH;
     move(map_start_p.y - 2, px);
-    printw("TIME: %-*d", TIME_MAX_LENGTH, time);
+    printw("TIME: %-*d", TIME_MAX_LENGTH, (int) time);
 }
 
 void Renderer::display_level_number(int level_number) {

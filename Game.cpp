@@ -142,12 +142,12 @@ bool Game::win() {
     return level_manager.all_levels_completed();
 }
 
-void Game::update_timer(std::chrono::steady_clock::time_point start) {
-    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    int elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
+void Game::update_timer(chrono::steady_clock::time_point start) {
+    chrono::steady_clock::time_point now = chrono::steady_clock::now();
+    double elapsed = chrono::duration<double>(now - start).count();
     timer = TIMER_START_VALUE - elapsed;
     if (timer < 0) {
-        timer = 0;
+        timer = 0.0;
     }
 }
 
@@ -286,7 +286,7 @@ void Game::handle_collisions() {
 
 
 void Game::run() {
-    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+    chrono::steady_clock::time_point start = chrono::steady_clock::now();
 
     while (!game_over() && !win() && !quit) {
         Map& map = level_manager.get_current_map();
