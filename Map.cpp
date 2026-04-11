@@ -152,6 +152,7 @@ void Map::remove_empty_cell(Position p) {
 
             empty_cells_count--;
         }
+
         else {
             i++;
         }

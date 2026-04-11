@@ -2,8 +2,9 @@
 #include <cmath>
 
 SmartEnemy::SmartEnemy(Position _p, int _lives, int _speed) : DummyEnemy(_p, _lives, _speed) {
-    init_pairs();
+    type = SMART_ENEMY;  // da sistemare
     player_p = {-1, -1};
+    init_pairs();
 }
 
 void SmartEnemy::init_pairs() {

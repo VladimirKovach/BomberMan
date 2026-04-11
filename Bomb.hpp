@@ -3,37 +3,32 @@
 
 #include "Map.hpp"
 
-const int DEFAULT_TIMER = 60;       // frame prima dell'esplosione
+//const int DEFAULT_TIMER = 60;       // frame prima dell'esplosione
 const int EXPLOSION_DURATION = 30;  // frame di persistenza dell'esplosione
+
+const int DEFAULT_RANGE = 1;
+const double DEFAULT_TIMER = 3.0;
 
 class Bomb {
 protected:
     Position p;
     int range;
-    int timer;
-    bool active;
+    double timer;
+    double place_timer;
     bool exploded;
 
 public:
-    Bomb(Position _p = {-1, -1}, int _range = 1, int _timer = DEFAULT_TIMER);
+    Bomb(Position _p = {-1, -1}, int _range = DEFAULT_RANGE, double _timer = DEFAULT_TIMER);
 
     Position get_position();
 
-    int get_range();
-
-    bool is_active();
-
     bool is_exploded();
 
-    bool is_timer_expired();
+    bool is_timer_expired(double game_timer);
 
-    void update_timer();
-
-    void place(Position _p, int _range, int _timer);
+    void place(Position _p, double _game_timer, int _range = DEFAULT_RANGE, double _timer = DEFAULT_TIMER);
 
     void explode(Map& map);
-
-    void reset();
 };
 
 #endif

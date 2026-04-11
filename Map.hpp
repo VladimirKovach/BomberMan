@@ -7,7 +7,8 @@ enum CellContent {
     UNBREAKABLE_WALL,
     PLAYER,
     BOMB,
-    ENEMY,
+    DUMMY_ENEMY,
+    SMART_ENEMY,
     ITEM,
     EXPLOSION,
     DOOR_NEXT,      // porta per andare al livello successivo (bordo destro)

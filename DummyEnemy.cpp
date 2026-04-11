@@ -1,12 +1,14 @@
 #include "DummyEnemy.hpp"
 #include <cstdlib>
 
-DummyEnemy::DummyEnemy(Position _p, int _lives, int _speed) : Character(_p, _lives, ENEMY) {
-    init_directions();
+DummyEnemy::DummyEnemy(Position _p, int _lives, int _speed) : Character(_p, _lives, DUMMY_ENEMY) {
     speed = _speed;
     move_timer = 1.0 / speed;
-    last_move_time = 1000.0;  // per convenzione
+    last_move_time = -1.0;  // per convenzione
+
+    init_directions();
 }
+
 
 void DummyEnemy::init_directions() {
     directions[0] = UP;
@@ -28,10 +30,8 @@ void DummyEnemy::choose_directions() {
 }
 
 
-void DummyEnemy::move(Map& map, double timer) {
-    if ((last_move_time - timer) >= move_timer) {
-        choose_directions();
-
+void DummyEnemy::move(Map& map, double game_timer) {
+    if ((last_move_time - game_timer) >= move_timer || last_move_time == -1) {
         int i = 0;
         Position start_p = p;
 
@@ -40,6 +40,6 @@ void DummyEnemy::move(Map& map, double timer) {
             i++;
         }
 
-        last_move_time = timer;
+        last_move_time = game_timer;
     }
 }

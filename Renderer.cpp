@@ -9,7 +9,7 @@ void Renderer::init_colors() {
     init_pair(CP_SCREEN, COLOR_BLACK, COLOR_BLACK);
 
     init_pair(CP_UNBREAKABLE_WALL, COLOR_WHITE, COLOR_WHITE);
-    init_pair(CP_BREAKABLE_WALL, 244, 244);  // 244 = grey
+    init_pair(CP_BREAKABLE_WALL, 244, 244);  // 244 = GRIGIO
 
     init_pair(CP_PLAYER, COLOR_CYAN, COLOR_BLACK);
     init_pair(CP_ENEMY, COLOR_MAGENTA, COLOR_BLACK);
@@ -30,7 +30,7 @@ void Renderer::paint_it_black() {
 }
 
 Renderer::Renderer() {
-    // Set map at the center of the screen
+    // Mappa al centro dello schermo
     map_start_p = {(COLS - MAP_COLS) / 2, (LINES - MAP_ROWS) / 2};
     init_colors();
     paint_it_black();
@@ -65,8 +65,12 @@ char Renderer::get_cell_view(CellContent content) {
             view = '@';
             break;
 
-        case ENEMY:
-            view = '$';
+        case DUMMY_ENEMY:
+            view = '?';
+            break;
+        
+        case SMART_ENEMY:
+            view = '!';
             break;
 
         case BOMB:
@@ -109,7 +113,8 @@ ColorPair Renderer::get_cell_color(CellContent content) {
             color = CP_PLAYER;
             break;
 
-        case ENEMY:
+        case DUMMY_ENEMY:
+        case SMART_ENEMY:
             color = CP_ENEMY;
             break;
 
@@ -153,7 +158,7 @@ void Renderer::draw_map(Map& map) {
 void Renderer::draw_level(Map& map, int score, int time, int level_number) {
     display_score(score);
     display_time(time);
-    display_level_number(level_number);
+    //display_level_number(level_number);
     draw_map(map);
     refresh();
 }

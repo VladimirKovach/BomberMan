@@ -22,11 +22,16 @@ public:
     Character(Position _p = {0, 0}, int _lives = 1, CellContent _type = PLAYER);
 
     void gain_life();
+
     void lose_life();
+
     bool is_dead();
 
     Position get_position();
+
     Position get_next_position(Direction d);
+
+    CellContent get_cell_under();
 
     void set_cell_under(CellContent content);
 

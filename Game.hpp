@@ -8,7 +8,7 @@
 #include "Renderer.hpp"
 #include "SmartEnemy.hpp"
 #include <chrono>
-using namespace std;
+using namespace std::chrono;
 
 const int MAX_ENEMIES = 10;  // Numero massimo di nemici per livello
 const int MAX_BOMBS = 5;     // Numero massimo di bombe piazzabili contemporaneamente
@@ -20,6 +20,8 @@ protected:
     int score;
     double timer;
 
+    Map map;
+
     // Array di bombe attive per il livello corrente
     Bomb bombs[MAX_BOMBS];
     int bomb_count;
@@ -28,7 +30,7 @@ protected:
     DummyEnemy enemies[MAX_ENEMIES];
     int enemy_count;
 
-    SmartEnemy enemy;
+    SmartEnemy enemy;  // temporaneo
 
     LevelManager level_manager;
     Renderer renderer;
@@ -42,9 +44,10 @@ protected:
     void update_bombs();
 
     bool game_over();
+
     bool win();
 
-    void update_timer(chrono::steady_clock::time_point start);
+    void update_timer(steady_clock::time_point start);
 
     void handle_input();
 
