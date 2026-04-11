@@ -29,10 +29,10 @@ Map::Map(int difficulty) {
     }
 
     // PASSO 3: Muri indistruttibili interni (pattern a scacchiera)
-    place_unbreakable_walls();
+    //place_unbreakable_walls();
 
     // PASSO 4: Muri distruttibili (quantita' basata sulla difficolta')
-    place_breakable_walls(difficulty);
+    //place_breakable_walls(difficulty);
 
     // PASSO 5: Riempi l'array empty_cells con tutte le celle rimaste EMPTY
     for (int y = 1; y < MAP_ROWS - 1; y++) {

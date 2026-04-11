@@ -6,6 +6,7 @@
 #include "LevelManager.hpp"
 #include "Player.hpp"
 #include "Renderer.hpp"
+#include "SmartEnemy.hpp"
 #include <chrono>
 using namespace std;
 
@@ -26,6 +27,8 @@ protected:
     // Array di nemici per il livello corrente
     DummyEnemy enemies[MAX_ENEMIES];
     int enemy_count;
+
+    SmartEnemy enemy;
 
     LevelManager level_manager;
     Renderer renderer;

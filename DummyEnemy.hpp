@@ -13,8 +13,7 @@ protected:
     double last_move_time;
 
     void init_directions();
-
-    void shuffle(Direction a[], int length);
+    virtual void choose_directions();
 
 public:
     DummyEnemy(Position _p = {-1, -1}, int _lives = 1, int _speed = 1);

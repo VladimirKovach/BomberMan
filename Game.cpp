@@ -34,6 +34,10 @@ void Game::spawn_enemies() {
 
     // Comunica alla mappa quanti nemici ci sono
     map.set_enemy_count(enemy_count);
+
+    Position spawn_p = map.get_random_empty_cell();
+    enemy = SmartEnemy(spawn_p, 1, 2);
+    map.set_cell_content(spawn_p, ENEMY);
 }
 
 // =====================================================
@@ -246,6 +250,8 @@ void Game::handle_enemy_movement() {
             enemies[i].move(map, timer);
         }
     }
+    enemy.update_player_position(player.get_position());
+    enemy.move(map, timer);
 }
 
 
@@ -259,6 +265,10 @@ void Game::handle_collisions() {
             positions_equal(player_p, enemies[i].get_position())) {
             player.lose_life();
         }
+    }
+
+    if (positions_equal(player_p, enemy.get_position())) {
+        player.lose_life();
     }
 
     // Collisione player con esplosione

@@ -15,7 +15,7 @@ class Character {
 protected:
     Position p;
     int lives;
-    CellContent cell_under;  // EMPTY or BOMB
+    CellContent cell_under;  // EMPTY o BOMB
     CellContent type;
 
 public:

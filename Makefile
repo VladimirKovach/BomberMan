@@ -1,8 +1,11 @@
-bomberman: main.o Character.o DummyEnemy.o Game.o Map.o Player.o Renderer.o Bomb.o LevelManager.o
-	g++ main.o Character.o DummyEnemy.o Game.o Map.o Player.o Renderer.o Bomb.o LevelManager.o -lncurses -o bomberman
+bomberman: main.o Bomb.o Character.o DummyEnemy.o Game.o LevelManager.o Map.o Player.o Renderer.o SmartEnemy.o
+	g++ main.o Bomb.o Character.o DummyEnemy.o Game.o LevelManager.o Map.o Player.o Renderer.o SmartEnemy.o -lncurses -o bomberman
 
 main.o: main.cpp Game.hpp
 	g++ -c main.cpp
+
+Bomb.o: Bomb.cpp Bomb.hpp Map.hpp
+	g++ -c Bomb.cpp
 
 Character.o: Character.cpp Character.hpp Map.hpp
 	g++ -c Character.cpp
@@ -25,8 +28,8 @@ Player.o: Player.cpp Player.hpp
 Renderer.o: Renderer.cpp Renderer.hpp Map.hpp
 	g++ -c Renderer.cpp
 
-Bomb.o: Bomb.cpp Bomb.hpp Map.hpp
-	g++ -c Bomb.cpp
+SmartEnemy.o: SmartEnemy.cpp SmartEnemy.hpp
+	g++ -c SmartEnemy.cpp
 
 clean:
 	rm -f *.o
