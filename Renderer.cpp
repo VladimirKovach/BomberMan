@@ -1,20 +1,21 @@
 #include "Renderer.hpp"
 #include "Bomb.hpp"
-#include <curses.h>
+#include <ncurses.h>
 
 void Renderer::init_colors() {
     if (has_colors()) {
         start_color();
     }
+
     init_pair(CP_SCREEN, COLOR_BLACK, COLOR_BLACK);
 
     init_pair(CP_UNBREAKABLE_WALL, COLOR_WHITE, COLOR_WHITE);
     init_pair(CP_BREAKABLE_WALL, 244, 244);  // 244 = GRIGIO
 
     init_pair(CP_PLAYER, COLOR_CYAN, COLOR_BLACK);
-    init_pair(CP_ENEMY, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(CP_ENEMY, COLOR_RED, COLOR_BLACK);
 
-    init_pair(CP_BOMB, COLOR_RED, COLOR_BLACK);
+    init_pair(CP_BOMB, 208, COLOR_BLACK);  // 208 = ARANCIONE
     init_pair(CP_EXPLOSION, COLOR_YELLOW, COLOR_RED);
 
     init_pair(CP_DOOR, COLOR_GREEN, COLOR_BLACK);
@@ -52,7 +53,7 @@ void Renderer::display_time(double time) {
 void Renderer::display_level_number(int level_number) {
     const int LEVEL_LABEL_MAX_LENGTH = 7;  // length(LEVEL 5) = 7
     int px = map_start_p.x + ((MAP_COLS - LEVEL_LABEL_MAX_LENGTH) / 2);
-    move(map_start_p.y - 4, px);
+    move(map_start_p.y - 2, px);
     printw("LEVEL %d", level_number);
 }
 

@@ -52,17 +52,17 @@ CellContent Character::get_cell_under() {
     return cell_under;
 }
 
-void Character::set_cell_under(CellContent content) {
-    cell_under = content;
-}
-
 
 void Character::move(Map& map, Direction d) {
     Position next_p = get_next_position(d);
 
-    if (map.is_walkable_cell(next_p)) {
-        map.clear_cell(p);
-        map.set_cell_content(p, cell_under);
+    if (!map.is_wall(next_p)) {
+        if (cell_under != EMPTY) {
+            map.set_cell_content(p, cell_under);
+        }
+        else {
+            map.clear_cell(p);
+        }
 
         cell_under = map.get_cell_content(next_p);
 

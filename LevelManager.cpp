@@ -146,13 +146,13 @@ bool LevelManager::all_levels_completed() {
 //
 // Questa funzione viene chiamata ogni frame dal Game loop.
 // =====================================================
-void LevelManager::update_doors(int enemy_count) {
+void LevelManager::update_doors() {
     if (current == 0) return;
 
     Map& map = current->map;
 
     // Porta avanti: aperta solo se nemici tutti morti e c'e' un livello successivo
-    if (enemy_count == 0 && current->next != 0) {
+    if (is_current_completed() && current->next != 0) {
         map.open_next_door();
     }
     else {

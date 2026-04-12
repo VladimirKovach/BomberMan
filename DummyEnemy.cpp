@@ -35,12 +35,18 @@ void DummyEnemy::plan_movement() {
 
 
 void DummyEnemy::move(Map& map, double game_timer) {
-    int i = 0;
     Position start_p = p;
 
-    while (i < DIRECTION_COUNT && positions_equal(p, start_p)) {
-        Character::move(map, directions[i]);
-        i++;
+    for (int i = 0; i < DIRECTION_COUNT; i++) {
+        Position next_p = get_next_position(directions[i]);
+
+        if (!map.is_enemy(next_p) && !map.is_explosion(next_p)) {
+            Character::move(map, directions[i]);
+
+            if (!positions_equal(p, start_p)) {
+                break;
+            }
+        }
     }
 
     last_move_time = game_timer;

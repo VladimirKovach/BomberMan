@@ -27,6 +27,8 @@ const int MAP_ROWS = 20;
 const int MAP_COLS = MAP_ROWS * 2;
 const int MAX_EMPTY_CELLS = MAP_ROWS * MAP_COLS;
 
+const int MAX_DIFFICULTY = 5;
+
 class Map {
 protected:
     CellContent grid[MAP_ROWS][MAP_COLS];
@@ -52,7 +54,11 @@ public:
 
     bool is_empty_cell(Position p);
 
-    bool is_walkable_cell(Position p);
+    bool is_wall(Position p);
+
+    bool is_enemy(Position p);
+
+    bool is_explosion(Position p);
 
     Position get_random_empty_cell();
 

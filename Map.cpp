@@ -7,16 +7,14 @@ bool positions_equal(Position p1, Position p2) {
 
 
 Map::Map(int difficulty) {
-    // PASSO 1: Inizializza tutta la griglia come EMPTY
-    empty_cells_count = 0;
-
+    // Inizializza tutta la griglia come EMPTY
     for (int y = 0; y < MAP_ROWS; y++) {
         for (int x = 0; x < MAP_COLS; x++) {
             grid[y][x] = EMPTY;
         }
     }
 
-    // PASSO 2: Bordi della mappa (muri indistruttibili)
+    // Bordi della mappa (muri indistruttibili)
     for (int x = 0; x < MAP_COLS; x++) {
         grid[0][x] = UNBREAKABLE_WALL;
         grid[MAP_ROWS - 1][x] = UNBREAKABLE_WALL;
@@ -26,13 +24,14 @@ Map::Map(int difficulty) {
         grid[y][MAP_COLS - 1] = UNBREAKABLE_WALL;
     }
 
-    // PASSO 3: Muri indistruttibili interni (pattern a scacchiera)
-    //place_unbreakable_walls();
+    // Muri indistruttibili interni (pattern a scacchiera)
+    place_unbreakable_walls();
 
-    // PASSO 4: Muri distruttibili (quantita' basata sulla difficolta')
-    //place_breakable_walls(difficulty);
+    // Muri distruttibili (quantita' basata sulla difficolta')
+    place_breakable_walls(difficulty);
 
-    // PASSO 5: Riempi l'array empty_cells con tutte le celle rimaste EMPTY
+    // Riempi l'array empty_cells con tutte le celle rimaste EMPTY
+    empty_cells_count = 0;
     for (int y = 1; y < MAP_ROWS - 1; y++) {
         for (int x = 1; x < MAP_COLS - 1; x++) {
             if (grid[y][x] == EMPTY) {
@@ -41,7 +40,7 @@ Map::Map(int difficulty) {
         }
     }
 
-    // PASSO 6: Inizializza la tabella di timer di esplosione a 0
+    // Inizializza la tabella di timer di esplosione a 0
     for (int y = 0; y < MAP_ROWS; y++) {
         for (int x = 0; x < MAP_COLS; x++) {
             explosion_timer[y][x] = 0;
@@ -51,46 +50,58 @@ Map::Map(int difficulty) {
 
 
 // =====================================================
-// is_safe_zone: controlla se la cella (x,y) NON deve
-// mai ricevere muri distruttibili.
-//
+// Controlla se la cella (x,y) NON deve mai ricevere muri distruttibili
 // Protegge solo la zona spawn del giocatore: (1,1), (2,1), (1,2)
 // Senza questo, il giocatore potrebbe iniziare intrappolato.
 // =====================================================
 bool Map::is_safe_zone(int x, int y) {
-    if (x == 1 && y == 1) return true;
-    if (x == 2 && y == 1) return true;
-    if (x == 1 && y == 2) return true;
-
-    return false;
+    if (x == 1 && y == 1) {
+        return true;
+    }
+    else if (x == 2 && y == 1) {
+        return true;
+    }
+    else if (x == 1 && y == 2) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 
 void Map::place_unbreakable_walls() {
-    for (int y = 2; y < MAP_ROWS - 1; y += 2) {
-        for (int x = 2; x < MAP_COLS - 1; x += 2) {
-            grid[y][x] = UNBREAKABLE_WALL;
+    for (int y = 1; y < MAP_ROWS - 1; y += 2) {
+        for (int x = 1; x < MAP_COLS - 1; x += 2) {
+            int place = rand() % 5;  // idea
+            if (place == 1) {
+                grid[y][x] = UNBREAKABLE_WALL;
+            }
         }
     }
 }
 
 
 void Map::place_breakable_walls(int difficulty) {
-    if (difficulty < 1) difficulty = 1;
-    if (difficulty > 5) difficulty = 5;
+    if (difficulty < 1) {
+        difficulty = 1;
+    }
+    else if (difficulty > MAX_DIFFICULTY) {
+        difficulty = MAX_DIFFICULTY;
+    }
 
-    int percentage[6] = {0, 30, 37, 45, 52, 60};
+    int percentage[MAX_DIFFICULTY] = {5, 10, 15, 20, 25};  // idea
 
-    int total_empty = 0;
+    int empty_cells = 0;
     for (int y = 1; y < MAP_ROWS - 1; y++) {
         for (int x = 1; x < MAP_COLS - 1; x++) {
             if (grid[y][x] == EMPTY && !is_safe_zone(x, y)) {
-                total_empty++;
+                empty_cells++;
             }
         }
     }
 
-    int walls_to_place = total_empty * percentage[difficulty] / 100;
+    int walls_to_place = empty_cells * percentage[difficulty - 1] / 100;
 
     int placed = 0;
     int max_attempts = walls_to_place * 10;
@@ -120,12 +131,24 @@ bool Map::is_empty_cell(Position p) {
     return grid[p.y][p.x] == EMPTY;
 }
 
-bool Map::is_walkable_cell(Position p) {
+bool Map::is_wall(Position p) {
     return (
         cell_exists(p) &&
-        grid[p.y][p.x] != BREAKABLE_WALL &&
-        grid[p.y][p.x] != UNBREAKABLE_WALL
+        (grid[p.y][p.x] == BREAKABLE_WALL || 
+        grid[p.y][p.x] == UNBREAKABLE_WALL)
     );
+}
+
+bool Map::is_enemy(Position p) {
+    return (
+        cell_exists(p) &&
+        (grid[p.y][p.x] == DUMMY_ENEMY ||
+        grid[p.y][p.x] == SMART_ENEMY)
+    );
+}
+
+bool Map::is_explosion(Position p) {
+    return cell_exists(p) && grid[p.y][p.x] == EXPLOSION;
 }
 
 void Map::add_empty_cell(Position p) {
@@ -158,6 +181,7 @@ void Map::remove_empty_cell(Position p) {
 }
 
 
+// da modificare: le celle (1, 2), (2, 1) non vanno bene all'inizio
 Position Map::get_random_empty_cell() {
     if (empty_cells_count != 0) {
         int i = rand() % empty_cells_count;
@@ -196,9 +220,7 @@ void Map::clear_cell(Position p) {
 
 // =====================================================
 // Porte tra livelli
-//
 // DOOR_NEXT (uscita): bordo superiore destro
-//
 // DOOR_PREV (entrata): bordo superiore sinistro
 // =====================================================
 void Map::open_next_door() {
@@ -218,9 +240,7 @@ void Map::close_prev_door() {
 }
 
 
-// =====================================================
-// Esplosioni
-// =====================================================
+// Esplosioni (da mettere in Bomb o in Game)
 void Map::set_explosion(Position p, int duration) {
     if (cell_exists(p)) {
         grid[p.y][p.x] = EXPLOSION;

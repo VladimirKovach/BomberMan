@@ -5,3 +5,7 @@ Player::Player(Position _p, int _lives): Character(_p, _lives, PLAYER) {}
 void Player::heal() {
     lives++;
 }
+
+void Player::set_cell_under(CellContent content) {
+    cell_under = content;
+}

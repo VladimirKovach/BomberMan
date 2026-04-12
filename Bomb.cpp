@@ -35,12 +35,13 @@ void Bomb::explode(Map& map) {
         map.set_explosion(p, EXPLOSION_DURATION);
 
         // Esplosione nelle 4 direzioni (croce)
+        const int DIRECTIONS = 4;
         int dx[] = {0, 0, -1, 1};
         int dy[] = {-1, 1, 0, 0};
 
-        for (int d = 0; d < 4; d++) {
-            for (int i = 1; i <= range; i++) {
-                Position target = {p.x + (dx[d] * i), p.y + (dy[d] * i)};
+        for (int i = 0; i < DIRECTIONS; i++) {
+            for (int j = 1; j <= range; j++) {
+                Position target = {p.x + (dx[i] * j), p.y + (dy[i] * j)};
                 if (!map.cell_exists(target)) {
                     break;
                 }
@@ -51,8 +52,6 @@ void Bomb::explode(Map& map) {
                 }
 
                 map.set_explosion(target, EXPLOSION_DURATION);
-
-                // Se colpisce un'altra bomba, la fa esplodere a catena (gestito dal game loop)
             }
         }
     }
