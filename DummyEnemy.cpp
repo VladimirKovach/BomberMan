@@ -17,8 +17,12 @@ void DummyEnemy::init_directions() {
     directions[3] = RIGHT;
 }
 
+bool DummyEnemy::can_move(double game_timer) {
+    return (last_move_time - game_timer) >= move_timer || last_move_time == -1;
+}
+
 // algoritmo di shuffle di Fisher-Yates
-void DummyEnemy::choose_directions() {
+void DummyEnemy::plan_movement() {
     for (int i = DIRECTION_COUNT - 1; i >= 0; i--) {
         int j = rand() % (i + 1);
         if (j != i) {
@@ -31,15 +35,13 @@ void DummyEnemy::choose_directions() {
 
 
 void DummyEnemy::move(Map& map, double game_timer) {
-    if ((last_move_time - game_timer) >= move_timer || last_move_time == -1) {
-        int i = 0;
-        Position start_p = p;
+    int i = 0;
+    Position start_p = p;
 
-        while (i < DIRECTION_COUNT && positions_equal(p, start_p)) {
-            Character::move(map, directions[i]);
-            i++;
-        }
-
-        last_move_time = game_timer;
+    while (i < DIRECTION_COUNT && positions_equal(p, start_p)) {
+        Character::move(map, directions[i]);
+        i++;
     }
+
+    last_move_time = game_timer;
 }

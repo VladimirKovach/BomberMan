@@ -22,5 +22,5 @@ public:
 
     void update_player_position(Position _player_p);
 
-    void choose_directions();
+    void plan_movement();
 };

@@ -3,7 +3,6 @@
 
 #include "Map.hpp"
 
-//const int DEFAULT_TIMER = 60;       // frame prima dell'esplosione
 const int EXPLOSION_DURATION = 30;  // frame di persistenza dell'esplosione
 
 const int DEFAULT_RANGE = 1;
@@ -29,6 +28,8 @@ public:
     void place(Position _p, double _game_timer, int _range = DEFAULT_RANGE, double _timer = DEFAULT_TIMER);
 
     void explode(Map& map);
+
+    void reset();
 };
 
 #endif

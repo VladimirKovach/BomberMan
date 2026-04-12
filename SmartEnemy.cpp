@@ -35,7 +35,7 @@ void SmartEnemy::sort_pairs() {
 double SmartEnemy::get_distance(Position p1, Position p2) {
     int dx = (p1.x - p2.x);
     int dy = (p1.y - p2.y);
-    return sqrt((dx * dx) + (dy * dy));
+    return sqrt((dx * dx) + (dy * dy));  // togliere sqrt()?
 }
 
 void SmartEnemy::update_player_position(Position _player_p) {
@@ -43,7 +43,8 @@ void SmartEnemy::update_player_position(Position _player_p) {
 }
 
 
-void SmartEnemy::choose_directions() {
+// strategia greedy: ordina le direzioni in base a quanto lo avvicinano al giocatore
+void SmartEnemy::plan_movement() {
     for (int i = 0; i < DIRECTION_COUNT; i++) {
         Position next_p = get_next_position(pairs[i].direction);
         pairs[i].distance = get_distance(next_p, player_p);

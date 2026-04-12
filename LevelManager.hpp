@@ -73,7 +73,7 @@ public:
     // - Se tutti i nemici sono morti E c'e' un livello successivo -> apre DOOR_NEXT
     // - Se c'e' un livello precedente -> apre DOOR_PREV
     // - Altrimenti chiude le porte
-    void update_doors();
+    void update_doors(int enemy_count);
 };
 
 #endif

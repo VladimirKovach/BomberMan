@@ -136,7 +136,7 @@ bool LevelManager::all_levels_completed() {
 //
 // Logica:
 //   - DOOR_NEXT (bordo destro): si apre SOLO se tutti i
-//     nemici del livello sono morti E esiste un livello
+//     nemici del livello sono morti e esiste un livello
 //     successivo. Questo obbliga il giocatore a completare
 //     il livello prima di poter avanzare.
 //
@@ -146,13 +146,13 @@ bool LevelManager::all_levels_completed() {
 //
 // Questa funzione viene chiamata ogni frame dal Game loop.
 // =====================================================
-void LevelManager::update_doors() {
+void LevelManager::update_doors(int enemy_count) {
     if (current == 0) return;
 
     Map& map = current->map;
 
-    // Porta avanti: aperta solo se nemici tutti morti E c'e' un next
-    if (map.all_enemies_dead() && current->next != 0) {
+    // Porta avanti: aperta solo se nemici tutti morti e c'e' un livello successivo
+    if (enemy_count == 0 && current->next != 0) {
         map.open_next_door();
     }
     else {

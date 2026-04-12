@@ -13,7 +13,6 @@ void Bomb::place(Position _p, double _place_timer, int _range, double _timer) {
     place_timer = _place_timer;
     range = _range;
     timer = _timer;
-    exploded = false;
 }
 
 Position Bomb::get_position() {
@@ -57,4 +56,8 @@ void Bomb::explode(Map& map) {
             }
         }
     }
+}
+
+void Bomb::reset() {
+    exploded = false;
 }

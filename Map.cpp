@@ -9,8 +9,6 @@ bool positions_equal(Position p1, Position p2) {
 Map::Map(int difficulty) {
     // PASSO 1: Inizializza tutta la griglia come EMPTY
     empty_cells_count = 0;
-    total_enemies = 0;
-    alive_enemies = 0;
 
     for (int y = 0; y < MAP_ROWS; y++) {
         for (int x = 0; x < MAP_COLS; x++) {
@@ -199,53 +197,24 @@ void Map::clear_cell(Position p) {
 // =====================================================
 // Porte tra livelli
 //
-// DOOR_NEXT (uscita): bordo inferiore destro
-//   Posizione: ultima colonna (MAP_COLS-1), penultima riga (MAP_ROWS-2)
+// DOOR_NEXT (uscita): bordo superiore destro
 //
 // DOOR_PREV (entrata): bordo superiore sinistro
-//   Posizione: prima colonna (0), seconda riga (1)
 // =====================================================
 void Map::open_next_door() {
-    Position door_pos = {MAP_COLS - 1, MAP_ROWS - 2};
-    grid[door_pos.y][door_pos.x] = DOOR_NEXT;
+    grid[1][MAP_COLS - 1] = DOOR_NEXT;
 }
 
 void Map::open_prev_door() {
-    Position door_pos = {0, 1};
-    grid[door_pos.y][door_pos.x] = DOOR_PREV;
+    grid[1][0] = DOOR_PREV;
 }
 
 void Map::close_next_door() {
-    Position door_pos = {MAP_COLS - 1, MAP_ROWS - 2};
-    grid[door_pos.y][door_pos.x] = UNBREAKABLE_WALL;
+    grid[1][MAP_COLS - 1] = UNBREAKABLE_WALL;
 }
 
 void Map::close_prev_door() {
-    Position door_pos = {0, 1};
-    grid[door_pos.y][door_pos.x] = UNBREAKABLE_WALL;
-}
-
-
-// =====================================================
-// Gestione nemici nel livello
-// =====================================================
-void Map::set_enemy_count(int count) {
-    total_enemies = count;
-    alive_enemies = count;
-}
-
-void Map::enemy_killed() {
-    if (alive_enemies > 0) {
-        alive_enemies--;
-    }
-}
-
-int Map::get_alive_enemies() {
-    return alive_enemies;
-}
-
-bool Map::all_enemies_dead() {
-    return alive_enemies <= 0;
+    grid[1][0] = UNBREAKABLE_WALL;
 }
 
 

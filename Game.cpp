@@ -31,11 +31,8 @@ void Game::spawn_enemies() {
         map.set_cell_content(spawn_pos, DUMMY_ENEMY);
     }
 
-    // Comunica alla mappa quanti nemici ci sono
-    map.set_enemy_count(enemy_count);
-
     Position spawn_p = map.get_random_empty_cell();
-    enemy = SmartEnemy(spawn_p, 1, 2);
+    smart_enemy = SmartEnemy(spawn_p, 1, 2);
     map.set_cell_content(spawn_p, SMART_ENEMY);
 }
 
@@ -61,9 +58,10 @@ void Game::enter_level(bool from_prev) {
     // Posiziona il giocatore
     Position spawn;
     if (from_prev) {
-        spawn = {1, 1};                         // alto sinistra (vicino alla porta entrata)
-    } else {
-        spawn = {MAP_COLS - 2, MAP_ROWS - 2};   // basso destra (vicino alla porta uscita)
+        spawn = {1, 1};             // in alto a sinistra (vicino alla porta di entrata)
+    }
+    else {
+        spawn = {MAP_COLS - 2, 1};  // in alto a destra (vicino alla porta di uscita)
     }
 
     // Adesso per spostare il giocatore in una nuova posizione,
@@ -75,7 +73,7 @@ void Game::enter_level(bool from_prev) {
 
     // LIVELLO
     // Se il livello non ha nemici vivi (prima visita), spawnali
-    if (map.get_alive_enemies() <= 0 && !level_manager.is_current_completed()) {
+    if (enemy_count == 0 && !level_manager.is_current_completed()) {
         spawn_enemies();
     }
     else {
@@ -127,8 +125,10 @@ void Game::check_door_transition() {
 
 Game::Game() {
     quit = false;
-    score = 0;
     timer = TIMER_START_VALUE;
+    start = steady_clock::now();
+    score = 0;
+
     bomb_count = 0;
     enemy_count = 0;
 
@@ -145,11 +145,68 @@ bool Game::win() {
     return level_manager.all_levels_completed();
 }
 
+
+void Game::update_bombs() {
+    Map& map = level_manager.get_current_map();
+
+    for (int i = 0; i < bomb_count; i++) {
+        if (bombs[i].is_timer_expired(timer)) {
+            bombs[i].explode(map);
+        }
+    }
+
+    // Rimuovi bombe esplose
+    int count = 0;
+    for (int i = 0; i < bomb_count; i++) {
+        if (bombs[i].is_exploded()) {
+            bombs[i].reset();
+        }
+        else {
+            bombs[count] = bombs[i];
+            count++;
+        }
+    }
+    bomb_count = count;
+}
+
+
+void Game::update_enemies() {
+    Map& map = level_manager.get_current_map();
+
+    for (int i = 0; i < enemy_count; i++) {
+        if (enemies[i].can_move(timer)) {
+            enemies[i].plan_movement();
+            enemies[i].move(map, timer);
+        }
+    }
+
+    if (!smart_enemy.is_dead() && smart_enemy.can_move(timer)) {
+        smart_enemy.update_player_position(player.get_position());
+        smart_enemy.plan_movement();
+        smart_enemy.move(map, timer);
+    }
+
+    // Rimuovi nemici morti
+    int count = 0;
+    for (int i = 0; i < enemy_count; i++) {
+        if (!enemies[i].is_dead()) {
+            enemies[count] = enemies[i];
+            count++;
+        }
+    }
+    enemy_count = count;
+
+    if (enemy_count == 0) {
+        level_manager.mark_current_completed();
+    }
+}
+
+
 void Game::update_timer(steady_clock::time_point start) {
     steady_clock::time_point now = steady_clock::now();
     double elapsed = duration<double>(now - start).count();
     timer = TIMER_START_VALUE - elapsed;
-    if (timer < 0) {
+    if (timer < 0.0) {
         timer = 0.0;
     }
 }
@@ -203,105 +260,57 @@ void Game::handle_input() {
 }
 
 
-void Game::update_bombs() {
-    Map& map = level_manager.get_current_map();
-
-    for (int i = 0; i < bomb_count; i++) {
-        if (bombs[i].is_timer_expired(timer)) {
-            bombs[i].explode(map);
-        }
-    }
-
-    // Rimuovi bombe esplose
-    int count = 0;
-    for (int i = 0; i < bomb_count; i++) {
-        if (!bombs[i].is_exploded()) {
-            bombs[count] = bombs[i];
-            count++;
-        }
-    }
-    bomb_count = count;
-}
-
-
-void Game::handle_enemy_movement() {
-    Map& map = level_manager.get_current_map();
-    for (int i = 0; i < enemy_count; i++) {
-        if (!enemies[i].is_dead()) {
-            enemies[i].choose_directions();
-            enemies[i].move(map, timer);
-        }
-    }
-    if (!enemy.is_dead()) {
-        enemy.update_player_position(player.get_position());
-        enemy.choose_directions();
-        enemy.move(map, timer);
-    }
-}
-
-
 void Game::handle_collisions() {
     Map& map = level_manager.get_current_map();
     Position player_p = player.get_position();
 
     // Collisione player con nemici
     for (int i = 0; i < enemy_count; i++) {
-        if (!enemies[i].is_dead() &&
-            positions_equal(player_p, enemies[i].get_position())) {
-            player.lose_life();
+        if (positions_equal(player_p, enemies[i].get_position())) {
+            player.take_damage();
         }
     }
 
-    if (positions_equal(player_p, enemy.get_position())) {
-        player.lose_life();
+    if (positions_equal(player_p, smart_enemy.get_position())) {
+        player.take_damage();
     }
 
-    // Collisione player con esplosione (non funziona)
-    if (map.get_cell_content(player_p) == EXPLOSION || player.get_cell_under() == EXPLOSION) {
-        player.lose_life();
+    // Collisione player con esplosione (funziona parzialmente)
+    if (map.get_cell_content(player_p) == EXPLOSION) {
+        player.take_damage();
     }
 
     // Collisione nemici con esplosione (funziona parzialmente)
     for (int i = 0; i < enemy_count; i++) {
-        if (!enemies[i].is_dead()) {
-            Position enemy_p = enemies[i].get_position();
-            if (map.get_cell_content(enemy_p) == EXPLOSION) {
-                enemies[i].lose_life();
-                map.enemy_killed();
-
-            if (map.get_cell_content(enemy.get_position()) == EXPLOSION) {
-                enemy.lose_life();
-            }
-
-                // Se tutti i nemici sono morti, segna il livello come completato
-                if (map.all_enemies_dead()) {
-                    level_manager.mark_current_completed();
-                }
-            }
+        Position enemy_p = enemies[i].get_position();
+        if (map.get_cell_content(enemy_p) == EXPLOSION) {
+            enemies[i].take_damage();
         }
+    }
+
+    if (!smart_enemy.is_dead() && map.get_cell_content(smart_enemy.get_position()) == EXPLOSION) {
+        smart_enemy.take_damage();
     }
 }
 
 
 void Game::run() {
-    steady_clock::time_point start = steady_clock::now();  // da mettere come campo?
-
     while (!game_over() && !win() && !quit) {
         Map& map = level_manager.get_current_map();  // da mettere come campo
-
-        handle_input();
 
         update_bombs();
         map.update_explosions();
 
-        handle_enemy_movement();
+        update_enemies();
+
+        update_timer(start);
+
+        handle_input();
 
         handle_collisions();
 
         check_door_transition();
-        level_manager.update_doors();
-
-        update_timer(start);
+        level_manager.update_doors(enemy_count);
 
         renderer.draw_level(map, score, timer, level_manager.get_current_level_number());
 

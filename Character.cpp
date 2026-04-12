@@ -3,15 +3,11 @@
 Character::Character(Position _p, int _lives, CellContent _type) {
     p = _p;
     lives = _lives;
-    cell_under = EMPTY;
     type = _type;
+    cell_under = EMPTY;
 }
 
-void Character::gain_life() {
-    lives++;
-}
-
-void Character::lose_life() {
+void Character::take_damage() {
     lives--;
 }
 

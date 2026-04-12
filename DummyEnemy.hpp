@@ -18,7 +18,9 @@ protected:
 public:
     DummyEnemy(Position _p = {-1, -1}, int _lives = 1, int _speed = 1);
 
-    void choose_directions();
+    bool can_move(double game_timer);
+
+    void plan_movement();
 
     void move(Map& map, double game_timer);
 };

@@ -15,15 +15,13 @@ class Character {
 protected:
     Position p;
     int lives;
-    CellContent cell_under;  // EMPTY o BOMB
     CellContent type;
+    CellContent cell_under;  // EMPTY o BOMB
 
 public:
     Character(Position _p = {0, 0}, int _lives = 1, CellContent _type = PLAYER);
 
-    void gain_life();
-
-    void lose_life();
+    void take_damage();
 
     bool is_dead();
 
