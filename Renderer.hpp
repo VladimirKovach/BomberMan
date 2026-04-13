@@ -3,6 +3,11 @@
 
 #include "Map.hpp"
 
+enum Color {
+    ORANGE = 208,
+    GREY = 244
+};
+
 enum ColorPair {
     CP_NONE,  // terminal default color
     CP_SCREEN,
