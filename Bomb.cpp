@@ -42,12 +42,8 @@ void Bomb::explode(Map& map) {
         for (int i = 0; i < DIRECTIONS; i++) {
             for (int j = 1; j <= range; j++) {
                 Position target = {p.x + (dx[i] * j), p.y + (dy[i] * j)};
-                if (!map.cell_exists(target)) {
-                    break;
-                }
 
-                CellContent content = map.get_cell_content(target);
-                if (content == UNBREAKABLE_WALL) {
+                if (map.get_cell_content(target) == UNBREAKABLE_WALL) {
                     break;
                 }
 

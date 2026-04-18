@@ -112,7 +112,7 @@ void Game::check_door_transition() {
     Position player_p = player.get_position();
     CellContent cell = map.get_cell_content(player_p);
 
-    if (cell == DOOR_NEXT && level_manager.has_next_level()) {
+    if (cell == NEXT_DOOR && level_manager.has_next_level()) {
         // Rimuovi il giocatore dalla mappa corrente
         map.clear_cell(player_p);
 
@@ -122,7 +122,7 @@ void Game::check_door_transition() {
         // Entra nel nuovo livello (arriva da sinistra)
         enter_level(true);
     }
-    else if (cell == DOOR_PREV && level_manager.has_prev_level()) {
+    else if (cell == PREV_DOOR && level_manager.has_prev_level()) {
         // Rimuovi il giocatore dalla mappa corrente
         map.clear_cell(player_p);
 
@@ -305,12 +305,12 @@ void Game::handle_collisions() {
         }
     }
 
-    // Collisione player con esplosione (funziona parzialmente)
+    // Collisione player con esplosione
     if (map.is_explosion(player_p)) {
         player.take_damage();
     }
 
-    // Collisione nemici con esplosione (funziona parzialmente)
+    // Collisione nemici con esplosione
     for (int i = 0; i < dummy_enemy_count; i++) {
         Position dummy_enemy_p = dummy_enemies[i].get_position();
         if (map.is_explosion(dummy_enemy_p)) {

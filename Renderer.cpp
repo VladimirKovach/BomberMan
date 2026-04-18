@@ -50,10 +50,11 @@ void Renderer::display_time(double time) {
     printw("TIME: %-*d", TIME_MAX_LENGTH, (int) time);
 }
 
+// cambiare posizione
 void Renderer::display_level_number(int level_number) {
     const int LEVEL_LABEL_MAX_LENGTH = 7;  // length(LEVEL 5) = 7
     int px = map_start_p.x + ((MAP_COLS - LEVEL_LABEL_MAX_LENGTH) / 2);
-    move(map_start_p.y - 2, px);  // cambiare posizione
+    move(map_start_p.y - 2, px);
     printw("LEVEL %d", level_number);
 }
 
@@ -82,11 +83,11 @@ char Renderer::get_cell_view(CellContent content) {
             view = '*';
             break;
 
-        case DOOR_NEXT:
+        case NEXT_DOOR:
             view = '>';
             break;
 
-        case DOOR_PREV:
+        case PREV_DOOR:
             view = '<';
             break;
 
@@ -127,8 +128,8 @@ ColorPair Renderer::get_cell_color(CellContent content) {
             color = CP_EXPLOSION;
             break;
 
-        case DOOR_NEXT:
-        case DOOR_PREV:
+        case NEXT_DOOR:
+        case PREV_DOOR:
             color = CP_DOOR;
             break;
 

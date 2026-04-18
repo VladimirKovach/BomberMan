@@ -9,7 +9,7 @@ enum Color {
 };
 
 enum ColorPair {
-    CP_NONE,  // terminal default color
+    CP_DEFAULT,  // terminal default color pair
     CP_SCREEN,
     CP_UNBREAKABLE_WALL,
     CP_BREAKABLE_WALL,

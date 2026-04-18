@@ -57,16 +57,18 @@ void Character::move(Map& map, Direction d) {
     Position next_p = get_next_position(d);
 
     if (!map.is_wall(next_p)) {
-        if (cell_under != EMPTY) {
-            map.set_cell_content(p, cell_under);
-        }
-        else {
+        if (cell_under == EMPTY) {
             map.clear_cell(p);
         }
-
-        cell_under = map.get_cell_content(next_p);
+        else {
+            map.set_cell_content(p, cell_under);
+        }
 
         p = next_p;
-        map.set_cell_content(p, type);
+
+        if (!map.is_explosion(p) && !map.is_enemy(p)) {
+            cell_under = map.get_cell_content(p);
+            map.set_cell_content(p, type);
+        }
     }
 }

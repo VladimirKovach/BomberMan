@@ -120,7 +120,7 @@ void Map::place_breakable_walls(int difficulty) {
 }
 
 
-bool Map::cell_exists(Position p) {
+bool Map::is_in_bounds(Position p) {
     return (
         p.x >= 0 && p.x < MAP_COLS &&
         p.y >= 0 && p.y < MAP_ROWS
@@ -133,7 +133,7 @@ bool Map::is_empty_cell(Position p) {
 
 bool Map::is_wall(Position p) {
     return (
-        cell_exists(p) &&
+        is_in_bounds(p) &&
         (grid[p.y][p.x] == BREAKABLE_WALL || 
         grid[p.y][p.x] == UNBREAKABLE_WALL)
     );
@@ -141,14 +141,14 @@ bool Map::is_wall(Position p) {
 
 bool Map::is_enemy(Position p) {
     return (
-        cell_exists(p) &&
+        is_in_bounds(p) &&
         (grid[p.y][p.x] == DUMMY_ENEMY ||
         grid[p.y][p.x] == SMART_ENEMY)
     );
 }
 
 bool Map::is_explosion(Position p) {
-    return cell_exists(p) && grid[p.y][p.x] == EXPLOSION;
+    return is_in_bounds(p) && grid[p.y][p.x] == EXPLOSION;
 }
 
 void Map::add_empty_cell(Position p) {
@@ -167,7 +167,7 @@ void Map::remove_empty_cell(Position p) {
         if (positions_equal(empty_cells[i], p)) {
             found = true;
 
-            for (; i < empty_cells_count - 1; i++) {
+            for (i; i < empty_cells_count - 1; i++) {
                 empty_cells[i] = empty_cells[i + 1];
             }
 
@@ -193,7 +193,7 @@ Position Map::get_random_empty_cell() {
 }
 
 CellContent Map::get_cell_content(Position p) {
-    if (cell_exists(p)) {
+    if (is_in_bounds(p)) {
         return grid[p.y][p.x];
     }
     else {
@@ -202,7 +202,7 @@ CellContent Map::get_cell_content(Position p) {
 }
 
 void Map::set_cell_content(Position p, CellContent content) {
-    if (cell_exists(p)) {
+    if (is_in_bounds(p)) {
         if (is_empty_cell(p)) {
             remove_empty_cell(p);
         }
@@ -211,7 +211,7 @@ void Map::set_cell_content(Position p, CellContent content) {
 }
 
 void Map::clear_cell(Position p) {
-    if (cell_exists(p) && !is_empty_cell(p)) {
+    if (is_in_bounds(p) && !is_empty_cell(p)) {
         grid[p.y][p.x] = EMPTY;
         add_empty_cell(p);
     }
@@ -220,15 +220,15 @@ void Map::clear_cell(Position p) {
 
 // =====================================================
 // Porte tra livelli
-// DOOR_NEXT (uscita): bordo superiore destro
-// DOOR_PREV (entrata): bordo superiore sinistro
+// NEXT_DOOR (uscita): bordo superiore destro
+// PREV_DOOR (entrata): bordo superiore sinistro
 // =====================================================
 void Map::open_next_door() {
-    grid[1][MAP_COLS - 1] = DOOR_NEXT;
+    grid[1][MAP_COLS - 1] = NEXT_DOOR;
 }
 
 void Map::open_prev_door() {
-    grid[1][0] = DOOR_PREV;
+    grid[1][0] = PREV_DOOR;
 }
 
 void Map::close_next_door() {
@@ -242,14 +242,14 @@ void Map::close_prev_door() {
 
 // Esplosioni (da mettere in Bomb o in Game)
 void Map::set_explosion(Position p, int duration) {
-    if (cell_exists(p)) {
+    if (is_in_bounds(p)) {
         grid[p.y][p.x] = EXPLOSION;
         explosion_timer[p.y][p.x] = duration;
     }
 }
 
 int Map::get_explosion_timer(Position p) {
-    if (cell_exists(p)) {
+    if (is_in_bounds(p)) {
         return explosion_timer[p.y][p.x];
     }
     return 0;

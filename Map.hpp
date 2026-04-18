@@ -11,8 +11,8 @@ enum CellContent {
     SMART_ENEMY,
     ITEM,
     EXPLOSION,
-    DOOR_NEXT,  // porta per andare al livello successivo
-    DOOR_PREV,  // porta per tornare al livello precedente
+    NEXT_DOOR,  // porta per andare al livello successivo
+    PREV_DOOR,  // porta per tornare al livello precedente
     UNKNOWN
 };
 
@@ -41,7 +41,7 @@ protected:
 
     void remove_empty_cell(Position p);
 
-    bool is_safe_zone(int x, int y);
+    bool is_safe_zone(int x, int y);  // nome da cambiare
 
     void place_unbreakable_walls();
 
@@ -50,7 +50,7 @@ protected:
 public:
     Map(int difficulty = 1);
 
-    bool cell_exists(Position p);
+    bool is_in_bounds(Position p);
 
     bool is_empty_cell(Position p);
 
