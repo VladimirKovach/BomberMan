@@ -252,7 +252,9 @@ int Map::get_explosion_timer(Position p) {
     if (is_in_bounds(p)) {
         return explosion_timer[p.y][p.x];
     }
-    return 0;
+    else {
+        return -1;  // fallback
+    }
 }
 
 void Map::update_explosions() {
@@ -260,10 +262,10 @@ void Map::update_explosions() {
         for (int x = 0; x < MAP_COLS; x++) {
             if (grid[y][x] == EXPLOSION) {
                 explosion_timer[y][x]--;
+
                 if (explosion_timer[y][x] <= 0) {
-                    grid[y][x] = EMPTY;
+                    clear_cell({x, y});
                     explosion_timer[y][x] = 0;
-                    add_empty_cell({x, y});
                 }
             }
         }

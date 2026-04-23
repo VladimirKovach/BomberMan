@@ -16,7 +16,7 @@ protected:
     Position p;
     int lives;
     CellContent type;
-    CellContent cell_under;  // EMPTY, BOMB, ITEM
+    CellContent under;  // EMPTY, BOMB, ITEM
 
 public:
     Character(Position _p = {0, 0}, int _lives = 1, CellContent _type = PLAYER);
@@ -29,7 +29,7 @@ public:
 
     Position get_next_position(Direction d);
 
-    CellContent get_cell_under();
+    CellContent get_under();
 
     void move(Map& map, Direction d);
 };

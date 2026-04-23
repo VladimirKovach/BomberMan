@@ -5,7 +5,7 @@
 // =====================================================
 // spawn_enemies: crea i nemici per il livello corrente.
 //
-// Il numero di nemici scala con la difficolta':
+// Il numero di nemici scala con la difficolta' (da sistemare):
 //   - difficulty 1: 1 (dummy), 1 (smart)
 //   - difficulty 2: 2 (dummy), 2 (smart)
 //   - difficulty 3: 4 (dummy), 3 (smart)
@@ -19,7 +19,7 @@ void Game::spawn_enemies() {
     int difficulty = level_manager.get_current_difficulty();
 
     // Numero di nemici in base alla difficolta'
-    dummy_enemy_count = (int) pow(2, difficulty - 1);  // da sistemare
+    dummy_enemy_count = pow(2, difficulty - 1);  // da sistemare
     if (dummy_enemy_count > MAX_DUMMY_ENEMIES) {
         dummy_enemy_count = MAX_DUMMY_ENEMIES;
     }
@@ -78,9 +78,10 @@ void Game::enter_level(bool from_prev) {
     map.set_cell_content(spawn, PLAYER);
 
     // LIVELLO
-    // Se il livello non ha nemici vivi (prima visita), spawnali
-    if (all_enemies_dead() && !level_manager.is_current_completed()) {
+    // Se un livello non e' ancora stato visitato, spawna i nemici
+    if (!level_manager.is_current_visited()) {
         spawn_enemies();
+        level_manager.mark_current_visited();
     }
     else {
         // Il livello e' gia' stato visitato, i nemici sono gia' sulla mappa.
@@ -126,7 +127,7 @@ void Game::check_door_transition() {
         // Rimuovi il giocatore dalla mappa corrente
         map.clear_cell(player_p);
 
-        level_manager.go_to_previous_level();
+        level_manager.go_to_prev_level();
 
         // Entra nel nuovo livello (arriva da destra)
         enter_level(false);
@@ -166,7 +167,7 @@ void Game::update_bombs() {
     Map& map = level_manager.get_current_map();
 
     for (int i = 0; i < bomb_count; i++) {
-        if (bombs[i].is_timer_expired(timer) || map.is_explosion(bombs[i].get_position())) {
+        if (bombs[i].is_timer_finished(timer) || map.is_explosion(bombs[i].get_position())) {
             bombs[i].explode(map);
         }
     }
@@ -274,10 +275,10 @@ void Game::handle_input() {
             break;
 
         case ' ':
-            if (bomb_count < MAX_BOMBS && player.get_cell_under() != BOMB) {
+            if (bomb_count < MAX_BOMBS && player.get_under() != BOMB) {
                 bombs[bomb_count].place(player.get_position(), timer);
                 bomb_count++;
-                player.set_cell_under(BOMB);
+                player.set_under(BOMB);
             }
             break;
 

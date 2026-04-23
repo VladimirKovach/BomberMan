@@ -13,7 +13,7 @@ protected:
     Position p;
     int range;
     double timer;
-    double place_timer;
+    double place_time;
     bool exploded;
 
 public:
@@ -23,7 +23,7 @@ public:
 
     bool is_exploded();
 
-    bool is_timer_expired(double game_timer);
+    bool is_timer_finished(double game_timer);
 
     void place(Position _p, double _game_timer, int _range = DEFAULT_RANGE, double _timer = DEFAULT_TIMER);
 

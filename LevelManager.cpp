@@ -26,6 +26,7 @@ LevelManager::LevelManager() {
         node->level_number = i;
         node->difficulty = i;
         node->completed = false;
+        node->visited = false;
         node->next = 0;
         node->prev = prev_node;
 
@@ -97,7 +98,7 @@ bool LevelManager::go_to_next_level() {
 }
 
 
-bool LevelManager::go_to_previous_level() {
+bool LevelManager::go_to_prev_level() {
     if (current != 0 && current->prev != 0) {
         current = current->prev;
         return true;
@@ -112,9 +113,22 @@ void LevelManager::mark_current_completed() {
     }
 }
 
+void LevelManager::mark_current_visited() {
+    if (current != 0) {
+        current->visited = true;
+    }
+}
+
 bool LevelManager::is_current_completed() {
     if (current != 0) {
         return current->completed;
+    }
+    return false;
+}
+
+bool LevelManager::is_current_visited() {
+    if (current != 0) {
+        return current->visited;
     }
     return false;
 }

@@ -19,6 +19,7 @@ struct LevelNode {
     int level_number;
     int difficulty;
     bool completed;
+    bool visited;
     LevelNode* next;
     LevelNode* prev;
 };
@@ -60,12 +61,15 @@ public:
 
     bool go_to_next_level();
 
-    bool go_to_previous_level();
+    bool go_to_prev_level();
 
-    // Segna il livello corrente come completato
     void mark_current_completed();
 
+    void mark_current_visited();
+
     bool is_current_completed();
+
+    bool is_current_visited();
 
     bool all_levels_completed();
 

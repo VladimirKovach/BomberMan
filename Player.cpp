@@ -6,6 +6,6 @@ void Player::heal() {
     lives++;
 }
 
-void Player::set_cell_under(CellContent content) {
-    cell_under = content;
+void Player::set_under(CellContent content) {
+    under = content;
 }

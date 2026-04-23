@@ -4,13 +4,13 @@ Bomb::Bomb(Position _p, int _range, double _timer) {
     p = _p;
     range = _range;
     timer = _timer;
-    place_timer = -1.0;  // per convenzione
+    place_time = -1.0;  // per convenzione
     exploded = false;
 }
 
-void Bomb::place(Position _p, double _place_timer, int _range, double _timer) {
+void Bomb::place(Position _p, double _place_time, int _range, double _timer) {
     p = _p;
-    place_timer = _place_timer;
+    place_time = _place_time;
     range = _range;
     timer = _timer;
 }
@@ -23,8 +23,8 @@ bool Bomb::is_exploded() {
     return exploded;
 }
 
-bool Bomb::is_timer_expired(double game_timer) {
-    return (place_timer - game_timer) >= timer;
+bool Bomb::is_timer_finished(double game_timer) {
+    return place_time - game_timer >= timer;
 }
 
 void Bomb::explode(Map& map) {
@@ -32,6 +32,7 @@ void Bomb::explode(Map& map) {
         exploded = true;
 
         // Esplosione al centro
+        //map.set_cell_content(p, EXPLOSION);
         map.set_explosion(p, EXPLOSION_DURATION);
 
         // Esplosione nelle 4 direzioni (croce)
@@ -47,6 +48,7 @@ void Bomb::explode(Map& map) {
                     break;
                 }
 
+                //map.set_cell_content(target, EXPLOSION);
                 map.set_explosion(target, EXPLOSION_DURATION);
             }
         }

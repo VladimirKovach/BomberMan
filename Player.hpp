@@ -12,7 +12,7 @@ public:
     void heal();
 
     // Per piazzare bombe (o altri oggetti) nella propria posizione
-    void set_cell_under(CellContent content);
+    void set_under(CellContent content);
 };
 
 #endif
