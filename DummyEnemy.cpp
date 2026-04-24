@@ -40,7 +40,7 @@ void DummyEnemy::move(Map& map, double game_timer) {
     for (int i = 0; i < DIRECTION_COUNT; i++) {
         Position next_p = get_next_position(directions[i]);
 
-        if (!map.is_enemy(next_p) && !map.is_explosion(next_p)) {
+        if (!map.is_enemy(next_p) && !map.is_explosion(next_p) && map.get_cell_content(next_p) != PREV_DOOR) {
             Character::move(map, directions[i]);
 
             if (!positions_equal(p, start_p)) {

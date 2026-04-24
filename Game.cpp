@@ -61,45 +61,20 @@ void Game::enter_level(bool from_prev) {
     // Pulisci le bombe dal livello precedente
     bomb_count = 0;
 
-    // Posiziona il giocatore
     Position spawn;
     if (from_prev) {
-        spawn = {1, 1};             // in alto a sinistra (vicino alla porta di entrata)
+        spawn = {1, 1};  // vicino alla porta di entrata
     }
     else {
-        spawn = {MAP_COLS - 2, 1};  // in alto a destra (vicino alla porta di uscita)
+        spawn = {MAP_COLS - 2, 1};  // vicino alla porta di uscita
     }
 
-    // Adesso per spostare il giocatore in una nuova posizione,
-    // creiamo un Player nuovo da zero. Ma cosi perdiamo l'informazione sulle
-    // sue vite.
-    // TODO: fare un metodo nella classe Player tipo 'set_position'
-    player = Player(spawn, 1);
+    player.set_position(spawn);
     map.set_cell_content(spawn, PLAYER);
 
-    // LIVELLO
-    // Se un livello non e' ancora stato visitato, spawna i nemici
     if (!level_manager.is_current_visited()) {
         spawn_enemies();
         level_manager.mark_current_visited();
-    }
-    else {
-        // Il livello e' gia' stato visitato, i nemici sono gia' sulla mappa.
-        // Dobbiamo ricostruire l'array enemies leggendo dalla mappa.
-        dummy_enemy_count = 0;
-        smart_enemy_count = 0;
-        for (int y = 1; y < MAP_ROWS - 1; y++) {
-            for (int x = 1; x < MAP_COLS - 1; x++) {
-                if (map.get_cell_content({x, y}) == DUMMY_ENEMY) {
-                    dummy_enemies[dummy_enemy_count] = DummyEnemy({x, y}, 1, 1);
-                    dummy_enemy_count++;
-                }
-                else if (map.get_cell_content({x, y}) == SMART_ENEMY) {
-                    smart_enemies[smart_enemy_count] = SmartEnemy({x, y}, 1, 2);
-                    smart_enemy_count++;
-                }
-            }
-        }
     }
 }
 
@@ -190,42 +165,44 @@ void Game::update_bombs() {
 void Game::update_enemies() {
     Map& map = level_manager.get_current_map();
 
-    for (int i = 0; i < dummy_enemy_count; i++) {
-        if (dummy_enemies[i].can_move(timer)) {
-            dummy_enemies[i].plan_movement();
-            dummy_enemies[i].move(map, timer);
+    if (!level_manager.is_current_completed()) {
+        for (int i = 0; i < dummy_enemy_count; i++) {
+            if (dummy_enemies[i].can_move(timer)) {
+                dummy_enemies[i].plan_movement();
+                dummy_enemies[i].move(map, timer);
+            }
         }
-    }
 
-    for (int i = 0; i < smart_enemy_count; i++) {
-        if (smart_enemies[i].can_move(timer)) {
-            smart_enemies[i].update_player_position(player.get_position());
-            smart_enemies[i].plan_movement();
-            smart_enemies[i].move(map, timer);
+        for (int i = 0; i < smart_enemy_count; i++) {
+            if (smart_enemies[i].can_move(timer)) {
+                smart_enemies[i].update_player_position(player.get_position());
+                smart_enemies[i].plan_movement();
+                smart_enemies[i].move(map, timer);
+            }
         }
-    }
 
-    // Rimuovi nemici morti
-    int dummy_count = 0;
-    for (int i = 0; i < dummy_enemy_count; i++) {
-        if (!dummy_enemies[i].is_dead()) {
-            dummy_enemies[dummy_count] = dummy_enemies[i];
-            dummy_count++;
+        // Rimuovi nemici morti
+        int dummy_count = 0;
+        for (int i = 0; i < dummy_enemy_count; i++) {
+            if (!dummy_enemies[i].is_dead()) {
+                dummy_enemies[dummy_count] = dummy_enemies[i];
+                dummy_count++;
+            }
         }
-    }
-    dummy_enemy_count = dummy_count;
+        dummy_enemy_count = dummy_count;
 
-    int smart_count = 0;
-    for (int i = 0; i < smart_enemy_count; i++) {
-        if (!smart_enemies[i].is_dead()) {
-            smart_enemies[smart_count] = smart_enemies[i];
-            smart_count++;
+        int smart_count = 0;
+        for (int i = 0; i < smart_enemy_count; i++) {
+            if (!smart_enemies[i].is_dead()) {
+                smart_enemies[smart_count] = smart_enemies[i];
+                smart_count++;
+            }
         }
-    }
-    smart_enemy_count = smart_count;
+        smart_enemy_count = smart_count;
 
-    if (all_enemies_dead()) {
-        level_manager.mark_current_completed();
+        if (all_enemies_dead()) {
+            level_manager.mark_current_completed();
+        }
     }
 }
 

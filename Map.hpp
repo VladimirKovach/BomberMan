@@ -56,6 +56,8 @@ public:
 
     bool is_wall(Position p);
 
+    bool is_door(Position p);
+
     bool is_enemy(Position p);
 
     bool is_explosion(Position p);

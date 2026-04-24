@@ -139,6 +139,14 @@ bool Map::is_wall(Position p) {
     );
 }
 
+bool Map::is_door(Position p) {
+    return (
+        is_in_bounds(p) &&
+        (grid[p.y][p.x] == PREV_DOOR || 
+        grid[p.y][p.x] == NEXT_DOOR)
+    );
+}
+
 bool Map::is_enemy(Position p) {
     return (
         is_in_bounds(p) &&

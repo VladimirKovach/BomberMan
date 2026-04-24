@@ -11,6 +11,8 @@ public:
 
     void heal();
 
+    void set_position(Position new_p);
+
     // Per piazzare bombe (o altri oggetti) nella propria posizione
     void set_under(CellContent content);
 };

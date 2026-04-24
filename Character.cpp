@@ -66,7 +66,7 @@ void Character::move(Map& map, Direction d) {
 
         p = next_p;
 
-        if (!map.is_explosion(p) && !map.is_enemy(p)) {
+        if (!map.is_explosion(p) && !map.is_enemy(p) && !map.is_door(p)) {
             under = map.get_cell_content(p);
             map.set_cell_content(p, type);
         }
