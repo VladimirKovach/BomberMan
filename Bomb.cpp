@@ -1,18 +1,16 @@
 #include "Bomb.hpp"
 
-Bomb::Bomb(Position _p, int _range, double _timer) {
+Bomb::Bomb(Position _p, int _range) {
     p = _p;
     range = _range;
-    timer = _timer;
     place_time = -1.0;  // per convenzione
     exploded = false;
 }
 
-void Bomb::place(Position _p, double _place_time, int _range, double _timer) {
+void Bomb::place(Position _p, double game_timer, int _range) {
     p = _p;
-    place_time = _place_time;
+    place_time = game_timer;
     range = _range;
-    timer = _timer;
 }
 
 Position Bomb::get_position() {
@@ -24,7 +22,7 @@ bool Bomb::is_exploded() {
 }
 
 bool Bomb::is_timer_finished(double game_timer) {
-    return place_time - game_timer >= timer;
+    return place_time - game_timer >= TIMER;
 }
 
 void Bomb::explode(Map& map) {
@@ -54,6 +52,7 @@ void Bomb::explode(Map& map) {
         }
     }
 }
+
 
 void Bomb::reset() {
     exploded = false;

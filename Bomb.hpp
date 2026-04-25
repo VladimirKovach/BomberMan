@@ -6,18 +6,18 @@
 const int EXPLOSION_DURATION = 30;  // frame di persistenza dell'esplosione
 
 const int DEFAULT_RANGE = 1;
-const double DEFAULT_TIMER = 3.0;
+const double TIMER = 3.0;
+//const double EXPLOSION_DURATION = 2.0;
 
 class Bomb {
 protected:
     Position p;
     int range;
-    double timer;
     double place_time;
     bool exploded;
 
 public:
-    Bomb(Position _p = {-1, -1}, int _range = DEFAULT_RANGE, double _timer = DEFAULT_TIMER);
+    Bomb(Position _p = {-1, -1}, int _range = DEFAULT_RANGE);
 
     Position get_position();
 
@@ -25,7 +25,7 @@ public:
 
     bool is_timer_finished(double game_timer);
 
-    void place(Position _p, double _game_timer, int _range = DEFAULT_RANGE, double _timer = DEFAULT_TIMER);
+    void place(Position _p, double game_timer, int _range = DEFAULT_RANGE);
 
     void explode(Map& map);
 

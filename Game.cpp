@@ -58,7 +58,7 @@ void Game::spawn_enemies() {
 void Game::enter_level(bool from_prev) {
     Map& map = level_manager.get_current_map();
 
-    // Pulisci le bombe dal livello precedente
+    // Pulisci le bombe dal livello precedente (da sistemare)
     bomb_count = 0;
 
     Position spawn;
@@ -134,7 +134,7 @@ bool Game::win() {
 }
 
 bool Game::all_enemies_dead() {
-    return (dummy_enemy_count + smart_enemy_count) == 0;
+    return dummy_enemy_count + smart_enemy_count == 0;
 }
 
 
@@ -168,7 +168,7 @@ void Game::update_enemies() {
     if (!level_manager.is_current_completed()) {
         for (int i = 0; i < dummy_enemy_count; i++) {
             if (dummy_enemies[i].can_move(timer)) {
-                dummy_enemies[i].plan_movement();
+                dummy_enemies[i].plan_move();
                 dummy_enemies[i].move(map, timer);
             }
         }
@@ -176,7 +176,7 @@ void Game::update_enemies() {
         for (int i = 0; i < smart_enemy_count; i++) {
             if (smart_enemies[i].can_move(timer)) {
                 smart_enemies[i].update_player_position(player.get_position());
-                smart_enemies[i].plan_movement();
+                smart_enemies[i].plan_move();
                 smart_enemies[i].move(map, timer);
             }
         }
@@ -259,7 +259,7 @@ void Game::handle_input() {
             }
             break;
 
-        default:
+        default:  // ERR
             break;
     }
 }

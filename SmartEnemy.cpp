@@ -43,8 +43,8 @@ void SmartEnemy::update_player_position(Position _player_p) {
 }
 
 
-// strategia greedy: ordina le direzioni in base a quanto lo avvicinano al giocatore
-void SmartEnemy::plan_movement() {
+// Ordina le direzioni in base a quanto lo avvicinano al giocatore (greedy)
+void SmartEnemy::plan_move() {
     for (int i = 0; i < DIRECTION_COUNT; i++) {
         Position next_p = get_next_position(pairs[i].direction);
         pairs[i].distance = get_distance(next_p, player_p);

@@ -22,11 +22,11 @@ protected:
     steady_clock::time_point start;
     int score;
 
-    // Array di bombe attive per il livello corrente
+    // Array di bombe attive
     Bomb bombs[MAX_BOMBS];
     int bomb_count;
 
-    // Array di nemici per il livello corrente
+    // Array di nemici vivi
     DummyEnemy dummy_enemies[MAX_DUMMY_ENEMIES];
     int dummy_enemy_count;
     SmartEnemy smart_enemies[MAX_SMART_ENEMIES];
@@ -43,8 +43,6 @@ protected:
     bool all_enemies_dead();
 
     void spawn_enemies();
-
-    void clear_enemies();  // quando si cambia livello (da implementare)
 
     void update_bombs();
 

@@ -20,7 +20,7 @@ public:
 
     bool can_move(double game_timer);
 
-    void plan_movement();
+    void plan_move();
 
     void move(Map& map, double game_timer);
 };

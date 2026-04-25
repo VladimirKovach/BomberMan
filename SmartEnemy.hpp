@@ -18,9 +18,9 @@ protected:
     double get_distance(Position p1, Position p2);
 
 public:
-    SmartEnemy(Position _p = {-1, -1}, int _lives = 1, int _speed = 2);
+    SmartEnemy(Position _p = {-1, -1}, int _lives = 1, int _speed = 1);
 
     void update_player_position(Position _player_p);
 
-    void plan_movement();
+    void plan_move();
 };
