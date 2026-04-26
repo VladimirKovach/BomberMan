@@ -11,9 +11,9 @@
 using namespace std::chrono;
 
 const double TIMER_START_VALUE = 1000.0;  // secondi
-const int MAX_DUMMY_ENEMIES = 10;         // Numero massimo di nemici (dummy) per livello
-const int MAX_SMART_ENEMIES = 5;          // Numero massimo di nemici (smart) per livello
-const int MAX_BOMBS = 3;                  // Numero massimo di bombe piazzabili contemporaneamente
+const int MAX_DUMMY_ENEMIES = 10;  // Numero massimo di nemici (dummy) per livello
+const int MAX_SMART_ENEMIES = 5;  // Numero massimo di nemici (smart) per livello
+const int MAX_BOMBS = 5;  // Numero massimo di bombe piazzabili contemporaneamente
 
 class Game {
 protected:

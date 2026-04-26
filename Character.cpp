@@ -70,5 +70,8 @@ void Character::move(Map& map, Direction d) {
             under = map.get_cell_content(p);
             map.set_cell_content(p, type);
         }
+        else {
+            under = EMPTY;
+        }
     }
 }

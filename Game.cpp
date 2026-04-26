@@ -142,7 +142,7 @@ void Game::update_bombs() {
     Map& map = level_manager.get_current_map();
 
     for (int i = 0; i < bomb_count; i++) {
-        if (bombs[i].is_timer_finished(timer) || map.is_explosion(bombs[i].get_position())) {
+        if (bombs[i].is_timer_finished(timer)) {
             bombs[i].explode(map);
         }
     }
@@ -167,18 +167,11 @@ void Game::update_enemies() {
 
     if (!level_manager.is_current_completed()) {
         for (int i = 0; i < dummy_enemy_count; i++) {
-            if (dummy_enemies[i].can_move(timer)) {
-                dummy_enemies[i].plan_move();
-                dummy_enemies[i].move(map, timer);
-            }
+            dummy_enemies[i].update(map, timer);
         }
 
         for (int i = 0; i < smart_enemy_count; i++) {
-            if (smart_enemies[i].can_move(timer)) {
-                smart_enemies[i].update_player_position(player.get_position());
-                smart_enemies[i].plan_move();
-                smart_enemies[i].move(map, timer);
-            }
+            smart_enemies[i].update(map, timer, player.get_position());
         }
 
         // Rimuovi nemici morti
@@ -300,6 +293,13 @@ void Game::handle_collisions() {
         Position smart_enemy_p = smart_enemies[i].get_position();
         if (map.is_explosion(smart_enemy_p)) {
             smart_enemies[i].take_damage();
+        }
+    }
+
+    // Collisione bombe con esplosione
+    for (int i = 0; i < bomb_count; i++) {
+        if (map.is_explosion(bombs[i].get_position())) {
+            bombs[i].explode(map);
         }
     }
 }

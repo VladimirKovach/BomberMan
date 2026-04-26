@@ -13,14 +13,16 @@ protected:
 
     void init_pairs();
 
-    void sort_pairs();
-
     double get_distance(Position p1, Position p2);
 
-public:
-    SmartEnemy(Position _p = {-1, -1}, int _lives = 1, int _speed = 1);
+    void sort_pairs();
 
     void update_player_position(Position _player_p);
 
     void plan_move();
+
+public:
+    SmartEnemy(Position _p = {-1, -1}, int _lives = 1, int _speed = 1);
+
+    void update(Map& map, double game_timer, Position _player_p);
 };

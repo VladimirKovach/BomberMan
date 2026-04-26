@@ -7,12 +7,11 @@ enum CellContent {
     UNBREAKABLE_WALL,
     PLAYER,
     BOMB,
+    EXPLOSION,
     DUMMY_ENEMY,
     SMART_ENEMY,
-    ITEM,
-    EXPLOSION,
-    NEXT_DOOR,  // porta per andare al livello successivo
-    PREV_DOOR,  // porta per tornare al livello precedente
+    NEXT_DOOR,
+    PREV_DOOR,
     UNKNOWN
 };
 
@@ -32,8 +31,9 @@ const int MAX_DIFFICULTY = 5;
 class Map {
 protected:
     CellContent grid[MAP_ROWS][MAP_COLS];
-    int explosion_timer[MAP_ROWS][MAP_COLS];
-    Position start_p;
+
+    int explosion_timer[MAP_ROWS][MAP_COLS];  // da togliere
+
     Position empty_cells[MAX_EMPTY_CELLS];
     int empty_cells_count;
 
@@ -50,7 +50,7 @@ protected:
 public:
     Map(int difficulty = 1);
 
-    bool is_in_bounds(Position p);
+    bool in_bounds(Position p);
 
     bool is_empty_cell(Position p);
 
