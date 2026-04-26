@@ -13,7 +13,7 @@ using namespace std::chrono;
 const double TIMER_START_VALUE = 1000.0;  // secondi
 const int MAX_DUMMY_ENEMIES = 10;  // Numero massimo di nemici (dummy) per livello
 const int MAX_SMART_ENEMIES = 5;  // Numero massimo di nemici (smart) per livello
-const int MAX_BOMBS = 5;  // Numero massimo di bombe piazzabili contemporaneamente
+const int MAX_ACTIVE_BOMBS = 3;
 
 class Game {
 protected:
@@ -22,9 +22,7 @@ protected:
     steady_clock::time_point start;
     int score;
 
-    // Array di bombe attive
-    Bomb bombs[MAX_BOMBS];
-    int bomb_count;
+    Bomb bombs[MAX_ACTIVE_BOMBS];
 
     // Array di nemici vivi
     DummyEnemy dummy_enemies[MAX_DUMMY_ENEMIES];
@@ -37,12 +35,11 @@ protected:
     Player player;
 
     bool game_over();
-
     bool win();
 
     bool all_enemies_dead();
 
-    void spawn_enemies();
+    int get_active_bombs();
 
     void update_bombs();
 
@@ -53,6 +50,8 @@ protected:
     void handle_input();
 
     void handle_collisions();
+
+    void spawn_enemies();
 
     // Gestisce il passaggio tra livelli quando il giocatore entra in una porta
     void check_door_transition();

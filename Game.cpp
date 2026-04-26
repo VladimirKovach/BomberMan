@@ -58,9 +58,6 @@ void Game::spawn_enemies() {
 void Game::enter_level(bool from_prev) {
     Map& map = level_manager.get_current_map();
 
-    // Pulisci le bombe dal livello precedente (da sistemare)
-    bomb_count = 0;
-
     Position spawn;
     if (from_prev) {
         spawn = {1, 1};  // vicino alla porta di entrata
@@ -116,7 +113,6 @@ Game::Game() {
     start = steady_clock::now();
     score = 0;
 
-    bomb_count = 0;
     dummy_enemy_count = 0;
     smart_enemy_count = 0;
 
@@ -137,28 +133,25 @@ bool Game::all_enemies_dead() {
     return dummy_enemy_count + smart_enemy_count == 0;
 }
 
+int Game::get_active_bombs() {
+    int count = 0;
+    for (int i = 0; i < MAX_ACTIVE_BOMBS; i++) {
+        if (bombs[i].is_active()) {
+            count++;
+        }
+    }
+    return count;
+}
+
 
 void Game::update_bombs() {
     Map& map = level_manager.get_current_map();
 
-    for (int i = 0; i < bomb_count; i++) {
-        if (bombs[i].is_timer_finished(timer)) {
-            bombs[i].explode(map);
+    for (int i = 0; i < MAX_ACTIVE_BOMBS; i++) {
+        if (bombs[i].is_active()) {
+            bombs[i].update(map, timer);
         }
     }
-
-    // Rimuovi bombe esplose
-    int count = 0;
-    for (int i = 0; i < bomb_count; i++) {
-        if (bombs[i].is_exploded()) {
-            bombs[i].reset();
-        }
-        else {
-            bombs[count] = bombs[i];
-            count++;
-        }
-    }
-    bomb_count = count;
 }
 
 
@@ -245,10 +238,15 @@ void Game::handle_input() {
             break;
 
         case ' ':
-            if (bomb_count < MAX_BOMBS && player.get_under() != BOMB) {
-                bombs[bomb_count].place(player.get_position(), timer);
-                bomb_count++;
-                player.set_under(BOMB);
+            if (get_active_bombs() < MAX_ACTIVE_BOMBS && player.get_under() != BOMB) {
+                int i = 0;
+                while (i < MAX_ACTIVE_BOMBS && bombs[i].is_active()) {
+                    i++;
+                }
+                if (i < MAX_ACTIVE_BOMBS) {
+                    bombs[i].place(player.get_position(), 1, timer);
+                    player.set_under(BOMB);
+                }
             }
             break;
 
@@ -297,9 +295,10 @@ void Game::handle_collisions() {
     }
 
     // Collisione bombe con esplosione
-    for (int i = 0; i < bomb_count; i++) {
-        if (map.is_explosion(bombs[i].get_position())) {
-            bombs[i].explode(map);
+    for (int i = 0; i < MAX_ACTIVE_BOMBS; i++) {
+        Position bomb_p = bombs[i].get_position();
+        if (bombs[i].is_active() && !bombs[i].is_exploded() && map.is_explosion(bomb_p)) {
+            bombs[i].explode(map, timer);
         }
     }
 }
@@ -310,7 +309,6 @@ void Game::run() {
         Map& map = level_manager.get_current_map();  // da mettere come campo
 
         update_bombs();
-        map.update_explosions();
 
         update_enemies();
 

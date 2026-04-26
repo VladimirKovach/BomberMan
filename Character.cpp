@@ -25,19 +25,19 @@ Position Character::get_next_position(Direction d) {
 
     switch (d) {
         case UP:
-            (next_p.y)--;
+            next_p.y--;
             break;
 
         case LEFT:
-            (next_p.x)--;
+            next_p.x--;
             break;
 
         case DOWN:
-            (next_p.y)++;
+            next_p.y++;
             break;
 
         case RIGHT:
-            (next_p.x)++;
+            next_p.x++;
             break;
 
         default:  // NONE

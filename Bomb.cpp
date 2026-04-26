@@ -3,57 +3,73 @@
 Bomb::Bomb(Position _p, int _range) {
     p = _p;
     range = _range;
-    place_time = -1.0;  // per convenzione
+
+    active = false;
     exploded = false;
+
+    placement_time = -1.0;  // per convenzione
+    explosion_time = -1.0;  // per convenzione
 }
 
-void Bomb::place(Position _p, double game_timer, int _range) {
-    p = _p;
-    place_time = game_timer;
-    range = _range;
-}
 
 Position Bomb::get_position() {
     return p;
+}
+
+bool Bomb::is_active() {
+    return active;
 }
 
 bool Bomb::is_exploded() {
     return exploded;
 }
 
-bool Bomb::is_timer_finished(double game_timer) {
-    return place_time - game_timer >= TIMER;
+
+void Bomb::place(Position _p, int _range, double game_timer) {
+    p = _p;
+    range = _range;
+
+    active = true;
+    placement_time = game_timer;
+
+    targets[0] = {p.x, p.y};
+    targets[1] = {p.x, p.y - 1};
+    targets[2] = {p.x - 1, p.y};
+    targets[3] = {p.x, p.y + 1};
+    targets[4] = {p.x + 1, p.y};
 }
 
-void Bomb::explode(Map& map) {
-    if (!exploded) {
-        exploded = true;
 
-        // Esplosione al centro
-        //map.set_cell_content(p, EXPLOSION);
-        map.set_explosion(p, EXPLOSION_DURATION);
+void Bomb::explode(Map& map, double game_timer) {
+    exploded = true;
+    explosion_time = game_timer;
 
-        // Esplosione nelle 4 direzioni (croce)
-        const int DIRECTIONS = 4;
-        int dx[] = {0, 0, -1, 1};
-        int dy[] = {-1, 1, 0, 0};
-
-        for (int i = 0; i < DIRECTIONS; i++) {
-            for (int j = 1; j <= range; j++) {
-                Position target = {p.x + (dx[i] * j), p.y + (dy[i] * j)};
-
-                if (map.get_cell_content(target) == UNBREAKABLE_WALL) {
-                    break;
-                }
-
-                //map.set_cell_content(target, EXPLOSION);
-                map.set_explosion(target, EXPLOSION_DURATION);
-            }
+    for (int i = 0; i < TARGET_COUNT; i++) {
+        if (map.get_cell_content(targets[i]) != UNBREAKABLE_WALL) {
+            map.set_cell_content(targets[i], EXPLOSION);
         }
     }
 }
 
 
+void Bomb::update(Map& map, double game_timer) {
+    if (!exploded && placement_time - game_timer >= EXPLOSION_TIMER) {
+        explode(map, game_timer);
+    }
+
+    else if (exploded && explosion_time - game_timer >= EXPLOSION_DURATION) {
+        for (int i = 0; i < TARGET_COUNT; i++) {
+            if (map.is_explosion(targets[i])) {
+                map.clear_cell(targets[i]);
+            }
+        }
+
+        reset();
+    }
+}
+
+
 void Bomb::reset() {
+    active = false;
     exploded = false;
 }

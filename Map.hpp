@@ -78,11 +78,6 @@ public:
     void close_next_door();
 
     void close_prev_door();
-
-    // da togliere
-    void set_explosion(Position p, int duration);
-    int get_explosion_timer(Position p);
-    void update_explosions();
 };
 
 #endif

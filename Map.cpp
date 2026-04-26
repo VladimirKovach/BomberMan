@@ -39,13 +39,6 @@ Map::Map(int difficulty) {
             }
         }
     }
-
-    // Inizializza la tabella di timer di esplosione a 0
-    for (int y = 0; y < MAP_ROWS; y++) {
-        for (int x = 0; x < MAP_COLS; x++) {
-            explosion_timer[y][x] = 0;
-        }
-    }
 }
 
 
@@ -236,37 +229,4 @@ void Map::close_next_door() {
 
 void Map::close_prev_door() {
     grid[1][0] = UNBREAKABLE_WALL;
-}
-
-
-// Esplosioni (da mettere in Bomb o in Game)
-void Map::set_explosion(Position p, int duration) {
-    if (in_bounds(p)) {
-        grid[p.y][p.x] = EXPLOSION;
-        explosion_timer[p.y][p.x] = duration;
-    }
-}
-
-int Map::get_explosion_timer(Position p) {
-    if (in_bounds(p)) {
-        return explosion_timer[p.y][p.x];
-    }
-    else {
-        return -1;  // fallback
-    }
-}
-
-void Map::update_explosions() {
-    for (int y = 0; y < MAP_ROWS; y++) {
-        for (int x = 0; x < MAP_COLS; x++) {
-            if (grid[y][x] == EXPLOSION) {
-                explosion_timer[y][x]--;
-
-                if (explosion_timer[y][x] <= 0) {
-                    clear_cell({x, y});
-                    explosion_timer[y][x] = 0;
-                }
-            }
-        }
-    }
 }
