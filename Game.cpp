@@ -3,31 +3,23 @@
 #include <ncurses.h>
 
 // =====================================================
-// spawn_enemies: crea i nemici per il livello corrente.
+// Crea i nemici per il livello corrente
 //
-// Il numero di nemici scala con la difficolta' (da sistemare):
-//   - difficulty 1: 1 (dummy), 1 (smart)
-//   - difficulty 2: 2 (dummy), 2 (smart)
-//   - difficulty 3: 4 (dummy), 3 (smart)
-//   - difficulty 4: 8 (dummy), 4 (smart)
-//   - difficulty 5: 10 (dummy), 5 (smart)
+// Il numero di nemici varia in base alla difficolta' (da sistemare):
+//   - difficolta' 1: 1 (dummy), 1 (smart)
+//   - difficolta' 2: 2 (dummy), 2 (smart)
+//   - difficolta' 3: 3 (dummy), 3 (smart)
+//   - difficolta' 4: 4 (dummy), 4 (smart)
+//   - difficolta' 5: 5 (dummy), 5 (smart)
 //
-// Ogni nemico viene piazzato su una cella vuota casuale.
+// Ogni nemico viene piazzato su una cella vuota casuale
 // =====================================================
 void Game::spawn_enemies() {
     Map& map = level_manager.get_current_map();
     int difficulty = level_manager.get_current_difficulty();
 
-    // Numero di nemici in base alla difficolta'
-    dummy_enemy_count = pow(2, difficulty - 1);  // da sistemare
-    if (dummy_enemy_count > MAX_DUMMY_ENEMIES) {
-        dummy_enemy_count = MAX_DUMMY_ENEMIES;
-    }
-    
+    dummy_enemy_count = difficulty;
     smart_enemy_count = difficulty;
-    if (smart_enemy_count > MAX_SMART_ENEMIES) {
-        smart_enemy_count = MAX_SMART_ENEMIES;
-    }
 
     for (int i = 0; i < dummy_enemy_count; i++) {
         Position spawn_p = map.get_random_empty_cell();
@@ -43,7 +35,7 @@ void Game::spawn_enemies() {
 }
 
 // =====================================================
-// enter_level: configura tutto per giocare nel livello corrente.
+// Configura il livello corrente
 //
 // Parametro from_prev:
 //   - true: il giocatore arriva dal livello precedente
@@ -76,32 +68,22 @@ void Game::enter_level(bool from_prev) {
 }
 
 
-// =====================================================
-// check_door_transition: controlla se il giocatore e'
-// su una porta e gestisce il cambio livello.
-// =====================================================
+
+// Controlla se il giocatore e' su una porta e gestisce il cambio livello
 void Game::check_door_transition() {
     Map& map = level_manager.get_current_map();
     Position player_p = player.get_position();
     CellContent cell = map.get_cell_content(player_p);
 
     if (cell == NEXT_DOOR && level_manager.has_next_level()) {
-        // Rimuovi il giocatore dalla mappa corrente
         map.clear_cell(player_p);
-
-        // Vai al livello successivo
         level_manager.go_to_next_level();
-
-        // Entra nel nuovo livello (arriva da sinistra)
         enter_level(true);
     }
+
     else if (cell == PREV_DOOR && level_manager.has_prev_level()) {
-        // Rimuovi il giocatore dalla mappa corrente
         map.clear_cell(player_p);
-
         level_manager.go_to_prev_level();
-
-        // Entra nel nuovo livello (arriva da destra)
         enter_level(false);
     }
 }
@@ -284,6 +266,7 @@ void Game::handle_collisions() {
         Position dummy_enemy_p = dummy_enemies[i].get_position();
         if (map.is_explosion(dummy_enemy_p)) {
             dummy_enemies[i].take_damage();
+            score += 5;
         }
     }
 
@@ -291,6 +274,7 @@ void Game::handle_collisions() {
         Position smart_enemy_p = smart_enemies[i].get_position();
         if (map.is_explosion(smart_enemy_p)) {
             smart_enemies[i].take_damage();
+            score += 5;
         }
     }
 
@@ -309,13 +293,10 @@ void Game::run() {
         Map& map = level_manager.get_current_map();  // da mettere come campo
 
         update_bombs();
-
         update_enemies();
-
         update_timer(start);
 
         handle_input();
-
         handle_collisions();
 
         check_door_transition();
