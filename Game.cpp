@@ -291,18 +291,20 @@ void Game::handle_collisions() {
 void Game::run() {
     while (!game_over() && !win() && !quit) {
         Map& map = level_manager.get_current_map();  // da mettere come campo
+        int level_number = level_manager.get_current_level_number();
+
+        handle_input();
 
         update_bombs();
         update_enemies();
         update_timer(start);
 
-        handle_input();
         handle_collisions();
 
         check_door_transition();
         level_manager.update_doors();
 
-        renderer.draw_level(map, score, timer, level_manager.get_current_level_number());
+        renderer.render_level(map, score, timer, level_number);
 
         napms(50);  // ~20 FPS
     }

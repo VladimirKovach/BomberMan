@@ -35,12 +35,12 @@ protected:
     char get_cell_view(CellContent content);
     ColorPair get_cell_color(CellContent content);
 
-    void draw_map(Map& map);
+    void render_map(Map& map);
 
 public:
     Renderer();
 
-    void draw_level(Map& map, int score, int time, int level_number);
+    void render_level(Map& map, int score, int time, int level_number);
 };
 
 #endif

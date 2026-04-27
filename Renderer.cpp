@@ -50,7 +50,6 @@ void Renderer::display_time(double time) {
     printw("TIME: %-*d", TIME_MAX_LENGTH, (int) time);
 }
 
-// cambiare posizione
 void Renderer::display_level_number(int level_number) {
     const int LEVEL_LABEL_MAX_LENGTH = 7;  // length(LEVEL 5) = 7
     int px = map_start_p.x + ((MAP_COLS - LEVEL_LABEL_MAX_LENGTH) / 2);
@@ -141,7 +140,7 @@ ColorPair Renderer::get_cell_color(CellContent content) {
 }
 
 
-void Renderer::draw_map(Map& map) {
+void Renderer::render_map(Map& map) {
     int frame_counter = 0;
     frame_counter++;
 
@@ -157,10 +156,10 @@ void Renderer::draw_map(Map& map) {
 }
 
 
-void Renderer::draw_level(Map& map, int score, int time, int level_number) {
+void Renderer::render_level(Map& map, int score, int time, int level_number) {
     display_score(score);
     display_time(time);
-    //display_level_number(level_number);
-    draw_map(map);
+    display_level_number(level_number);
+    render_map(map);
     refresh();
 }

@@ -21,8 +21,6 @@ protected:
 
     Position targets[TARGET_COUNT];
 
-    void reset();
-
 public:
     Bomb(Position _p = {-1, -1}, int _range = DEFAULT_RANGE);
 

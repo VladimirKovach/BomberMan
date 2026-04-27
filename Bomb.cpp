@@ -64,12 +64,7 @@ void Bomb::update(Map& map, double game_timer) {
             }
         }
 
-        reset();
+        active = false;
+        exploded = false;
     }
-}
-
-
-void Bomb::reset() {
-    active = false;
-    exploded = false;
 }
