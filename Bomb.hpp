@@ -3,8 +3,6 @@
 
 #include "Map.hpp"
 
-const int DEFAULT_RANGE = 1;
-const int TARGET_COUNT = 5;
 const double EXPLOSION_TIMER = 3.0;
 const double EXPLOSION_DURATION = 2.0;
 
@@ -19,10 +17,8 @@ protected:
     double placement_time;
     double explosion_time;
 
-    Position targets[TARGET_COUNT];
-
 public:
-    Bomb(Position _p = {-1, -1}, int _range = DEFAULT_RANGE);
+    Bomb(Position _p = {-1, -1}, int _range = 1);
 
     Position get_position();
 
