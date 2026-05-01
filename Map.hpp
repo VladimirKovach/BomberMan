@@ -31,6 +31,7 @@ const int MAX_DIFFICULTY = 5;
 class Map {
 protected:
     CellContent grid[MAP_ROWS][MAP_COLS];
+    CellContent start_grid[MAP_ROWS][MAP_COLS];
 
     // Possibili posizioni in cui piazzare nemici
     Position spawns[MAX_SPAWNS];
@@ -46,6 +47,10 @@ protected:
 
 public:
     Map(int difficulty = 1);
+
+    void save_state();
+
+    void reset_state();
 
     bool in_bounds(Position p);
 

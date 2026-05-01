@@ -55,6 +55,21 @@ Map::Map(int difficulty) {
     shuffle();
 }
 
+void Map::save_state() {
+    for (int y = 0; y < MAP_ROWS; y++) {
+        for (int x = 0; x < MAP_COLS; x++) {
+            start_grid[y][x] = grid[y][x];
+        }
+    }
+}
+
+void Map::reset_state() {
+    for (int y = 0; y < MAP_ROWS; y++) {
+        for (int x = 0; x < MAP_COLS; x++) {
+            grid[y][x] = start_grid[y][x];
+        }
+    }
+}
 
 // =====================================================
 // Controlla se la cella (x,y) NON deve mai ricevere muri distruttibili

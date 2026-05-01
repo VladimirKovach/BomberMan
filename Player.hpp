@@ -7,7 +7,7 @@ class Player : public Character {
 protected:
 
 public:
-    Player(Position _p = {1, 1}, int _lives = 1);
+    Player(Position _p = {1, 1}, int _lives = 3);
 
     void heal();
 
