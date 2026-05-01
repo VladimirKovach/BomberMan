@@ -57,12 +57,7 @@ void Character::move(Map& map, Direction d) {
     Position next_p = get_next_position(d);
 
     if (!map.is_wall(next_p)) {
-        if (under == EMPTY) {
-            map.clear_cell(p);
-        }
-        else {
-            map.set_cell_content(p, under);
-        }
+        map.set_cell_content(p, under);
 
         p = next_p;
 

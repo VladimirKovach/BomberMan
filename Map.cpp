@@ -30,15 +30,29 @@ Map::Map(int difficulty) {
     // Muri distruttibili (quantita' basata sulla difficolta')
     place_breakable_walls(difficulty);
 
-    // Riempi l'array empty_cells con tutte le celle rimaste EMPTY
-    empty_cells_count = 0;
-    for (int y = 1; y < MAP_ROWS - 1; y++) {
-        for (int x = 1; x < MAP_COLS - 1; x++) {
+    spawn_count = 0;
+
+    // secondo quadrante (primo quadrante escluso)
+    for (int y = 0; y < MAP_ROWS / 2; y++) {
+        for (int x = MAP_COLS / 2; x < MAP_COLS; x++) {
             if (grid[y][x] == EMPTY) {
-                add_empty_cell({x, y});
+                spawns[spawn_count] = {x, y};
+                spawn_count++;
             }
         }
     }
+
+    // terzo e quarto quadrante
+    for (int y = MAP_ROWS / 2; y < MAP_ROWS; y++) {
+        for (int x = 0; x < MAP_COLS; x++) {
+            if (grid[y][x] == EMPTY) {
+                spawns[spawn_count] = {x, y};
+                spawn_count++;
+            }
+        }
+    }
+
+    shuffle();
 }
 
 
@@ -112,6 +126,16 @@ void Map::place_breakable_walls(int difficulty) {
     }
 }
 
+void Map::shuffle() {
+    for (int i = spawn_count - 1; i >= 0; i--) {
+        int j = rand() % (i + 1);
+        if (j != i) {
+            Position tmp = spawns[i];
+            spawns[i] = spawns[j];
+            spawns[j] = tmp;
+        }
+    }
+}
 
 bool Map::in_bounds(Position p) {
     return (p.x >= 0 && p.x < MAP_COLS) && (p.y >= 0 && p.y < MAP_ROWS);
@@ -143,72 +167,32 @@ bool Map::is_explosion(Position p) {
     return in_bounds(p) && grid[p.y][p.x] == EXPLOSION;
 }
 
-void Map::add_empty_cell(Position p) {
-    if (is_empty_cell(p)) {
-        empty_cells[empty_cells_count] = p;
-        empty_cells_count++;
-    }
-}
-
-
-void Map::remove_empty_cell(Position p) {
-    bool found = false;
-    int i = 0;
-
-    while (i < empty_cells_count && !found) {
-        if (positions_equal(empty_cells[i], p)) {
-            found = true;
-
-            for (i; i < empty_cells_count - 1; i++) {
-                empty_cells[i] = empty_cells[i + 1];
-            }
-
-            empty_cells_count--;
-        }
-
-        else {
-            i++;
-        }
-    }
-}
-
-
-// da modificare: le celle (1, 2), (2, 1) non vanno bene all'inizio
-Position Map::get_random_empty_cell() {
-    if (empty_cells_count != 0) {
-        int i = rand() % empty_cells_count;
-        return empty_cells[i];
-    }
-    else {
-        return {-1, -1};  // da gestire
-    }
-}
-
 CellContent Map::get_cell_content(Position p) {
     if (in_bounds(p)) {
         return grid[p.y][p.x];
     }
     else {
-        return UNKNOWN;
+        return UNKNOWN;  // fallback
     }
 }
 
 void Map::set_cell_content(Position p, CellContent content) {
     if (in_bounds(p)) {
-        if (is_empty_cell(p)) {
-            remove_empty_cell(p);
-        }
         grid[p.y][p.x] = content;
     }
 }
 
 void Map::clear_cell(Position p) {
-    if (in_bounds(p) && !is_empty_cell(p)) {
+    if (in_bounds(p)) {
         grid[p.y][p.x] = EMPTY;
-        add_empty_cell(p);
     }
 }
 
+Position Map::get_random_spawn() {
+    Position spawn = spawns[spawn_count - 1];
+    spawn_count--;
+    return spawn;
+}
 
 // =====================================================
 // Porte tra livelli

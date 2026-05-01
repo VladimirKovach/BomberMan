@@ -22,13 +22,13 @@ void Game::spawn_enemies() {
     smart_enemy_count = difficulty;
 
     for (int i = 0; i < dummy_enemy_count; i++) {
-        Position spawn_p = map.get_random_empty_cell();
+        Position spawn_p = map.get_random_spawn();
         dummy_enemies[i] = DummyEnemy(spawn_p, 1, 1);
         map.set_cell_content(spawn_p, DUMMY_ENEMY);
     }
 
     for (int i = 0; i < smart_enemy_count; i++) {
-        Position spawn_p = map.get_random_empty_cell();
+        Position spawn_p = map.get_random_spawn();
         smart_enemies[i] = SmartEnemy(spawn_p, 1, 1);
         map.set_cell_content(spawn_p, SMART_ENEMY);
     }
