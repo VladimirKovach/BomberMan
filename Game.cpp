@@ -1,6 +1,7 @@
 #include "Game.hpp"
-#include <cmath>
+#include <algorithm>
 #include <ncurses.h>
+using namespace std;
 
 // =====================================================
 // Crea i nemici per il livello corrente
@@ -178,10 +179,7 @@ void Game::update_enemies() {
 void Game::update_timer(steady_clock::time_point start) {
     steady_clock::time_point now = steady_clock::now();
     double elapsed = duration<double>(now - start).count();
-    timer = TIMER_START_VALUE - elapsed;
-    if (timer < 0.0) {
-        timer = 0.0;
-    }
+    timer = max(0.0, TIMER_START_VALUE - elapsed);
 }
 
 

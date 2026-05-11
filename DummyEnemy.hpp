@@ -14,9 +14,7 @@ protected:
     Direction directions[DIRECTION_COUNT];
 
     bool can_move(double game_timer);
-
     void plan_move();
-
     void move(Map& map, double game_timer);
 
 public:

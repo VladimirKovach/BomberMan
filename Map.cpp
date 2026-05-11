@@ -1,8 +1,8 @@
 #include "Map.hpp"
 #include <cstdlib>
 
-bool positions_equal(Position p1, Position p2) {
-    return p1.x == p2.x && p1.y == p2.y;
+bool positions_equal(Position p, Position q) {
+    return p.x == q.x && p.y == q.y;
 }
 
 
@@ -52,8 +52,9 @@ Map::Map(int difficulty) {
         }
     }
 
-    shuffle();
+    shuffle_spawns();
 }
+
 
 void Map::save_state() {
     for (int y = 0; y < MAP_ROWS; y++) {
@@ -141,7 +142,7 @@ void Map::place_breakable_walls(int difficulty) {
     }
 }
 
-void Map::shuffle() {
+void Map::shuffle_spawns() {
     for (int i = spawn_count - 1; i >= 0; i--) {
         int j = rand() % (i + 1);
         if (j != i) {
@@ -158,6 +159,16 @@ bool Map::in_bounds(Position p) {
 
 bool Map::is_empty_cell(Position p) {
     return grid[p.y][p.x] == EMPTY;
+}
+
+bool Map::is_walkable(Position p) {
+    if (in_bounds(p)) {
+        CellContent c = grid[p.y][p.x];
+        return c != BREAKABLE_WALL && c != UNBREAKABLE_WALL;
+    }
+    else {
+        return false;
+    }
 }
 
 bool Map::is_wall(Position p) {

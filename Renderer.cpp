@@ -1,24 +1,34 @@
 #include "Renderer.hpp"
 #include "Bomb.hpp"
+
+#include <cstdlib>
+#include <iostream>
 #include <ncurses.h>
+using namespace std;
+
 
 void Renderer::init_colors() {
     if (has_colors()) {
         start_color();
+
+        init_pair(CP_SCREEN, COLOR_BLACK, COLOR_BLACK);
+
+        init_pair(CP_UNBREAKABLE_WALL, COLOR_WHITE, COLOR_WHITE);
+        init_pair(CP_BREAKABLE_WALL, GREY, GREY);
+        init_pair(CP_DOOR, COLOR_GREEN, COLOR_BLACK);
+
+        init_pair(CP_PLAYER, COLOR_CYAN, COLOR_BLACK);
+        init_pair(CP_ENEMY, COLOR_RED, COLOR_BLACK);
+
+        init_pair(CP_BOMB, ORANGE, COLOR_BLACK);
+        init_pair(CP_EXPLOSION, COLOR_YELLOW, COLOR_RED);
+
     }
 
-    init_pair(CP_SCREEN, COLOR_BLACK, COLOR_BLACK);
-
-    init_pair(CP_UNBREAKABLE_WALL, COLOR_WHITE, COLOR_WHITE);
-    init_pair(CP_BREAKABLE_WALL, GREY, GREY);
-
-    init_pair(CP_PLAYER, COLOR_CYAN, COLOR_BLACK);
-    init_pair(CP_ENEMY, COLOR_RED, COLOR_BLACK);
-
-    init_pair(CP_BOMB, ORANGE, COLOR_BLACK);
-    init_pair(CP_EXPLOSION, COLOR_YELLOW, COLOR_RED);
-
-    init_pair(CP_DOOR, COLOR_GREEN, COLOR_BLACK);
+    else {
+        cout << "Error: terminal does not support colors\n";
+        exit(EXIT_FAILURE);
+    }
 }
 
 
