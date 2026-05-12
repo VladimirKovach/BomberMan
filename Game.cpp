@@ -19,6 +19,11 @@ void Game::spawn_enemies() {
     Map& map = level_manager.get_current_map();
     int difficulty = level_manager.get_current_difficulty();
 
+    DummyEnemy* dummy_enemies = level_manager.get_current_dummy_enemies();
+    int& dummy_enemy_count = level_manager.get_current_dummy_count();
+    SmartEnemy* smart_enemies = level_manager.get_current_smart_enemies();
+    int& smart_enemy_count = level_manager.get_current_smart_count();
+
     dummy_enemy_count = difficulty;
     smart_enemy_count = difficulty;
 
@@ -69,8 +74,9 @@ void Game::enter_level(bool from_prev) {
 }
 
 
-
-// Controlla se il giocatore e' su una porta e gestisce il cambio livello
+// Controlla se il giocatore e' su una porta e gestisce il cambio livello.
+// Se il livello che si sta lasciando e' completato, viene rimosso dalla lista
+// Se non e' completato, resta nella lista e potra' essere rivisitato.
 void Game::check_door_transition() {
     Map& map = level_manager.get_current_map();
     Position player_p = player.get_position();
@@ -78,13 +84,26 @@ void Game::check_door_transition() {
 
     if (cell == NEXT_DOOR && level_manager.has_next_level()) {
         map.clear_cell(player_p);
-        level_manager.go_to_next_level();
+
+        if (level_manager.is_current_completed()) {
+            level_manager.remove_current_level(true);
+        }
+        else {
+            level_manager.go_to_next_level();
+        }
+
         enter_level(true);
     }
-
     else if (cell == PREV_DOOR && level_manager.has_prev_level()) {
         map.clear_cell(player_p);
-        level_manager.go_to_prev_level();
+
+        if (level_manager.is_current_completed()) {
+            level_manager.remove_current_level(false);
+        }
+        else {
+            level_manager.go_to_prev_level();
+        }
+
         enter_level(false);
     }
 }
@@ -95,9 +114,6 @@ Game::Game() {
     timer = TIMER_START_VALUE;
     start = steady_clock::now();
     score = 0;
-
-    dummy_enemy_count = 0;
-    smart_enemy_count = 0;
 
     // Entra nel primo livello
     enter_level(true);
@@ -113,7 +129,8 @@ bool Game::win() {
 }
 
 bool Game::all_enemies_dead() {
-    return dummy_enemy_count + smart_enemy_count == 0;
+    return level_manager.get_current_dummy_count() +
+           level_manager.get_current_smart_count() == 0;
 }
 
 int Game::get_active_bombs() {
@@ -140,6 +157,10 @@ void Game::update_bombs() {
 
 void Game::update_enemies() {
     Map& map = level_manager.get_current_map();
+    DummyEnemy* dummy_enemies = level_manager.get_current_dummy_enemies();
+    int& dummy_enemy_count = level_manager.get_current_dummy_count();
+    SmartEnemy* smart_enemies = level_manager.get_current_smart_enemies();
+    int& smart_enemy_count = level_manager.get_current_smart_count();
 
     if (!level_manager.is_current_completed()) {
         for (int i = 0; i < dummy_enemy_count; i++) {
@@ -150,7 +171,6 @@ void Game::update_enemies() {
             smart_enemies[i].update(map, timer, player.get_position());
         }
 
-        // Rimuovi nemici morti
         int dummy_count = 0;
         for (int i = 0; i < dummy_enemy_count; i++) {
             if (!dummy_enemies[i].is_dead()) {
@@ -238,7 +258,10 @@ void Game::handle_input() {
 
 void Game::handle_collisions() {
     Map& map = level_manager.get_current_map();
-
+    DummyEnemy* dummy_enemies = level_manager.get_current_dummy_enemies();
+    int dummy_enemy_count = level_manager.get_current_dummy_count();
+    SmartEnemy* smart_enemies = level_manager.get_current_smart_enemies();
+    int smart_enemy_count = level_manager.get_current_smart_count();
     Position player_p = player.get_position();
 
     // Collisione player con nemici

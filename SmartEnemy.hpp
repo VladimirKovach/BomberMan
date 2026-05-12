@@ -1,3 +1,6 @@
+#ifndef SMARTENEMY_HPP
+#define SMARTENEMY_HPP
+
 #include "DummyEnemy.hpp"
 #include "Character.hpp"
 
@@ -26,3 +29,5 @@ public:
 
     void update(Map& map, double game_timer, Position _player_p);
 };
+
+#endif

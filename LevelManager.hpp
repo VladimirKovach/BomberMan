@@ -2,6 +2,10 @@
 #define LEVELMANAGER_HPP
 
 #include "Map.hpp"
+#include "DummyEnemy.hpp"
+#include "SmartEnemy.hpp"
+const int MAX_DUMMY_ENEMIES = 10;
+const int MAX_SMART_ENEMIES = 5;
 
 // =====================================================
 // LevelNode: un nodo della lista bidirezionale.
@@ -20,6 +24,10 @@ struct LevelNode {
     int difficulty;
     bool completed;
     bool visited;
+	DummyEnemy dummy_enemies[MAX_DUMMY_ENEMIES];
+    int dummy_enemy_count;
+    SmartEnemy smart_enemies[MAX_SMART_ENEMIES];
+    int smart_enemy_count;
     LevelNode* next;
     LevelNode* prev;
 };
@@ -63,6 +71,10 @@ public:
 
     bool go_to_prev_level();
 
+	// Rimuove dalla lista il nodo corrente e sposta 'current'
+    // al nodo adiacente (next se forward=true, prev se forward=false).
+    bool remove_current_level(bool forward);
+
     void mark_current_completed();
 
     void mark_current_visited();
@@ -78,6 +90,11 @@ public:
     // - Se c'e' un livello precedente -> apre DOOR_PREV
     // - Altrimenti chiude le porte
     void update_doors();
+
+	DummyEnemy* get_current_dummy_enemies();
+    int& get_current_dummy_count();
+    SmartEnemy* get_current_smart_enemies();
+    int& get_current_smart_count();
 };
 
 #endif

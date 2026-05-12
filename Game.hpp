@@ -11,8 +11,6 @@
 using namespace std::chrono;
 
 const double TIMER_START_VALUE = 1000.0;  // secondi
-const int MAX_DUMMY_ENEMIES = 10;  // Numero massimo di nemici (dummy) per livello
-const int MAX_SMART_ENEMIES = 5;  // Numero massimo di nemici (smart) per livello
 const int MAX_ACTIVE_BOMBS = 3;
 
 class Game {
@@ -23,12 +21,6 @@ protected:
     int score;
 
     Bomb bombs[MAX_ACTIVE_BOMBS];
-
-    // Array di nemici vivi
-    DummyEnemy dummy_enemies[MAX_DUMMY_ENEMIES];
-    int dummy_enemy_count;
-    SmartEnemy smart_enemies[MAX_SMART_ENEMIES];
-    int smart_enemy_count;
 
     LevelManager level_manager;
     Renderer renderer;

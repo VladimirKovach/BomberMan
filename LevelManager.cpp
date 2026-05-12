@@ -29,6 +29,8 @@ LevelManager::LevelManager() {
         node->visited = false;
         node->next = 0;
         node->prev = prev_node;
+		node->dummy_enemy_count = 0;
+        node->smart_enemy_count = 0;
 
         if (prev_node != 0) {
             prev_node->next = node;
@@ -147,37 +149,86 @@ bool LevelManager::all_levels_completed() {
 
 // =====================================================
 // update_doors: aggiorna le porte del livello corrente.
-//
-// Logica:
-//   - DOOR_NEXT (bordo destro): si apre SOLO se tutti i
-//     nemici del livello sono morti e esiste un livello
-//     successivo. Questo obbliga il giocatore a completare
-//     il livello prima di poter avanzare.
-//
-//   - DOOR_PREV (bordo sinistro): si apre SEMPRE se esiste
-//     un livello precedente. Il giocatore puo' tornare
-//     indietro in qualsiasi momento.
-//
-// Questa funzione viene chiamata ogni frame dal Game loop.
 // =====================================================
 void LevelManager::update_doors() {
     if (current == 0) return;
 
     Map& map = current->map;
 
-    // Porta avanti: aperta solo se nemici tutti morti e c'e' un livello successivo
-    if (is_current_completed() && current->next != 0) {
+    // Sia NEXT che PREV si aprono sempre se esiste un livello adiacente,
+    // indipendentemente dal completamento.
+    if (current->next != 0) {
         map.open_next_door();
     }
     else {
         map.close_next_door();
     }
 
-    // Porta indietro: aperta se c'e' un livello precedente
     if (current->prev != 0) {
         map.open_prev_door();
     }
     else {
         map.close_prev_door();
     }
+}
+
+// =====================================================
+// remove_current_level:
+// Cancella il nodo corrente dalla lista bidirezionale e sposta
+// 'current' al nodo adiacente. Aggiorna 'head' se necessario.
+// Restituisce false se non c'e' un nodo adiacente nella direzione richiesta.
+// =====================================================
+bool LevelManager::remove_current_level(bool forward) {
+    if (current == 0) {
+        return false;
+    }
+
+    LevelNode* to_remove = current;
+    LevelNode* new_current;
+
+    if (forward) {
+        new_current = to_remove->next;
+    }
+    else {
+        new_current = to_remove->prev;
+    }
+
+    if (new_current == 0) {
+        return false;
+    }
+
+    LevelNode* prev_node = to_remove->prev;
+    LevelNode* next_node = to_remove->next;
+
+    if (prev_node != 0) {
+        prev_node->next = next_node;
+    }
+    if (next_node != 0) {
+        next_node->prev = prev_node;
+    }
+
+    if (head == to_remove) {
+        head = next_node;
+    }
+
+    current = new_current;
+    delete to_remove;
+
+    return true;
+}
+
+DummyEnemy* LevelManager::get_current_dummy_enemies() {
+    return current->dummy_enemies;
+}
+
+int& LevelManager::get_current_dummy_count() {
+    return current->dummy_enemy_count;
+}
+
+SmartEnemy* LevelManager::get_current_smart_enemies() {
+    return current->smart_enemies;
+}
+
+int& LevelManager::get_current_smart_count() {
+    return current->smart_enemy_count;
 }
