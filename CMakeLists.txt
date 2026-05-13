@@ -26,6 +26,8 @@ add_executable(BomberMan
         LevelManager.hpp
         Map.cpp
         Map.hpp
+        Menu.cpp
+        Menu.hpp
         Player.cpp
         Player.hpp
         Renderer.cpp

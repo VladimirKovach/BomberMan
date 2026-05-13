@@ -1,7 +1,7 @@
-bomberman: main.o Bomb.o Character.o DummyEnemy.o Game.o LevelManager.o Map.o Player.o Renderer.o SmartEnemy.o
-	g++ main.o Bomb.o Character.o DummyEnemy.o Game.o LevelManager.o Map.o Player.o Renderer.o SmartEnemy.o -lncurses -o bomberman
+bomberman: main.o Bomb.o Character.o DummyEnemy.o Game.o LevelManager.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o
+	g++ main.o Bomb.o Character.o DummyEnemy.o Game.o LevelManager.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o -lncurses -o bomberman
 
-main.o: main.cpp Game.hpp
+main.o: main.cpp Game.hpp Menu.hpp
 	g++ -c main.cpp
 
 Bomb.o: Bomb.cpp Bomb.hpp Map.hpp
@@ -21,6 +21,9 @@ LevelManager.o: LevelManager.cpp LevelManager.hpp Map.hpp
 
 Map.o: Map.cpp Map.hpp
 	g++ -c Map.cpp
+
+Menu.o: Menu.cpp Menu.hpp
+	g++ -c Menu.cpp
 
 Player.o: Player.cpp Player.hpp
 	g++ -c Player.cpp
