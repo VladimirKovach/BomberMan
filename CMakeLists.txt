@@ -34,6 +34,8 @@ add_executable(BomberMan
         Renderer.hpp
         SmartEnemy.cpp
         SmartEnemy.hpp
+        Leaderboard.cpp
+        Leaderboard.hpp
 )
 
 target_link_libraries(BomberMan ${CURSES_LIBRARIES})

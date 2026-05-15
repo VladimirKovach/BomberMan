@@ -1,5 +1,7 @@
 #include "Menu.hpp"
+#include "Leaderboard.hpp"
 #include <ncurses.h>
+#include <cstdio>
 
 // Dimensioni della finestra del menu.
 // Tenute piccole perche' il menu ha poche voci e deve stare comoda
@@ -90,35 +92,153 @@ void Menu::draw() {
 }
 
 
-// todo CLASSIFICA
-void Menu::show_leaderboard_stub() {
+void Menu::read_string(int y, int x, char* buffer, int max_len) {
+    noecho();
+    curs_set(1);
+
+    int pos = 0;
+    bool done = false;
+
+    while (!done) {
+        move(y, x + pos);
+        refresh();
+        int key = getch();
+
+        switch (key) {
+            case '\n':
+            case KEY_ENTER:
+                done = true;
+                break;
+
+            case KEY_BACKSPACE:
+            case 127:
+            case '\b':
+                if (pos > 0) {
+                    pos--;
+                    mvaddch(y, x + pos, ' ');
+                    move(y, x + pos);
+                }
+                break;
+
+            default:
+                // Accetta caratteri stampabili (incluso lo spazio).
+                // L'unico vietato e' ';' (separatore nel file dei punteggi).
+                if (key >= ' ' && key < 127 && key != ';' && pos < max_len - 1) {
+                    buffer[pos] = (char) key;
+                    // disegna il carattere a schermo manualmente (echo è disattivato)
+                    mvaddch(y, x + pos, key);
+                    pos++;
+                }
+                break;
+        }
+    }
+
+    buffer[pos] = '\0';
+
+    noecho();
+    curs_set(0);
+}
+
+
+void Menu::show_leaderboard() {
     clear();
 
-    const char* msg1 = "CLASSIFICA";
-    const char* msg2 = "Funzione non ancora disponibile";
-    const char* msg3 = "Premi un tasto per tornare al menu...";
+    const char* title = "CLASSIFICA";
+    int title_len = 0;
+    while (title[title_len] != '\0') title_len++;
+    mvprintw(2, (COLS - title_len) / 2, "%s", title);
 
-    // Calcolo lunghezze manualmente per centrare.
-    int len1 = 0; while (msg1[len1] != '\0') len1++;
-    int len2 = 0; while (msg2[len2] != '\0') len2++;
-    int len3 = 0; while (msg3[len3] != '\0') len3++;
+    const char* prompt = "Quanti top? ";
+    int prompt_len = 0;
+    while (prompt[prompt_len] != '\0') prompt_len++;
+    int prompt_x = (COLS - prompt_len - 4) / 2;
+    mvprintw(4, prompt_x, "%s", prompt);
 
-    int center_y = LINES / 2;
-    mvprintw(center_y - 2, (COLS - len1) / 2, "%s", msg1);
-    mvprintw(center_y,     (COLS - len2) / 2, "%s", msg2);
-    mvprintw(center_y + 2, (COLS - len3) / 2, "%s", msg3);
+    char n_str[6];
+    read_string(4, prompt_x + prompt_len, n_str, 6);
+
+    int n = 0;
+    for (int i = 0; n_str[i] != '\0'; i++) {
+        if (n_str[i] >= '0' && n_str[i] <= '9') {
+            n = n * 10 + (n_str[i] - '0');
+        } else {
+            n = 0;
+            break;
+        }
+    }
+    if (n <= 0) n = 10;
+
+    ScoreEntry* head = Leaderboard::load();
+
+    clear();
+    mvprintw(1, (COLS - title_len) / 2, "%s", title);
+
+    if (head == nullptr) {
+        const char* empty = "Nessun punteggio salvato.";
+        int empty_len = 0;
+        while (empty[empty_len] != '\0') empty_len++;
+        mvprintw(LINES / 2, (COLS - empty_len) / 2, "%s", empty);
+    }
+    else {
+        ScoreEntry* curr = head;
+        int rank = 1;
+        int row = 4;
+        int col = (COLS - 30) / 2;
+
+        while (curr != nullptr && rank <= n) {
+            mvprintw(row, col, "%2d. %-15s %6d", rank, curr->name, curr->score);
+            curr = curr->next;
+            rank++;
+            row++;
+        }
+    }
+
+    Leaderboard::free_list(head);
+
+    const char* back = "Premi un tasto per tornare al menu...";
+    int back_len = 0;
+    while (back[back_len] != '\0') back_len++;
+    mvprintw(LINES - 2, (COLS - back_len) / 2, "%s", back);
 
     refresh();
-
     getch();
 }
 
+
+void Menu::prompt_save_score(int score) {
+    nodelay(stdscr, FALSE);
+    clear();
+
+    const char* title = "PARTITA TERMINATA";
+    int title_len = 0;
+    while (title[title_len] != '\0') title_len++;
+    mvprintw(LINES / 2 - 4, (COLS - title_len) / 2, "%s", title);
+
+    char score_str[32];
+    int score_len = snprintf(score_str, sizeof(score_str), "Punteggio: %d", score);
+    mvprintw(LINES / 2 - 2, (COLS - score_len) / 2, "%s", score_str);
+
+    const char* prompt = "Inserisci il tuo nome: ";
+    int prompt_len = 0;
+    while (prompt[prompt_len] != '\0') prompt_len++;
+    int prompt_x = (COLS - prompt_len - MAX_NAME_LEN) / 2;
+    mvprintw(LINES / 2, prompt_x, "%s", prompt);
+
+    char name[MAX_NAME_LEN];
+    read_string(LINES / 2, prompt_x + prompt_len, name, MAX_NAME_LEN);
+
+    if (name[0] == '\0') {
+        name[0] = 'A'; name[1] = 'n'; name[2] = 'o'; name[3] = 'n';
+        name[4] = 'i'; name[5] = 'm'; name[6] = 'o'; name[7] = '\0';
+    }
+
+    Leaderboard::save(name, score);
+}
 
 MenuChoice Menu::show() {
     // nodelay: getch() BLOCCHI in attesa di un tasto,
     // Lo ripristiniamo all'uscita - cosi' il main loop del gioco (che usa nodelay true) non viene rotto.
     nodelay(stdscr, FALSE);
-
     keypad(stdscr, TRUE);
     curs_set(0);
 
@@ -151,8 +271,7 @@ MenuChoice Menu::show() {
             case KEY_ENTER:  // Enter del tastierino numerico
             case ' ':        // spazio
                 if (selected == LEADERBOARD) {
-                    // todo
-                    show_leaderboard_stub();
+                    show_leaderboard();
                 }
                 else {
                     result = (MenuChoice) selected;

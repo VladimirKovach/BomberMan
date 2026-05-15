@@ -30,6 +30,9 @@ int main() {
                 // La prossima volta costruisce un Game nuovo di zecca, senza bisogno di un reset() esplicito.
                 Game game;
                 game.run();
+                if (game.get_score() > 0) {
+                    menu.prompt_save_score(game.get_score());
+                }
                 break;
             }
 

@@ -48,13 +48,16 @@ protected:
     // Gestisce il passaggio tra livelli quando il giocatore entra in una porta
     void check_door_transition();
 
-    // Entra in un livello (piazza il giocatore, spawna nemici)
+    // Entra in un livello (piazza il giocatore, spawna nemici).
     void enter_level(bool from_prev);
 
 public:
     Game();
 
     void run();
+
+    // Ritorna il punteggio finale della partita. E' usata dal MAIN.
+    int get_score() const { return score; }
 };
 
 #endif
