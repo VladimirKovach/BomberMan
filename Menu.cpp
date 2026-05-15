@@ -267,16 +267,13 @@ MenuChoice Menu::show() {
                 selected = (selected + 1) % MENU_ITEM_COUNT;
                 break;
 
-            case '\n':       // Enter normale
-            case KEY_ENTER:  // Enter del tastierino numerico
-            case ' ':        // spazio
-                if (selected == LEADERBOARD) {
-                    show_leaderboard();
-                }
-                else {
-                    result = (MenuChoice) selected;
-                    chosen = true;
-                }
+            case '\n':
+            case KEY_ENTER:
+            case ' ':
+                // Qualunque voce sia selezionata, la ritorniamo al main.
+                // Il main si occupera' di gestirla.
+                result = (MenuChoice) selected;
+                chosen = true;
                 break;
 
             case 'q':

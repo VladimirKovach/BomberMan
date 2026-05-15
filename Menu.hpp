@@ -23,12 +23,6 @@ protected:
     // Viene richiamato ogni volta che l'utente preme un tasto.
     void draw();
 
-    // LEADERBOARD
-    // chiede all'utente: il numero N di top punteggi
-    // legge il file tramite Leaderboard::load(),
-    // visualizza i primi N e attende un tasto per tornare al menu.
-    void show_leaderboard();
-
     // Helper privato: legge una stringa da tastiera in modo "bloccante".
     // Scrive il risultato in `buffer` (terminato da '\0'). max_len include
     // lo spazio per il terminatore (es. max_len=16 -> 15 caratteri utili).
@@ -43,6 +37,12 @@ public:
     // Schermata di fine partita: chiede il nome e salva il punteggio.
     // Viene chiamata dal MAIN dopo game.run().
     void prompt_save_score(int score);
+
+    // LEADERBOARD
+    // chiede all'utente: il numero N di top punteggi
+    // legge il file tramite Leaderboard::load(),
+    // visualizza i primi N e attende un tasto per tornare al menu.
+    void show_leaderboard();
 };
 
 #endif

@@ -41,7 +41,7 @@ int main() {
                 break;
 
             case LEADERBOARD:
-                // todo
+                menu.show_leaderboard();
                 break;
         }
     }
