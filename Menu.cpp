@@ -141,6 +141,13 @@ void Menu::read_string(int y, int x, char* buffer, int max_len) {
 
 
 void Menu::show_leaderboard() {
+    // Bloccante per la durata della schermata classifica.
+    // Senza questo, getch() ritorna ERR immediatamente perche' show()
+    // in uscita ha rimesso nodelay TRUE (pensando di tornare al game loop),
+    // ma siamo invece in un'altra schermata di menu.
+    // flushinp() scarta eventuali tasti pendenti dall'input precedente.
+    nodelay(stdscr, FALSE);
+    flushinp();
     clear();
 
     const char* title = "CLASSIFICA";
@@ -202,6 +209,7 @@ void Menu::show_leaderboard() {
 
     refresh();
     getch();
+    nodelay(stdscr, TRUE);
 }
 
 
