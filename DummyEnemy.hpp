@@ -3,7 +3,7 @@
 
 #include "Character.hpp"
 
-const int DIRECTION_COUNT = 4;
+const int ADJACENT_POSITIONS_COUNT = 4;
 
 class DummyEnemy : public Character {
 protected:
@@ -11,16 +11,20 @@ protected:
     double move_timer;
     double last_move_time;
 
-    Direction directions[DIRECTION_COUNT];
+    Position adjacent_positions[ADJACENT_POSITIONS_COUNT];
+
+    void update_adjacent_positions();
 
     bool can_move(double game_timer);
     void plan_move();
-    void move(Map& map, double game_timer);
+
+    bool is_valid_move(Grid& grid, Position _p);
+    void move(Grid& grid, double game_timer);
 
 public:
-    DummyEnemy(Position _p = {-1, -1}, int _lives = 1, int _speed = 1);
+    DummyEnemy(Position _p = {-1, -1}, int _lives = 0, int _speed = 0);
 
-    void update(Map& map, double game_timer);
+    void update(Grid& grid, double game_timer);
 };
 
 #endif

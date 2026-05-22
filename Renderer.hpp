@@ -2,6 +2,7 @@
 #define RENDERER_HPP
 
 #include "Map.hpp"
+#include "Player.hpp"
 
 enum Color {
     ORANGE = 208,
@@ -9,38 +10,43 @@ enum Color {
 };
 
 enum ColorPair {
-    CP_DEFAULT,  // terminal default color pair
+    CP_DEFAULT,  // colore predefinito del terminale
     CP_SCREEN,
-    CP_UNBREAKABLE_WALL,
     CP_BREAKABLE_WALL,
+    CP_UNBREAKABLE_WALL,
+    CP_DOOR,
     CP_PLAYER,
+    CP_ENEMY,
     CP_BOMB,
     CP_EXPLOSION,
-    CP_ENEMY,
-    CP_DOOR
+    CP_BLINK,
 };
 
 class Renderer {
 protected:
     Position map_start_p;
+    int max_y, max_x;
 
     void init_colors();
-
     void paint_it_black();
 
     void display_score(int score);
     void display_time(double time);
-    void display_level_number(int level_number);
 
-    char get_cell_view(CellContent content);
-    ColorPair get_cell_color(CellContent content);
+    char get_cell_view(Cell c);
+    ColorPair get_cell_color(Cell c);
 
-    void render_map(Map& map);
+    void draw_grid(Grid& grid);
+    void draw_bombs(Bomb* bombs);
+    void draw_player(Position player_p);
+    void draw_dummy_enemies(DummyEnemy* dummy_enemies);
+    void draw_smart_enemies(SmartEnemy* smart_enemies);
+    void draw_explosions(Grid& grid);
 
 public:
     Renderer();
 
-    void render_level(Map& map, int score, int time, int level_number);
+    void render(Map& map, Position player_p, int score, int time);
 };
 
 #endif

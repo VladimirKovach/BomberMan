@@ -1,33 +1,26 @@
 #ifndef SMARTENEMY_HPP
 #define SMARTENEMY_HPP
 
-#include "DummyEnemy.hpp"
 #include "Character.hpp"
-
-struct Pair {
-    Direction direction;
-    int distance;
-};
+#include "DummyEnemy.hpp"
 
 class SmartEnemy: public DummyEnemy {
 protected:
     Position player_p;
-    Pair pairs[DIRECTION_COUNT];
-
-    void init_pairs();
-
-    double get_distance(Position p1, Position p2);
-
-    void sort_pairs();
 
     void update_player_position(Position _player_p);
+    double get_player_distance(Position _p);
 
     void plan_move();
 
-public:
-    SmartEnemy(Position _p = {-1, -1}, int _lives = 1, int _speed = 1);
+    // duplicati di DummyEnemy (non posso usare virtual e override)
+    bool is_valid_move(Grid& grid, Position _p);
+    void move(Grid& grid, double game_timer);
 
-    void update(Map& map, double game_timer, Position _player_p);
+public:
+    SmartEnemy(Position _p = {-1, -1}, int _lives = 0, int _speed = 0);
+
+    void update(Grid& grid, double game_timer, Position _player_p);
 };
 
 #endif

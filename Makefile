@@ -1,28 +1,31 @@
-bomberman: main.o Bomb.o Character.o DummyEnemy.o Game.o Leaderboard.o LevelManager.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o
-	g++ main.o Bomb.o Character.o DummyEnemy.o Game.o Leaderboard.o LevelManager.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o -lncurses -o bomberman
+bomberman: main.o Bomb.o Character.o DummyEnemy.o Game.o Grid.o Leaderboard.o Level.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o Ncurses.o
+	g++ main.o Bomb.o Character.o DummyEnemy.o Game.o Grid.o Leaderboard.o Level.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o Ncurses.o -lncurses -o bomberman
 
-main.o: main.cpp Game.hpp Menu.hpp
+main.o: main.cpp Game.hpp
 	g++ -c main.cpp
 
-Bomb.o: Bomb.cpp Bomb.hpp Map.hpp
+Bomb.o: Bomb.cpp Bomb.hpp Grid.hpp
 	g++ -c Bomb.cpp
 
-Character.o: Character.cpp Character.hpp Map.hpp
+Character.o: Character.cpp Character.hpp Grid.hpp
 	g++ -c Character.cpp
 
 DummyEnemy.o: DummyEnemy.cpp DummyEnemy.hpp
 	g++ -c DummyEnemy.cpp
 
-Game.o: Game.cpp Game.hpp LevelManager.hpp Map.hpp Player.hpp Renderer.hpp
+Game.o: Game.cpp Game.hpp Map.hpp Player.hpp Renderer.hpp
 	g++ -c Game.cpp
 
-LevelManager.o: LevelManager.cpp LevelManager.hpp Map.hpp
-	g++ -c LevelManager.cpp
+Grid.o: Grid.cpp Grid.hpp
+	g++ -c Grid.cpp
 
 Leaderboard.o: Leaderboard.cpp Leaderboard.hpp
 	g++ -c Leaderboard.cpp
 
-Map.o: Map.cpp Map.hpp
+Level.o: Level.cpp Level.hpp Grid.hpp Bomb.hpp DummyEnemy.hpp SmartEnemy.hpp
+	g++ -c Level.cpp
+
+Map.o: Map.cpp Map.hpp Level.hpp
 	g++ -c Map.cpp
 
 Menu.o: Menu.cpp Menu.hpp
@@ -36,6 +39,9 @@ Renderer.o: Renderer.cpp Renderer.hpp Map.hpp
 
 SmartEnemy.o: SmartEnemy.cpp SmartEnemy.hpp
 	g++ -c SmartEnemy.cpp
+
+Ncurses.o: Ncurses.cpp Ncurses.hpp
+	g++ -c Ncurses.cpp
 
 clean:
 	rm -f *.o

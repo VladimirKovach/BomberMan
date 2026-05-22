@@ -1,76 +1,45 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 
-enum CellContent {
-    EMPTY,
-    BREAKABLE_WALL,
-    UNBREAKABLE_WALL,
-    PLAYER,
-    BOMB,
-    EXPLOSION,
-    DUMMY_ENEMY,
-    SMART_ENEMY,
-    NEXT_DOOR,
-    PREV_DOOR,
-    UNKNOWN
+#include "Level.hpp"
+
+const int NUM_LEVELS = 5;
+
+struct Node {
+    Level level;
+    Node* next;
+    Node* prev;
 };
-
-struct Position {
-    int x;
-    int y;
-};
-
-bool positions_equal(Position p, Position q);
-
-const int MAP_ROWS = 20;
-const int MAP_COLS = MAP_ROWS * 2;
-
-const int MAX_SPAWNS = MAP_ROWS * MAP_COLS;
-
-const int MAX_DIFFICULTY = 5;
 
 class Map {
 protected:
-    CellContent grid[MAP_ROWS][MAP_COLS];
-    CellContent start_grid[MAP_ROWS][MAP_COLS];
-
-    // Possibili posizioni in cui piazzare nemici
-    Position spawns[MAX_SPAWNS];
-    int spawn_count;
-
-    bool is_safe_zone(int x, int y);  // nome da cambiare
-
-    void place_unbreakable_walls();
-    void place_breakable_walls(int difficulty);
-
-    void shuffle_spawns();
+    Node* head;
+    Node* current;
 
 public:
-    Map(int difficulty = 1);
+    Map();
+    ~Map();
 
-    void save_state();
-    void reset_state();
+    Level& get_current_level();
 
-    bool in_bounds(Position p);
-    bool is_empty_cell(Position p);
-    bool is_walkable(Position p);
-    bool is_wall(Position p);
-    bool is_door(Position p);
-    bool is_enemy(Position p);
-    bool is_explosion(Position p);
+    bool has_next_level();
+    bool has_prev_level();
 
-    CellContent get_cell_content(Position p);
-    void set_cell_content(Position p, CellContent content);
+    void go_to_next_level();
+    void go_to_prev_level();
 
-    void clear_cell(Position p);
 
-    Position get_random_spawn();
+    // Rimuove dalla lista il nodo corrente e sposta 'current'
+    // al nodo adiacente (next se forward=true, prev se forward=false).
+    // Aggiorna 'head' se necessario.
+    // Restituisce false se non c'e' un nodo adiacente nella direzione richiesta.
+    bool remove_current_level(bool forward);
 
-    // Porte tra livelli
-    void open_next_door();
-    void open_prev_door();
-    void close_next_door();
-    void close_prev_door();
+    bool is_current_completed();
+    bool all_levels_completed();
+
+    void update_doors();
+    void update_all_bombs(double game_timer);
 };
 
 #endif

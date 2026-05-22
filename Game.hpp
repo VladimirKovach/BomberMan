@@ -3,61 +3,44 @@
 
 #include "Bomb.hpp"
 #include "DummyEnemy.hpp"
-#include "LevelManager.hpp"
+#include "Map.hpp"
 #include "Player.hpp"
 #include "Renderer.hpp"
 #include "SmartEnemy.hpp"
 #include <chrono>
-using namespace std::chrono;
+using namespace std;
 
 const double TIMER_START_VALUE = 1000.0;  // secondi
-const int MAX_ACTIVE_BOMBS = 3;
+const int DELAY = 50;  // millisecondi
 
 class Game {
 protected:
     bool quit;
+    chrono::steady_clock::time_point start;
     double timer;
-    steady_clock::time_point start;
     int score;
 
-    Bomb bombs[MAX_ACTIVE_BOMBS];
-
-    LevelManager level_manager;
-    Renderer renderer;
+    Map map;
     Player player;
+    Renderer renderer;
 
     bool game_over();
     bool win();
 
-    bool all_enemies_dead();
+    void spawn_player(bool forward);
 
-    int get_active_bombs();
+    void update_timer(chrono::steady_clock::time_point start);
 
-    void update_bombs();
-
-    void update_enemies();
-
-    void update_timer(steady_clock::time_point start);
-
+    bool bomb_under_player();
     void handle_input();
-
     void handle_collisions();
-
-    void spawn_enemies();
-
-    // Gestisce il passaggio tra livelli quando il giocatore entra in una porta
-    void check_door_transition();
-
-    // Entra in un livello (piazza il giocatore, spawna nemici).
-    void enter_level(bool from_prev);
 
 public:
     Game();
 
     void run();
 
-    // Ritorna il punteggio finale della partita. E' usata dal MAIN.
-    int get_score() const { return score; }
+    int get_score();
 };
 
 #endif

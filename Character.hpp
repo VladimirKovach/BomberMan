@@ -1,25 +1,15 @@
 #ifndef CHARACTER_HPP
 #define CHARACTER_HPP
 
-#include "Map.hpp"
-
-enum Direction {
-    UP,
-    LEFT,
-    DOWN,
-    RIGHT,
-    NONE
-};
+#include "Grid.hpp"
 
 class Character {
 protected:
     Position p;
     int lives;
-    CellContent type;
-    CellContent under;  // EMPTY, BOMB, ITEM
 
 public:
-    Character(Position _p = {0, 0}, int _lives = 1, CellContent _type = PLAYER);
+    Character(Position _p, int _lives);
 
     void take_damage();
 
@@ -27,11 +17,11 @@ public:
 
     Position get_position();
 
-    Position get_next_position(Direction d);
+    void set_position(Position _p);
 
-    CellContent get_under();
+    void save_state();
 
-    void move(Map& map, Direction d);
+    void reset_state();
 };
 
 #endif

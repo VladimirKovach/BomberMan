@@ -3,120 +3,25 @@
 #include <ncurses.h>
 using namespace std;
 
-// =====================================================
-// Crea i nemici per il livello corrente
-//
-// Il numero di nemici varia in base alla difficolta' (da sistemare):
-//   - difficolta' 1: 1 (dummy), 1 (smart)
-//   - difficolta' 2: 2 (dummy), 2 (smart)
-//   - difficolta' 3: 3 (dummy), 3 (smart)
-//   - difficolta' 4: 4 (dummy), 4 (smart)
-//   - difficolta' 5: 5 (dummy), 5 (smart)
-//
-// Ogni nemico viene piazzato su una cella vuota casuale
-// =====================================================
-void Game::spawn_enemies() {
-    Map& map = level_manager.get_current_map();
-    int difficulty = level_manager.get_current_difficulty();
-
-    DummyEnemy* dummy_enemies = level_manager.get_current_dummy_enemies();
-    int& dummy_enemy_count = level_manager.get_current_dummy_count();
-    SmartEnemy* smart_enemies = level_manager.get_current_smart_enemies();
-    int& smart_enemy_count = level_manager.get_current_smart_count();
-
-    dummy_enemy_count = difficulty;
-    smart_enemy_count = difficulty;
-
-    for (int i = 0; i < dummy_enemy_count; i++) {
-        Position spawn_p = map.get_random_spawn();
-        dummy_enemies[i] = DummyEnemy(spawn_p, 1, 1);
-        map.set_cell_content(spawn_p, DUMMY_ENEMY);
-    }
-
-    for (int i = 0; i < smart_enemy_count; i++) {
-        Position spawn_p = map.get_random_spawn();
-        smart_enemies[i] = SmartEnemy(spawn_p, 1, 1);
-        map.set_cell_content(spawn_p, SMART_ENEMY);
-    }
-}
-
-// =====================================================
-// Configura il livello corrente
-//
-// Parametro from_prev:
-//   - true: il giocatore arriva dal livello precedente
-//     (e' entrato dalla porta destra -> spawna a sinistra)
-//   - false: il giocatore arriva dal livello successivo
-//     (e' entrato dalla porta sinistra -> spawna a destra)
-//
-// Se il livello ha gia' dei nemici vivi (il giocatore ci
-// era gia' stato e poi era tornato indietro), NON li
-// rispawniamo - la mappa e' rimasta come l'aveva lasciata.
-// =====================================================
-void Game::enter_level(bool from_prev) {
-    Map& map = level_manager.get_current_map();
-
+void Game::spawn_player(bool forward) {
     Position spawn;
-    if (from_prev) {
+    if (forward) {
         spawn = {1, 1};  // vicino alla porta di entrata
     }
     else {
-        spawn = {MAP_COLS - 2, 1};  // vicino alla porta di uscita
+        spawn = {1, GRID_COLS - 2};  // vicino alla porta di uscita
     }
-
     player.set_position(spawn);
-    map.set_cell_content(spawn, PLAYER);
-
-    if (!level_manager.is_current_visited()) {
-        spawn_enemies();
-        level_manager.mark_current_visited();
-    }
 }
-
-
-// Controlla se il giocatore e' su una porta e gestisce il cambio livello.
-// Se il livello che si sta lasciando e' completato, viene rimosso dalla lista
-// Se non e' completato, resta nella lista e potra' essere rivisitato.
-void Game::check_door_transition() {
-    Map& map = level_manager.get_current_map();
-    Position player_p = player.get_position();
-    CellContent cell = map.get_cell_content(player_p);
-
-    if (cell == NEXT_DOOR && level_manager.has_next_level()) {
-        map.clear_cell(player_p);
-
-        if (level_manager.is_current_completed()) {
-            level_manager.remove_current_level(true);
-        }
-        else {
-            level_manager.go_to_next_level();
-        }
-
-        enter_level(true);
-    }
-    else if (cell == PREV_DOOR && level_manager.has_prev_level()) {
-        map.clear_cell(player_p);
-
-        if (level_manager.is_current_completed()) {
-            level_manager.remove_current_level(false);
-        }
-        else {
-            level_manager.go_to_prev_level();
-        }
-
-        enter_level(false);
-    }
-}
-
 
 Game::Game() {
     quit = false;
+    start = chrono::steady_clock::now();
     timer = TIMER_START_VALUE;
-    start = steady_clock::now();
     score = 0;
 
     // Entra nel primo livello
-    enter_level(true);
+    spawn_player(true);
 }
 
 
@@ -125,86 +30,32 @@ bool Game::game_over() {
 }
 
 bool Game::win() {
-    return level_manager.all_levels_completed();
-}
-
-bool Game::all_enemies_dead() {
-    return level_manager.get_current_dummy_count() +
-           level_manager.get_current_smart_count() == 0;
-}
-
-int Game::get_active_bombs() {
-    int count = 0;
-    for (int i = 0; i < MAX_ACTIVE_BOMBS; i++) {
-        if (bombs[i].is_active()) {
-            count++;
-        }
-    }
-    return count;
+    return map.all_levels_completed();
 }
 
 
-void Game::update_bombs() {
-    Map& map = level_manager.get_current_map();
-
-    for (int i = 0; i < MAX_ACTIVE_BOMBS; i++) {
-        if (bombs[i].is_active()) {
-            bombs[i].update(map, timer);
-        }
-    }
-}
-
-
-void Game::update_enemies() {
-    Map& map = level_manager.get_current_map();
-    DummyEnemy* dummy_enemies = level_manager.get_current_dummy_enemies();
-    int& dummy_enemy_count = level_manager.get_current_dummy_count();
-    SmartEnemy* smart_enemies = level_manager.get_current_smart_enemies();
-    int& smart_enemy_count = level_manager.get_current_smart_count();
-
-    if (!level_manager.is_current_completed()) {
-        for (int i = 0; i < dummy_enemy_count; i++) {
-            dummy_enemies[i].update(map, timer);
-        }
-
-        for (int i = 0; i < smart_enemy_count; i++) {
-            smart_enemies[i].update(map, timer, player.get_position());
-        }
-
-        int dummy_count = 0;
-        for (int i = 0; i < dummy_enemy_count; i++) {
-            if (!dummy_enemies[i].is_dead()) {
-                dummy_enemies[dummy_count] = dummy_enemies[i];
-                dummy_count++;
-            }
-        }
-        dummy_enemy_count = dummy_count;
-
-        int smart_count = 0;
-        for (int i = 0; i < smart_enemy_count; i++) {
-            if (!smart_enemies[i].is_dead()) {
-                smart_enemies[smart_count] = smart_enemies[i];
-                smart_count++;
-            }
-        }
-        smart_enemy_count = smart_count;
-
-        if (all_enemies_dead()) {
-            level_manager.mark_current_completed();
-        }
-    }
-}
-
-
-void Game::update_timer(steady_clock::time_point start) {
-    steady_clock::time_point now = steady_clock::now();
-    double elapsed = duration<double>(now - start).count();
+void Game::update_timer(chrono::steady_clock::time_point start) {
+    chrono::steady_clock::time_point now = chrono::steady_clock::now();
+    double elapsed = chrono::duration<double>(now - start).count();
     timer = max(0.0, TIMER_START_VALUE - elapsed);
+}
+
+bool Game::bomb_under_player() {
+    Bomb* bombs = map.get_current_level().get_bombs();
+    for (int i = 0; i < MAX_BOMBS; i++) {
+        Position player_p = player.get_position();
+        Position bomb_p = bombs[i].get_position();
+        if (bombs[i].is_active() && positions_equal(player_p, bomb_p)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 
 void Game::handle_input() {
-    Map& map = level_manager.get_current_map();
+    Level& level = map.get_current_level();
+    Grid& grid = level.get_grid();
 
     int key = getch();
     switch (key) {
@@ -216,39 +67,42 @@ void Game::handle_input() {
         case KEY_UP:
         case 'w':
         case 'W':
-            player.move(map, UP);
+            player.move(grid, UP);
             break;
 
         case KEY_LEFT:
         case 'a':
         case 'A':
-            player.move(map, LEFT);
+            player.move(grid, LEFT);
             break;
 
         case KEY_DOWN:
         case 's':
         case 'S':
-            player.move(map, DOWN);
+            player.move(grid, DOWN);
             break;
 
         case KEY_RIGHT:
         case 'd':
         case 'D':
-            player.move(map, RIGHT);
+            player.move(grid, RIGHT);
             break;
 
         case ' ':
-            if (get_active_bombs() < MAX_ACTIVE_BOMBS && player.get_under() != BOMB) {
+        {
+            Bomb* bombs = level.get_bombs();
+            Position player_p = player.get_position();
+            if (level.get_bombs_count() < MAX_BOMBS && !bomb_under_player()) {
                 int i = 0;
-                while (i < MAX_ACTIVE_BOMBS && bombs[i].is_active()) {
+                while (i < MAX_BOMBS && bombs[i].is_active()) {
                     i++;
                 }
-                if (i < MAX_ACTIVE_BOMBS) {
-                    bombs[i].place(player.get_position(), 1, timer);
-                    player.set_under(BOMB);
+                if (i < MAX_BOMBS) {
+                    bombs[i].place(player_p, 1, timer);
                 }
             }
             break;
+        }
 
         default:  // ERR
             break;
@@ -257,76 +111,120 @@ void Game::handle_input() {
 
 
 void Game::handle_collisions() {
-    Map& map = level_manager.get_current_map();
-    DummyEnemy* dummy_enemies = level_manager.get_current_dummy_enemies();
-    int dummy_enemy_count = level_manager.get_current_dummy_count();
-    SmartEnemy* smart_enemies = level_manager.get_current_smart_enemies();
-    int smart_enemy_count = level_manager.get_current_smart_count();
     Position player_p = player.get_position();
+    Level& level = map.get_current_level();
+    Grid& grid = level.get_grid();
+    Bomb* bombs = level.get_bombs();
+    DummyEnemy* dummy_enemies = level.get_dummy_enemies();
+    SmartEnemy* smart_enemies = level.get_smart_enemies();
 
-    // Collisione player con nemici
-    for (int i = 0; i < dummy_enemy_count; i++) {
-        if (positions_equal(player_p, dummy_enemies[i].get_position())) {
-            player.take_damage();
+    // Collisioni giocatore-nemici
+    for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
+        if (!dummy_enemies[i].is_dead()) {
+            Position dummy_enemy_p = dummy_enemies[i].get_position();
+            if (positions_equal(player_p, dummy_enemy_p)) {
+                player.take_damage();
+            }
         }
     }
 
-    for (int i = 0; i < smart_enemy_count; i++) {
-        if (positions_equal(player_p, smart_enemies[i].get_position())) {
-            player.take_damage();
+    for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
+        if (!smart_enemies[i].is_dead()) {
+            Position smart_enemy_p = smart_enemies[i].get_position();
+            if (positions_equal(player_p, smart_enemy_p)) {
+                player.take_damage();
+            }
         }
     }
 
-    // Collisione player con esplosione
-    if (map.is_explosion(player_p)) {
+    // Collisioni giocatore-esplosioni
+    if (grid.is_explosion(player_p)) {
         player.take_damage();
     }
 
-    // Collisione nemici con esplosione
-    for (int i = 0; i < dummy_enemy_count; i++) {
-        Position dummy_enemy_p = dummy_enemies[i].get_position();
-        if (map.is_explosion(dummy_enemy_p)) {
-            dummy_enemies[i].take_damage();
-            score += 5;
+    // Collisioni muri-esplosioni
+    for (int y = 0; y < GRID_ROWS; y++) {
+        for (int x = 0; x < GRID_COLS; x++) {
+            Position p = {y, x};
+            if (grid.is_explosion(p) && grid.get_cell(p) == BREAKABLE_WALL) {
+                grid.set_cell({y, x}, EMPTY);
+                score++;
+            }
         }
     }
 
-    for (int i = 0; i < smart_enemy_count; i++) {
-        Position smart_enemy_p = smart_enemies[i].get_position();
-        if (map.is_explosion(smart_enemy_p)) {
-            smart_enemies[i].take_damage();
-            score += 5;
+    // Collisioni nemici-esplosioni
+    for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
+        if (!dummy_enemies[i].is_dead()) {
+            Position dummy_enemy_p = dummy_enemies[i].get_position();
+            if (grid.is_explosion(dummy_enemy_p)) {
+                dummy_enemies[i].take_damage();
+                score += 3;
+            }
         }
     }
 
-    // Collisione bombe con esplosione
-    for (int i = 0; i < MAX_ACTIVE_BOMBS; i++) {
-        Position bomb_p = bombs[i].get_position();
-        if (bombs[i].is_active() && !bombs[i].is_exploded() && map.is_explosion(bomb_p)) {
-            bombs[i].explode(map, timer);
+    for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
+        if (!smart_enemies[i].is_dead()) {
+            Position smart_enemy_p = smart_enemies[i].get_position();
+            if (grid.is_explosion(smart_enemy_p)) {
+                smart_enemies[i].take_damage();
+                score += 5;
+            }
         }
+    }
+
+    // Collisioni bombe-esplosioni
+    for (int i = 0; i < MAX_BOMBS; i++) {
+        if (bombs[i].is_active()) {
+            Position bomb_p = bombs[i].get_position();
+            // Reazione a catena
+            if (!bombs[i].is_exploding() && grid.is_explosion(bomb_p)) {
+                bombs[i].explode(grid, timer);
+            }
+        }
+    }
+
+    // Collisioni giocatore-porte
+    Cell c = grid.get_cell(player_p);
+    if (c == EXIT && map.has_next_level()) {
+        if (map.is_current_completed()) {
+            map.remove_current_level(true);
+        }
+        else {
+            map.go_to_next_level();
+        }
+        spawn_player(true);
+    }
+    else if (c == ENTRANCE && map.has_prev_level()) {
+        if (map.is_current_completed()) {
+            map.remove_current_level(false);
+        }
+        else {
+            map.go_to_prev_level();
+        }
+        spawn_player(false);
     }
 }
 
 
 void Game::run() {
     while (!game_over() && !win() && !quit) {
-        Map& map = level_manager.get_current_map();  // da mettere come campo
-        int level_number = level_manager.get_current_level_number();
+        Level& level = map.get_current_level();
 
         handle_input();
-
-        update_bombs();
-        update_enemies();
-        update_timer(start);
-
         handle_collisions();
 
-        check_door_transition();
-        level_manager.update_doors();
+        update_timer(start);
+        map.update_doors();
+        map.update_all_bombs(timer);
+        level.update_enemies(timer, player.get_position());
 
-        renderer.render_level(map, score, timer, level_number);
-
-        napms(50);  // ~20 FPS
+        renderer.render(map, player.get_position(), score, timer);
+        napms(DELAY);
     }
+}
+
+int Game::get_score() {
+    return score;
 }

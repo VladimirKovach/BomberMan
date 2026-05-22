@@ -1,0 +1,103 @@
+#include "Level.hpp"
+
+Level::Level(int level_number) {
+    number = level_number;
+    completed = false;
+    grid = Grid(level_number);
+}
+
+int Level::get_number() {
+    return number;
+}
+
+bool Level::is_completed() {
+    return completed;
+}
+
+Grid& Level::get_grid() {
+    return grid;
+}
+
+Bomb* Level::get_bombs() {
+    return bombs;
+}
+
+DummyEnemy* Level::get_dummy_enemies() {
+    return dummy_enemies;
+}
+
+SmartEnemy* Level::get_smart_enemies() {
+    return smart_enemies;
+}
+
+int Level::get_bombs_count() {
+    int count = 0;
+    for (int i = 0; i < MAX_BOMBS; i++) {
+        if (bombs[i].is_active()) {
+            count++;
+        }
+    }
+    return count;
+}
+
+bool Level::all_enemies_dead() {
+    if (completed) {
+        return true;
+    }
+    else {
+        int count = 0;
+        for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
+            if (!dummy_enemies[i].is_dead()) {
+                count++;
+            }
+        }
+        for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
+            if (!smart_enemies[i].is_dead()) {
+                count++;
+            }
+        }
+        return count == 0;
+    }
+}
+
+void Level::update_bombs(double game_timer) {
+    for (int i = 0; i < MAX_BOMBS; i++) {
+        if (bombs[i].is_active()) {
+            bombs[i].update(grid, game_timer);
+        }
+    }
+}
+
+
+void Level::update_enemies(double game_timer, Position player_p) {
+    if (!completed) {
+        for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
+            if (!dummy_enemies[i].is_dead()) {
+                dummy_enemies[i].update(grid, game_timer);
+            }
+        }
+
+        for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
+            if (!smart_enemies[i].is_dead()) {
+                smart_enemies[i].update(grid, game_timer, player_p);
+            }
+        }
+
+        if (all_enemies_dead()) {
+            completed = true;
+        }
+    }
+}
+
+
+void Level::spawn_enemies() {
+    for (int i = 0; i < number; i++) {
+        Position spawn_p = grid.get_random_spawn();
+        dummy_enemies[i] = DummyEnemy(spawn_p, 1, 1);
+    }
+
+    for (int i = 0; i < number; i++) {
+        Position spawn_p = grid.get_random_spawn();
+        smart_enemies[i] = SmartEnemy(spawn_p, 1, 2);
+    }
+}

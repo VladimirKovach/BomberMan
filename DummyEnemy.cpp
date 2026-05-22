@@ -1,56 +1,55 @@
 #include "DummyEnemy.hpp"
 #include <cstdlib>
 
-DummyEnemy::DummyEnemy(Position _p, int _lives, int _speed) : Character(_p, _lives, DUMMY_ENEMY) {
+DummyEnemy::DummyEnemy(Position _p, int _lives, int _speed) : Character(_p, _lives) {
     speed = _speed;
     move_timer = 1.0 / speed;
     last_move_time = -1.0;  // per convenzione
-
-    directions[0] = UP;
-    directions[1] = LEFT;
-    directions[2] = DOWN;
-    directions[3] = RIGHT;
+    update_adjacent_positions();
 }
 
+void DummyEnemy::update_adjacent_positions() {
+    adjacent_positions[0] = {p.y + 1, p.x};
+    adjacent_positions[1] = {p.y, p.x - 1};
+    adjacent_positions[2] = {p.y - 1, p.x};
+    adjacent_positions[3] = {p.y, p.x + 1};
+}
 
 bool DummyEnemy::can_move(double game_timer) {
     return last_move_time - game_timer >= move_timer || last_move_time == -1;
 }
 
-// Fisher-Yates shuffle: ordina le direzioni in modo casuale
+// Fisher-Yates Shuffle: ordina le posizioni adiacenti in modo casuale
 void DummyEnemy::plan_move() {
-    for (int i = DIRECTION_COUNT - 1; i >= 0; i--) {
+    for (int i = ADJACENT_POSITIONS_COUNT - 1; i >= 0; i--) {
         int j = rand() % (i + 1);
         if (j != i) {
-            Direction tmp = directions[i];
-            directions[i] = directions[j];
-            directions[j] = tmp;
+            Position tmp = adjacent_positions[i];
+            adjacent_positions[i] = adjacent_positions[j];
+            adjacent_positions[j] = tmp;
         }
     }
 }
 
-
-void DummyEnemy::move(Map& map, double game_timer) {
-    Position start_p = p;
-
-    for (int i = 0; i < DIRECTION_COUNT; i++) {
-        Position next_p = get_next_position(directions[i]);
-
-        if (!map.is_explosion(next_p) && !map.is_enemy(next_p) && !map.is_door(next_p)) {
-            Character::move(map, directions[i]);
-
-            if (!positions_equal(p, start_p)) {
-                break;
-            }
-        }
-    }
-
-    last_move_time = game_timer;
+// Una mossa e' valida sse la cella di arrivo non e' un muro e non e' una porta
+bool DummyEnemy::is_valid_move(Grid& grid, Position _p) {
+    return grid.is_walkable(_p) && !grid.is_door(_p);
 }
 
-void DummyEnemy::update(Map& map, double game_timer) {
+void DummyEnemy::move(Grid& grid, double game_timer) {
+    for (int i = 0; i < ADJACENT_POSITIONS_COUNT; i++) {
+        if (is_valid_move(grid, adjacent_positions[i])) {
+            p = adjacent_positions[i];
+            last_move_time = game_timer;
+            break;
+        }
+    }
+}
+
+void DummyEnemy::update(Grid& grid, double game_timer) {
     if (can_move(game_timer)) {
+        update_adjacent_positions();
         plan_move();
-        move(map, game_timer);
+        move(grid, game_timer);
     }
 }
