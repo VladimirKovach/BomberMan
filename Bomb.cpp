@@ -30,8 +30,10 @@ Bomb::Bomb(Position _p, int _range) {
 
     reset();
 
-    placement_time = -1.0;  // per convenzione
-    explosion_time = -1.0;  // per convenzione
+    // per convenzione
+    placement_time = -1.0;
+    explosion_time = -1.0;
+    blink_state_start = -1.0;
 }
 
 
@@ -47,13 +49,20 @@ bool Bomb::is_exploding() {
     return exploding;
 }
 
+bool Bomb::is_blinking() {
+    return blink_state;
+}
+
 
 void Bomb::place(Position _p, int _range, double game_timer) {
     p = _p;
     range = _range;
 
     active = true;
+    blink_state = true;
+
     placement_time = game_timer;
+    blink_state_start = game_timer;
 }
 
 
@@ -76,6 +85,12 @@ void Bomb::update(Grid& grid, double game_timer) {
     if (!exploding && placement_time - game_timer >= EXPLOSION_TIMER) {
         explode(grid, game_timer);
     }
+
+    else if (!exploding && blink_state_start - game_timer >= BLINK_DELTA) {
+        blink_state_start = game_timer;
+        blink_state = !blink_state;
+    }
+
     else if (exploding && explosion_time - game_timer >= EXPLOSION_DURATION) {
         grid.unset_explosion(p);
         end_explosion(grid, UP);
@@ -87,7 +102,9 @@ void Bomb::update(Grid& grid, double game_timer) {
     }
 }
 
+
 void Bomb::reset() {
     active = false;
     exploding = false;
+    blink_state = false;
 }

@@ -124,9 +124,13 @@ void Renderer::draw_bombs(Bomb* bombs) {
     for (int i = 0; i < MAX_BOMBS; i++) {
         if (bombs[i].is_active()) {
             Position bomb_p = bombs[i].get_position();
+            ColorPair bomb_color = CP_BOMB;
+            if (bombs[i].is_blinking()) {
+                bomb_color = CP_BLINK;
+            }
             int y = bomb_p.y + map_start_p.y;
             int x = bomb_p.x + map_start_p.x;
-            mvaddch(y, x, 'O' | COLOR_PAIR(CP_BOMB));
+            mvaddch(y, x, 'O' | COLOR_PAIR(bomb_color));
         }
     }
 }
