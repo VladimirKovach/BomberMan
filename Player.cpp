@@ -28,7 +28,9 @@ Position get_next_position(Position p, Direction d) {
 }
 
 
-Player::Player(Position _p, int _lives): Character(_p, _lives) {}
+Player::Player(Position _p, int _lives): Character(_p, _lives) {
+    start_p = _p;
+}
 
 void Player::heal() {
     lives++;
@@ -39,4 +41,8 @@ void Player::move(Grid& grid, Direction d) {
     if (grid.is_walkable(next_p)) {
         p = next_p;
     }
+}
+
+void Player::reset() {
+    p = start_p;
 }

@@ -7,6 +7,15 @@ bool positions_equal(Position p, Position q) {
     return p.y == q.y && p.x == q.x;
 }
 
+
+void Grid::save_state() {
+    for (int y = 0; y < GRID_ROWS; y++) {
+        for (int x = 0; x < GRID_COLS; x++) {
+            start_grid[y][x] = grid[y][x];
+        }
+    }
+}
+
 // Fisher-Yates Shuffle
 void Grid::shuffle_spawns() {
     for (int i = spawn_count - 1; i >= 0; i--) {
@@ -139,21 +148,16 @@ Grid::Grid(int difficulty) {
     }
 
     shuffle_spawns();
+
+    save_state();
 }
 
 
-void Grid::save_state() {
-    for (int y = 0; y < GRID_ROWS; y++) {
-        for (int x = 0; x < GRID_COLS; x++) {
-            start_grid[y][x] = grid[y][x];
-        }
-    }
-}
-
-void Grid::reset_state() {
+void Grid::reset() {
     for (int y = 0; y < GRID_ROWS; y++) {
         for (int x = 0; x < GRID_COLS; x++) {
             grid[y][x] = start_grid[y][x];
+            explosions[y][x] = false;
         }
     }
 }

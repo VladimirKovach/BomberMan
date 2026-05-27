@@ -5,6 +5,9 @@ DummyEnemy::DummyEnemy(Position _p, int _lives, int _speed) : Character(_p, _liv
     speed = _speed;
     move_timer = 1.0 / speed;
     last_move_time = -1.0;  // per convenzione
+    start_p = _p;
+    start_lives = _lives;
+    start_speed = _speed;
     update_adjacent_positions();
 }
 
@@ -52,4 +55,10 @@ void DummyEnemy::update(Grid& grid, double game_timer) {
         plan_move();
         move(grid, game_timer);
     }
+}
+
+void DummyEnemy::reset() {
+    p = start_p;
+    lives = start_lives;
+    speed = start_speed;
 }

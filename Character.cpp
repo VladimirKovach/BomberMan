@@ -20,11 +20,3 @@ Position Character::get_position() {
 void Character::set_position(Position _p) {
     p = _p;
 }
-
-void Character::save_state() {
-
-}
-
-void Character::reset_state() {
-    
-}

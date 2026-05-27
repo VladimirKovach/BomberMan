@@ -18,10 +18,6 @@ public:
     Position get_position();
 
     void set_position(Position _p);
-
-    void save_state();
-
-    void reset_state();
 };
 
 #endif

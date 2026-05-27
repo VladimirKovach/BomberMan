@@ -10,6 +10,9 @@ protected:
     int speed;
     double move_timer;
     double last_move_time;
+    Position start_p;
+    int start_lives;
+    int start_speed;
 
     Position adjacent_positions[ADJACENT_POSITIONS_COUNT];
 
@@ -25,6 +28,8 @@ public:
     DummyEnemy(Position _p = {-1, -1}, int _lives = 0, int _speed = 0);
 
     void update(Grid& grid, double game_timer);
+
+    void reset();
 };
 
 #endif

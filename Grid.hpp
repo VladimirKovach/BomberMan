@@ -29,6 +29,8 @@ protected:
 
     bool explosions[GRID_ROWS][GRID_COLS];
 
+    void save_state();
+
     // Possibili posizioni in cui piazzare nemici
     Position spawns[MAX_SPAWNS];
     int spawn_count;
@@ -44,8 +46,7 @@ protected:
 public:
     Grid(int difficulty = 1);
 
-    void save_state();
-    void reset_state();
+    void reset();
 
     Position get_random_spawn();
 

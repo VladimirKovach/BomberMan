@@ -101,3 +101,16 @@ void Level::spawn_enemies() {
         smart_enemies[i] = SmartEnemy(spawn_p, 1, 2);
     }
 }
+
+void Level::reset() {
+    for (int i = 0; i < MAX_BOMBS; i++) {
+        bombs[i].reset();
+    }
+    for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
+        dummy_enemies[i].reset();
+    }
+    for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
+        smart_enemies[i].reset();
+    }
+    grid.reset();
+}

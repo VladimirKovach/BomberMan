@@ -40,6 +40,8 @@ public:
     void update_enemies(double game_timer, Position player_p);
 
     void spawn_enemies();
+
+    void reset();
 };
 
 #endif

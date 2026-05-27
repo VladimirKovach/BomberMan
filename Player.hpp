@@ -15,12 +15,17 @@ enum Direction {
 Position get_next_position(Position p, Direction d);
 
 class Player : public Character {
+protected:
+    Position start_p;
+
 public:
     Player(Position _p = {1, 1}, int _lives = 3);
 
     void heal();
 
     void move(Grid& grid, Direction d);
+
+    void reset();
 };
 
 #endif

@@ -4,11 +4,8 @@
 using namespace std;
 
 void Game::spawn_player(bool forward) {
-    Position spawn;
-    if (forward) {
-        spawn = {1, 1};  // vicino alla porta di entrata
-    }
-    else {
+    Position spawn = {1, 1};  // vicino alla porta di entrata
+    if (!forward) {
         spawn = {1, GRID_COLS - 2};  // vicino alla porta di uscita
     }
     player.set_position(spawn);
@@ -124,6 +121,8 @@ void Game::handle_collisions() {
             Position dummy_enemy_p = dummy_enemies[i].get_position();
             if (positions_equal(player_p, dummy_enemy_p)) {
                 player.take_damage();
+                level.reset();
+                player.reset();
             }
         }
     }
@@ -133,6 +132,8 @@ void Game::handle_collisions() {
             Position smart_enemy_p = smart_enemies[i].get_position();
             if (positions_equal(player_p, smart_enemy_p)) {
                 player.take_damage();
+                level.reset();
+                player.reset();
             }
         }
     }
@@ -140,6 +141,8 @@ void Game::handle_collisions() {
     // Collisioni giocatore-esplosioni
     if (grid.is_explosion(player_p)) {
         player.take_damage();
+        level.reset();
+        player.reset();
     }
 
     // Collisioni muri-esplosioni

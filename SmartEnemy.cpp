@@ -1,4 +1,5 @@
 #include "SmartEnemy.hpp"
+#include <cstdlib>
 
 SmartEnemy::SmartEnemy(Position _p, int _lives, int _speed) : DummyEnemy(_p, _lives, _speed) {
     player_p = {-1, -1};
@@ -8,11 +9,11 @@ void SmartEnemy::update_player_position(Position _player_p) {
     player_p = _player_p;
 }
 
-// Distanza al quadrato, per confronti non serve sqrt
+// Distanza Manhattan
 double SmartEnemy::get_player_distance(Position _p) {
     int dx = (_p.x - player_p.x);
     int dy = (_p.y - player_p.y);
-    return (dx * dx) + (dy * dy);
+    return abs(dx) + abs(dy);
 }
 
 
