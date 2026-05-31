@@ -1,8 +1,9 @@
 #include "Bomb.hpp"
 
-void Bomb::begin_explosion(Grid& grid, Direction d) {
+void Bomb::start_explosion(Grid& grid, Direction d) {
+    Position target = p;
     for (int i = 0; i < range; i++) {
-        Position target = get_next_position(p, d);
+        target = get_next_position(target, d);
         if (grid.get_cell(target) == UNBREAKABLE_WALL) {
             break;
         }
@@ -13,13 +14,14 @@ void Bomb::begin_explosion(Grid& grid, Direction d) {
 }
 
 void Bomb::end_explosion(Grid& grid, Direction d) {
+    Position target = p;
     for (int i = 0; i < range; i++) {
-        Position target = get_next_position(p, d);
-        if (grid.is_explosion(target)) {
-            grid.unset_explosion(target);
+        target = get_next_position(target, d);
+        if (grid.get_cell(target) == UNBREAKABLE_WALL) {
+            break;
         }
         else {
-            break;
+            grid.unset_explosion(target);
         }
     }
 }
@@ -74,10 +76,10 @@ void Bomb::explode(Grid& grid, double game_timer) {
     grid.set_explosion(p);
 
     // Esplosione nelle 4 direzioni (croce)
-    begin_explosion(grid, UP);
-    begin_explosion(grid, LEFT);
-    begin_explosion(grid, DOWN);
-    begin_explosion(grid, RIGHT);
+    start_explosion(grid, UP);
+    start_explosion(grid, LEFT);
+    start_explosion(grid, DOWN);
+    start_explosion(grid, RIGHT);
 }
 
 
@@ -85,12 +87,10 @@ void Bomb::update(Grid& grid, double game_timer) {
     if (!exploding && placement_time - game_timer >= EXPLOSION_TIMER) {
         explode(grid, game_timer);
     }
-
     else if (!exploding && blink_state_start - game_timer >= BLINK_DELTA) {
         blink_state_start = game_timer;
         blink_state = !blink_state;
     }
-
     else if (exploding && explosion_time - game_timer >= EXPLOSION_DURATION) {
         grid.unset_explosion(p);
         end_explosion(grid, UP);
@@ -101,7 +101,6 @@ void Bomb::update(Grid& grid, double game_timer) {
         reset();
     }
 }
-
 
 void Bomb::reset() {
     active = false;

@@ -9,7 +9,7 @@ void SmartEnemy::update_player_position(Position _player_p) {
     player_p = _player_p;
 }
 
-// Distanza Manhattan
+// Distanza di Manhattan
 double SmartEnemy::get_player_distance(Position _p) {
     int dx = (_p.x - player_p.x);
     int dy = (_p.y - player_p.y);
@@ -17,24 +17,24 @@ double SmartEnemy::get_player_distance(Position _p) {
 }
 
 
-// Selection Sort: ordina le posizioni adiacenti in base alla distanza dal
+// selection sort: ordina le posizioni adiacenti in base alla distanza dal
 // giocatore (strategia greedy)
 void SmartEnemy::plan_move() {
-    for (int i = 0; i < ADJACENT_POSITIONS_COUNT - 1; i++) {
+    for (int i = 0; i < NEIGHBORS_COUNT - 1; i++) {
         int min = i;
 
-        for (int j = i + 1; j < ADJACENT_POSITIONS_COUNT; j++) {
-            Position p_min = adjacent_positions[min];
-            Position np = adjacent_positions[j];
-            if (get_player_distance(np) < get_player_distance(p_min)) {
+        for (int j = i + 1; j < NEIGHBORS_COUNT; j++) {
+            Position min_p = neighbors[min];
+            Position np = neighbors[j];
+            if (get_player_distance(np) < get_player_distance(min_p)) {
                 min = j;
             }
         }
 
         if (min != i) {
-            Position tmp = adjacent_positions[i];
-            adjacent_positions[i] = adjacent_positions[min];
-            adjacent_positions[min] = tmp;
+            Position tmp = neighbors[i];
+            neighbors[i] = neighbors[min];
+            neighbors[min] = tmp;
         }
     }
 }
@@ -46,9 +46,9 @@ bool SmartEnemy::is_valid_move(Grid& grid, Position _p) {
 }
 
 void SmartEnemy::move(Grid& grid, double game_timer) {
-    for (int i = 0; i < ADJACENT_POSITIONS_COUNT; i++) {
-        if (is_valid_move(grid, adjacent_positions[i])) {
-            p = adjacent_positions[i];
+    for (int i = 0; i < NEIGHBORS_COUNT; i++) {
+        if (is_valid_move(grid, neighbors[i])) {
+            p = neighbors[i];
             last_move_time = game_timer;
             break;
         }
@@ -57,7 +57,7 @@ void SmartEnemy::move(Grid& grid, double game_timer) {
 
 void SmartEnemy::update(Grid& grid, double game_timer, Position _player_p) {
     if (can_move(game_timer)) {
-        DummyEnemy::update_adjacent_positions();
+        update_neighbors();
         update_player_position(_player_p);
         plan_move();
         move(grid, game_timer);

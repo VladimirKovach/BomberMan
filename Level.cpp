@@ -1,13 +1,9 @@
 #include "Level.hpp"
 
-Level::Level(int level_number) {
-    number = level_number;
+Level::Level(int _difficulty) {
+    difficulty = _difficulty;
     completed = false;
-    grid = Grid(level_number);
-}
-
-int Level::get_number() {
-    return number;
+    grid = Grid(_difficulty);
 }
 
 bool Level::is_completed() {
@@ -91,12 +87,12 @@ void Level::update_enemies(double game_timer, Position player_p) {
 
 
 void Level::spawn_enemies() {
-    for (int i = 0; i < number; i++) {
+    for (int i = 0; i < difficulty; i++) {
         Position spawn_p = grid.get_random_spawn();
         dummy_enemies[i] = DummyEnemy(spawn_p, 1, 1);
     }
 
-    for (int i = 0; i < number; i++) {
+    for (int i = 0; i < difficulty; i++) {
         Position spawn_p = grid.get_random_spawn();
         smart_enemies[i] = SmartEnemy(spawn_p, 1, 2);
     }

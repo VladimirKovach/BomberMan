@@ -28,7 +28,6 @@ public:
     void go_to_next_level();
     void go_to_prev_level();
 
-
     // Rimuove dalla lista il nodo corrente e sposta 'current'
     // al nodo adiacente (next se forward=true, prev se forward=false).
     // Aggiorna 'head' se necessario.

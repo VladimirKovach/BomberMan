@@ -2,7 +2,7 @@
 #define BOMB_HPP
 
 #include "Grid.hpp"
-#include "Player.hpp"  // da cambiare in Player.hpp
+#include "Player.hpp"
 
 const double EXPLOSION_TIMER = 3.0;  // tempo che la bomba impiega a esplodere
 const double EXPLOSION_DURATION = 2.0;  // tempo di persistenza dell'esplosione
@@ -22,10 +22,10 @@ protected:
     double placement_time;
     double explosion_time;
 
-    // momento di inizio dello stato (lampeggio/non lampeggio)
+    // momento di inizio dello stato (lampeggio | non lampeggio)
     double blink_state_start;
 
-    void begin_explosion(Grid& grid, Direction d);
+    void start_explosion(Grid& grid, Direction d);
     void end_explosion(Grid& grid, Direction d);
 
 public:

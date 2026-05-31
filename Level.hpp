@@ -12,9 +12,8 @@ const int MAX_SMART_ENEMIES = 5;
 
 class Level {
 protected:
-    int number;
+    int difficulty;
     bool completed;
-    bool visited;
 
     Grid grid;
 
@@ -23,9 +22,8 @@ protected:
     SmartEnemy smart_enemies[MAX_SMART_ENEMIES];
 
 public:
-    Level(int level_number = 1);
+    Level(int _difficulty = 1);
 
-    int get_number();
     bool is_completed();
 
     Grid& get_grid();

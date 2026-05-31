@@ -3,7 +3,7 @@
 
 #include "Character.hpp"
 
-const int ADJACENT_POSITIONS_COUNT = 4;
+const int NEIGHBORS_COUNT = 4;
 
 class DummyEnemy : public Character {
 protected:
@@ -14,9 +14,9 @@ protected:
     int start_lives;
     int start_speed;
 
-    Position adjacent_positions[ADJACENT_POSITIONS_COUNT];
+    Position neighbors[NEIGHBORS_COUNT];
 
-    void update_adjacent_positions();
+    void update_neighbors();
 
     bool can_move(double game_timer);
     void plan_move();
