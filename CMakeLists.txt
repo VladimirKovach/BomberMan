@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(Curses)
 
 if(NOT CURSES_FOUND AND WIN32)
-    set(CURSES_INCLUDE_DIR "C:/MinGW/include")
-    set(CURSES_LIBRARIES "C:/MinGW/lib/libpdcurses.a")
+    set(CURSES_INCLUDE_DIR "C:/MinGW/include/ncurses")
+    set(CURSES_LIBRARIES "C:/MinGW/lib/libncurses.a")
 endif()
 
 include_directories(${CURSES_INCLUDE_DIR})
@@ -15,27 +15,19 @@ include_directories(${CURSES_INCLUDE_DIR})
 add_executable(BomberMan
         main.cpp
         Bomb.cpp
-        Bomb.hpp
         Character.cpp
-        Character.hpp
         DummyEnemy.cpp
-        DummyEnemy.hpp
         Game.cpp
-        Game.hpp
-        LevelManager.cpp
-        LevelManager.hpp
-        Map.cpp
-        Map.hpp
-        Menu.cpp
-        Menu.hpp
-        Player.cpp
-        Player.hpp
-        Renderer.cpp
-        Renderer.hpp
-        SmartEnemy.cpp
-        SmartEnemy.hpp
+        Grid.cpp
         Leaderboard.cpp
-        Leaderboard.hpp
+        Level.cpp
+        Map.cpp
+        Menu.cpp
+        Ncurses.cpp
+        Player.cpp
+        Renderer.cpp
+        SmartEnemy.cpp
+        Item.cpp
 )
 
 target_link_libraries(BomberMan ${CURSES_LIBRARIES})

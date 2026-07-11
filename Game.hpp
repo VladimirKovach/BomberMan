@@ -13,11 +13,17 @@ using namespace std;
 const double TIMER_START_VALUE = 1000.0;  // secondi
 const int DELAY = 50;  // millisecondi
 
+// Probabilita' (in percentuale) che un drop di item avvenga
+const int WALL_DROP_CHANCE = 25;   // alla rottura di un muro
+const int ENEMY_DROP_CHANCE = 50;  // alla morte di un nemico
+
 class Game {
 protected:
     bool quit;
     chrono::steady_clock::time_point start;
-    double timer;
+    double timer;        // tempo rimanente mostrato (include il bonus tempo)
+    double game_clock;   // orologio monotono decrescente per bombe, buff e nemici
+    double time_bonus;   // secondi accumulati dagli item tempo
     int score;
 
     Map map;
@@ -34,6 +40,9 @@ protected:
     bool bomb_under_player();
     void handle_input();
     void handle_collisions();
+
+    // Prova a generare un item di tipo casuale in p con probabilita' 'chance'
+    void try_drop_item(Level& level, Position p, int chance);
 
 public:
     Game();

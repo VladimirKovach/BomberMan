@@ -7,15 +7,27 @@ using namespace std;
 void Renderer::init_colors() {
     if (has_colors()) {
         start_color();
+
+        // Fallback per terminali senza 256 colori (es. pdcurses su Windows):
+        // GREY (244) e ORANGE (208) non esistono e init_pair fallisce,
+        // rendendo invisibili muri distruttibili e bombe
+        short grey = GREY;
+        short orange = ORANGE;
+        if (COLORS < 256) {
+            grey = COLOR_YELLOW;
+            orange = COLOR_YELLOW;
+        }
+
         init_pair(CP_SCREEN, COLOR_BLACK, COLOR_BLACK);
         init_pair(CP_UNBREAKABLE_WALL, COLOR_WHITE, COLOR_WHITE);
-        init_pair(CP_BREAKABLE_WALL, GREY, GREY);
+        init_pair(CP_BREAKABLE_WALL, grey, grey);
         init_pair(CP_DOOR, COLOR_GREEN, COLOR_BLACK);
         init_pair(CP_PLAYER, COLOR_CYAN, COLOR_BLACK);
         init_pair(CP_ENEMY, COLOR_RED, COLOR_BLACK);
-        init_pair(CP_BOMB, ORANGE, COLOR_BLACK);
+        init_pair(CP_BOMB, orange, COLOR_BLACK);
         init_pair(CP_EXPLOSION, COLOR_YELLOW, COLOR_RED);
         init_pair(CP_BLINK, COLOR_WHITE, COLOR_BLACK);
+        init_pair(CP_ITEM, COLOR_MAGENTA, COLOR_BLACK);
     }
     else {
         endwin();
@@ -48,7 +60,7 @@ Renderer::Renderer() {
 
 void Renderer::display_score(int score) {
     move(map_start_p.y - 2, map_start_p.x);
-    printw("SCORE: %d", score);
+    printw("SCORE: %d  COLORS: %d", score, COLORS);
 }
 
 void Renderer::display_time(double time) {
@@ -135,6 +147,38 @@ void Renderer::draw_bombs(Bomb* bombs) {
     }
 }
 
+void Renderer::draw_items(Item* items) {
+    for (int i = 0; i < MAX_ITEMS; i++) {
+        if (items[i].is_active()) {
+            Position item_p = items[i].get_position();
+
+            // chtype, non char: i simboli ACS_* sono definiti da curses
+            // e non entrano in un singolo byte
+            chtype glyph = 'R';  // ITEM_RANGE
+            switch (items[i].get_type()) {
+                case ITEM_LIFE:
+                    glyph = ACS_DIAMOND;
+                    break;
+
+                case ITEM_TIME:
+                    glyph = 'T';
+                    break;
+
+                case ITEM_SCORE:
+                    glyph = ACS_STERLING;
+                    break;
+
+                default:  // ITEM_RANGE
+                    break;
+            }
+
+            int y = item_p.y + map_start_p.y;
+            int x = item_p.x + map_start_p.x;
+            mvaddch(y, x, glyph | COLOR_PAIR(CP_ITEM));
+        }
+    }
+}
+
 void Renderer::draw_player(Position player_p) {
     int y = player_p.y + map_start_p.y;
     int x = player_p.x + map_start_p.x;
@@ -183,6 +227,7 @@ void Renderer::render(Map& map, Position player_p, int score, int time) {
     display_time(time);
 
     draw_grid(level.get_grid());
+    draw_items(level.get_items());
     draw_bombs(level.get_bombs());
     draw_player(player_p);
     draw_dummy_enemies(level.get_dummy_enemies());

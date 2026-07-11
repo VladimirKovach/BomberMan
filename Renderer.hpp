@@ -20,6 +20,7 @@ enum ColorPair {
     CP_BOMB,
     CP_EXPLOSION,
     CP_BLINK,
+    CP_ITEM,
 };
 
 class Renderer {
@@ -38,6 +39,7 @@ protected:
 
     void draw_grid(Grid& grid);
     void draw_bombs(Bomb* bombs);
+    void draw_items(Item* items);
     void draw_player(Position player_p);
     void draw_dummy_enemies(DummyEnemy* dummy_enemies);
     void draw_smart_enemies(SmartEnemy* smart_enemies);
