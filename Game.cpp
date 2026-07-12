@@ -65,13 +65,50 @@ void Game::handle_input() {
     Level& level = map.get_current_level();
     Grid& grid = level.get_grid();
 
-    int key = getch();
-    switch (key) {
-        case 'q':
-        case 'Q':
-            quit = true;
-            break;
+    // La tastiera in auto-repeat genera piu' eventi di quanti frame
+    // consumiamo (~30/s contro ~20 fps), quindi i tasti si accumulano nel
+    // buffer e il personaggio continua a muoversi dopo il rilascio.
+    // Svuotiamo tutto il buffer: bomba e uscita vengono gestite subito,
+    // per il movimento conta solo l'ultimo tasto letto.
 
+    //move_key: è un appunto.
+    //Durante la lettura del buffer non muoviamo nessuno — ci segniamo solo l'ultimo tasto di movimento che abbiamo visto.
+    //Tre D nel buffer → l'appunto viene sovrascritto tre volte, alla fine dice semplicemente "D".
+    //Poi, a buffer vuoto, guardiamo l'appunto e facciamo un movimento.
+    int move_key = ERR;
+    int key = getch();
+
+    while (key != ERR) {
+        switch (key) {
+            case 'q':
+            case 'Q':
+                quit = true;
+                break;
+
+            case ' ':
+            {
+                Bomb* bombs = level.get_bombs();
+                Position player_p = player.get_position();
+                if (level.get_bombs_count() < MAX_BOMBS && !bomb_under_player()) {
+                    int i = 0;
+                    while (i < MAX_BOMBS && bombs[i].is_active()) {
+                        i++;
+                    }
+                    if (i < MAX_BOMBS) {
+                        bombs[i].place(player_p, player.get_bomb_range(), game_clock);
+                    }
+                }
+                break;
+            }
+
+            default:
+                move_key = key;
+                break;
+        }
+        key = getch();
+    }
+
+    switch (move_key) {
         case KEY_UP:
         case 'w':
         case 'W':
@@ -96,23 +133,7 @@ void Game::handle_input() {
             player.move(grid, RIGHT);
             break;
 
-        case ' ':
-        {
-            Bomb* bombs = level.get_bombs();
-            Position player_p = player.get_position();
-            if (level.get_bombs_count() < MAX_BOMBS && !bomb_under_player()) {
-                int i = 0;
-                while (i < MAX_BOMBS && bombs[i].is_active()) {
-                    i++;
-                }
-                if (i < MAX_BOMBS) {
-                    bombs[i].place(player_p, player.get_bomb_range(), game_clock);
-                }
-            }
-            break;
-        }
-
-        default:  // ERR
+        default:
             break;
     }
 }
