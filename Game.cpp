@@ -288,7 +288,7 @@ void Game::run() {
         map.update_all_bombs(game_clock);
         level.update_enemies(game_clock, player.get_position());
 
-        renderer.render(map, player.get_position(), score, timer);
+        renderer.render(map, player, score, timer, game_clock);
         napms(DELAY);
     }
 }

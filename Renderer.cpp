@@ -1,5 +1,6 @@
 #include "Renderer.hpp"
 #include "Bomb.hpp"
+#include <cstdio>
 #include <iostream>
 #include <ncurses.h>
 using namespace std;
@@ -28,6 +29,8 @@ void Renderer::init_colors() {
         init_pair(CP_EXPLOSION, COLOR_YELLOW, COLOR_RED);
         init_pair(CP_BLINK, COLOR_WHITE, COLOR_BLACK);
         init_pair(CP_ITEM, COLOR_MAGENTA, COLOR_BLACK);
+        init_pair(CP_LIFE, COLOR_RED, COLOR_BLACK);
+        init_pair(CP_TITLE, COLOR_WHITE, COLOR_BLACK);
     }
     else {
         endwin();
@@ -58,17 +61,93 @@ Renderer::Renderer() {
     paint_it_black();
 }
 
-void Renderer::display_score(int score) {
+// Titolo in stile "banner" da vecchio terminale: ogni lettera grande e'
+// disegnata usando il suo stesso carattere come inchiostro.
+const int TITLE_ROWS = 5;
+const char* TITLE_BANNER[TITLE_ROWS] = {
+    "BBBB   OOO  M   M BBBB  EEEEE RRRR  M   M  AAA  N   N",
+    "B   B O   O MM MM B   B E     R   R MM MM A   A NN  N",
+    "BBBB  O   O M M M BBBB  EEE   RRRR  M M M AAAAA N N N",
+    "B   B O   O M   M B   B E     R  R  M   M A   A N  NN",
+    "BBBB   OOO  M   M BBBB  EEEEE R   R M   M A   A N   N",
+};
+
+void Renderer::display_title() {
+    int banner_w = 53;  // larghezza delle righe di TITLE_BANNER
+    int top = map_start_p.y - 2 - 1 - TITLE_ROWS;  // sopra la riga HUD, con una riga vuota
+
+    attron(COLOR_PAIR(CP_TITLE) | A_BOLD);
+    if (top >= 0 && max_x >= banner_w) {
+        // Centrato rispetto alla griglia (che a sua volta e' centrata)
+        int left = map_start_p.x + (GRID_COLS - banner_w) / 2;
+        if (left < 0) {
+            left = 0;
+        }
+        for (int i = 0; i < TITLE_ROWS; i++) {
+            mvprintw(top + i, left, "%s", TITLE_BANNER[i]);
+        }
+    }
+    else if (map_start_p.y - 3 >= 0) {
+        // Terminale piccolo: titolo compatto
+        const char* small_title = "B O M B E R M A N";
+        int left = (max_x - 17) / 2;
+        mvprintw(map_start_p.y - 3, left, "%s", small_title);
+    }
+    attroff(COLOR_PAIR(CP_TITLE) | A_BOLD);
+}
+
+void Renderer::display_lives(int lives) {
     move(map_start_p.y - 2, map_start_p.x);
-    printw("SCORE: %d  COLORS: %d", score, COLORS);
+    printw("VITE: ");
+
+    // Disegno sempre MAX_LIVES slot: quelli persi diventano spazi,
+    // cosi' i rombi vecchi vengono cancellati dal frame precedente
+    for (int i = 0; i < MAX_LIVES; i++) {
+        chtype glyph = ' ';
+        if (i < lives) {
+            glyph = ACS_DIAMOND | COLOR_PAIR(CP_LIFE) | A_BOLD;
+        }
+        addch(glyph);
+        addch(' ');
+    }
+}
+
+void Renderer::display_effect(double buff_remaining) {
+    move(map_start_p.y - 1, map_start_p.x);
+
+    char text[32] = "None";
+    if (buff_remaining > 0.0) {
+        // +1 = arrotondamento per eccesso: il conto parte da 10 e finisce a 1
+        snprintf(text, sizeof(text), "Range %ds", (int) buff_remaining + 1);
+    }
+    // %-9s: padding a destra per cancellare il testo del frame precedente
+    printw("EFFETTO: %-9s", text);
+}
+
+void Renderer::display_score(int score) {
+    const int SCORE_MAX_LENGTH = 6;         // fino a 999999
+    const int SCORE_LABEL_MAX_LENGTH = 13;  // length(SCORE: 999999) = 13
+    int x = map_start_p.x + GRID_COLS - SCORE_LABEL_MAX_LENGTH;
+    move(map_start_p.y - 1, x);
+    printw("SCORE: %-*d", SCORE_MAX_LENGTH, score);
 }
 
 void Renderer::display_time(double time) {
     const int TIME_MAX_LENGTH = 4;         // length(1000) = 4
-    const int TIME_LABEL_MAX_LENGTH = 10;  // length(TIME: 1000) = 10
-    int x = map_start_p.x + GRID_COLS - TIME_LABEL_MAX_LENGTH;
+    // Stessa colonna di partenza di SCORE (l'etichetta piu' larga), cosi'
+    // le due righe risultano incolonnate
+    const int HUD_RIGHT_LABEL_LENGTH = 13;  // length(SCORE: 999999) = 13
+    int x = map_start_p.x + GRID_COLS - HUD_RIGHT_LABEL_LENGTH;
     move(map_start_p.y - 2, x);
     printw("TIME: %-*d", TIME_MAX_LENGTH, (int) time);
+}
+
+void Renderer::display_colors_debug() {
+    // Info di debug sotto la griglia
+    if (map_start_p.y + GRID_ROWS < max_y) {
+        move(map_start_p.y + GRID_ROWS, map_start_p.x);
+        printw("COLORS: %d", COLORS);
+    }
 }
 
 
@@ -220,11 +299,16 @@ void Renderer::draw_explosions(Grid& grid) {
 }
 
 
-void Renderer::render(Map& map, Position player_p, int score, int time) {
+void Renderer::render(Map& map, Player& player, int score, int time, double game_clock) {
     Level& level = map.get_current_level();
+    Position player_p = player.get_position();
 
+    display_title();
+    display_lives(player.get_lives());
+    display_effect(player.get_buff_remaining(game_clock));
     display_score(score);
     display_time(time);
+    display_colors_debug();
 
     draw_grid(level.get_grid());
     draw_items(level.get_items());

@@ -13,6 +13,10 @@ bool Character::is_dead() {
     return lives <= 0;
 }
 
+int Character::get_lives() {
+    return lives;
+}
+
 Position Character::get_position() {
     return p;
 }

@@ -15,6 +15,8 @@ public:
 
     bool is_dead();
 
+    int get_lives();
+
     Position get_position();
 
     void set_position(Position _p);

@@ -35,7 +35,9 @@ Player::Player(Position _p, int _lives): Character(_p, _lives) {
 }
 
 void Player::heal() {
-    lives++;
+    if (lives < MAX_LIVES) {
+        lives++;
+    }
 }
 
 void Player::move(Grid& grid, Direction d) {
@@ -47,6 +49,14 @@ void Player::move(Grid& grid, Direction d) {
 
 int Player::get_bomb_range() {
     return bomb_range;
+}
+
+double Player::get_buff_remaining(double game_clock) {
+    // Orologio decrescente: il buff e' attivo finche' game_clock > buff_end
+    if (bomb_range > 1 && game_clock > buff_end) {
+        return game_clock - buff_end;
+    }
+    return 0.0;
 }
 
 void Player::apply_range_buff(double duration, double game_clock) {

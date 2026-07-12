@@ -21,6 +21,8 @@ enum ColorPair {
     CP_EXPLOSION,
     CP_BLINK,
     CP_ITEM,
+    CP_LIFE,   // rombi rossi delle vite nell'HUD
+    CP_TITLE,  // titolo bianco in alto
 };
 
 class Renderer {
@@ -31,8 +33,12 @@ protected:
     void init_colors();
     void paint_it_black();
 
+    void display_title();
+    void display_lives(int lives);
+    void display_effect(double buff_remaining);
     void display_score(int score);
     void display_time(double time);
+    void display_colors_debug();
 
     char get_cell_view(Cell c);
     ColorPair get_cell_color(Cell c);
@@ -48,7 +54,7 @@ protected:
 public:
     Renderer();
 
-    void render(Map& map, Position player_p, int score, int time);
+    void render(Map& map, Player& player, int score, int time, double game_clock);
 };
 
 #endif

@@ -15,6 +15,8 @@ enum Direction {
 
 Position get_next_position(Position p, Direction d);
 
+const int MAX_LIVES = 3;
+
 class Player : public Character {
 protected:
     Position start_p;
@@ -36,6 +38,9 @@ public:
 
     // Disattiva il buff se scaduto. Da chiamare ad ogni frame.
     void update_buff(double game_clock);
+
+    // Secondi rimanenti del buff raggio (0 se non attivo). Per l'HUD.
+    double get_buff_remaining(double game_clock);
 
     void reset();
 };
