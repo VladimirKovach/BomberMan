@@ -1,7 +1,7 @@
 #ifndef LEVEL_HPP
 #define LEVEL_HPP
 
-#include "Grid.hpp"
+#include "Map.hpp"
 #include "Bomb.hpp"
 #include "DummyEnemy.hpp"
 #include "SmartEnemy.hpp"
@@ -17,7 +17,7 @@ protected:
     int difficulty;
     bool completed;
 
-    Grid grid;
+    Map map;
 
     Bomb bombs[MAX_BOMBS];
     DummyEnemy dummy_enemies[MAX_DUMMY_ENEMIES];
@@ -29,7 +29,7 @@ public:
 
     bool is_completed();
 
-    Grid& get_grid();
+    Map& get_map();
     Bomb* get_bombs();
     DummyEnemy* get_dummy_enemies();
     SmartEnemy* get_smart_enemies();

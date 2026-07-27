@@ -10,7 +10,7 @@ DummyEnemy::DummyEnemy(Position _p, int _speed) {
     move_timer = 1.0 / speed;  // errore se speed == 0
     last_move_time = -1.0;  // per convenzione
 
-    if (positions_equal(p, {-1, -1})) {
+    if (equal(p, {-1, -1})) {
         dead = true;
     }
     else {
@@ -63,13 +63,13 @@ void DummyEnemy::plan_move() {
     }
 }
 
-bool DummyEnemy::is_valid_move(Grid& grid, Position _p) {
-    return grid.is_walkable(_p) && !grid.is_door(_p);
+bool DummyEnemy::is_valid_move(Map& map, Position _p) {
+    return map.is_walkable(_p) && !map.is_door(_p);
 }
 
-void DummyEnemy::move(Grid& grid, double game_timer) {
+void DummyEnemy::move(Map& map, double game_timer) {
     for (int i = 0; i < NEIGHBORS_COUNT; i++) {
-        if (is_valid_move(grid, neighbors[i])) {
+        if (is_valid_move(map, neighbors[i])) {
             p = neighbors[i];
             last_move_time = game_timer;
             break;
@@ -77,11 +77,11 @@ void DummyEnemy::move(Grid& grid, double game_timer) {
     }
 }
 
-void DummyEnemy::update(Grid& grid, double game_timer) {
+void DummyEnemy::update(Map& map, double game_timer) {
     if (can_move(game_timer)) {
         update_neighbors();
         plan_move();
-        move(grid, game_timer);
+        move(map, game_timer);
     }
 }
 
@@ -89,7 +89,7 @@ void DummyEnemy::reset() {
     p = start_p;
     speed = start_speed;
 
-    if (positions_equal(p, {-1, -1})) {
+    if (equal(p, {-1, -1})) {
         dead = true;
     }
     else {

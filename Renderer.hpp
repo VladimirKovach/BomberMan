@@ -1,7 +1,7 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
-#include "Map.hpp"
+#include "LevelManager.hpp"
 #include "Player.hpp"
 
 enum Color {
@@ -10,7 +10,7 @@ enum Color {
 };
 
 enum ColorPair {
-    CP_DEFAULT,  // colore predefinito del terminale
+    CP_NONE,
     CP_SCREEN,
     CP_BREAKABLE_WALL,
     CP_UNBREAKABLE_WALL,
@@ -21,8 +21,8 @@ enum ColorPair {
     CP_EXPLOSION,
     CP_BLINK,
     CP_ITEM,
-    CP_LIFE,   // rombi rossi delle vite nell'HUD
-    CP_TITLE,  // titolo bianco in alto
+    CP_LIFE,  // rombi rossi delle vite nell'HUD
+    CP_TITLE  // titolo bianco in alto
 };
 
 class Renderer {
@@ -43,18 +43,18 @@ protected:
     char get_cell_view(Cell c);
     ColorPair get_cell_color(Cell c);
 
-    void draw_grid(Grid& grid);
+    void draw_map(Map& map);
     void draw_bombs(Bomb* bombs);
     void draw_items(Item* items);
     void draw_player(Position player_p);
     void draw_dummy_enemies(DummyEnemy* dummy_enemies);
     void draw_smart_enemies(SmartEnemy* smart_enemies);
-    void draw_explosions(Grid& grid);
+    void draw_explosions(Map& map);
 
 public:
     Renderer();
 
-    void render(Map& map, Player& player, int score, int time, double game_clock);
+    void render(LevelManager& level_manager, Player& player, int score, int time, double game_clock);
 };
 
 #endif

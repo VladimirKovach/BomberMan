@@ -1,7 +1,7 @@
 #ifndef BOMB_HPP
 #define BOMB_HPP
 
-#include "Grid.hpp"
+#include "Map.hpp"
 #include "Player.hpp"
 
 const double EXPLOSION_TIMER = 3.0;  // tempo che la bomba impiega a esplodere
@@ -27,8 +27,8 @@ protected:
 
     Position next_position(Position _p, Direction d);
 
-    void start_explosion(Grid& grid, Direction d);
-    void end_explosion(Grid& grid, Direction d);
+    void start_explosion(Map& map, Direction d);
+    void end_explosion(Map& map, Direction d);
 
 public:
     Bomb(Position _p = {-1, -1}, int _range = 1);
@@ -41,9 +41,9 @@ public:
 
     void place(Position _p, int _range, double game_timer);
 
-    void explode(Grid& grid, double game_timer);
+    void explode(Map& map, double game_timer);
 
-    void update(Grid& grid, double game_timer);
+    void update(Map& map, double game_timer);
 
     void reset();
 };

@@ -41,13 +41,13 @@ void SmartEnemy::plan_move() {
 
 
 // Evita esplosioni
-bool SmartEnemy::is_valid_move(Grid& grid, Position _p) {
-    return DummyEnemy::is_valid_move(grid, _p) && !grid.is_explosion(_p);
+bool SmartEnemy::is_valid_move(Map& map, Position _p) {
+    return DummyEnemy::is_valid_move(map, _p) && !map.is_explosion(_p);
 }
 
-void SmartEnemy::move(Grid& grid, double game_timer) {
+void SmartEnemy::move(Map& map, double game_timer) {
     for (int i = 0; i < NEIGHBORS_COUNT; i++) {
-        if (is_valid_move(grid, neighbors[i])) {
+        if (is_valid_move(map, neighbors[i])) {
             p = neighbors[i];
             last_move_time = game_timer;
             break;
@@ -55,11 +55,11 @@ void SmartEnemy::move(Grid& grid, double game_timer) {
     }
 }
 
-void SmartEnemy::update(Grid& grid, double game_timer, Position _player_p) {
+void SmartEnemy::update(Map& map, double game_timer, Position _player_p) {
     if (can_move(game_timer)) {
         update_neighbors();
         update_player_position(_player_p);
         plan_move();
-        move(grid, game_timer);
+        move(map, game_timer);
     }
 }

@@ -1,7 +1,7 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-#include "Grid.hpp"
+#include "Map.hpp"
 #include "Item.hpp"
 
 enum Direction {
@@ -36,7 +36,7 @@ public:
     void lose_life();
     bool is_dead();
 
-    void move(Grid& grid, Direction d);
+    void move(Map& map, Direction d);
 
     int get_bomb_range();
 

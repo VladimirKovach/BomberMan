@@ -27,28 +27,28 @@ Position Bomb::next_position(Position _p, Direction d) {
     return next;
 }
 
-void Bomb::start_explosion(Grid& grid, Direction d) {
+void Bomb::start_explosion(Map& map, Direction d) {
     Position target = p;
     for (int i = 0; i < range; i++) {
         target = next_position(target, d);
-        if (grid.get_cell(target) == UNBREAKABLE_WALL) {
+        if (map.get_cell(target) == UNBREAKABLE_WALL) {
             break;
         }
         else {
-            grid.set_explosion(target);
+            map.set_explosion(target);
         }
     }
 }
 
-void Bomb::end_explosion(Grid& grid, Direction d) {
+void Bomb::end_explosion(Map& map, Direction d) {
     Position target = p;
     for (int i = 0; i < range; i++) {
         target = next_position(target, d);
-        if (grid.get_cell(target) == UNBREAKABLE_WALL) {
+        if (map.get_cell(target) == UNBREAKABLE_WALL) {
             break;
         }
         else {
-            grid.unset_explosion(target);
+            map.unset_explosion(target);
         }
     }
 }
@@ -95,35 +95,35 @@ void Bomb::place(Position _p, int _range, double game_timer) {
 }
 
 
-void Bomb::explode(Grid& grid, double game_timer) {
+void Bomb::explode(Map& map, double game_timer) {
     exploding = true;
     explosion_time = game_timer;
 
     // Esplosione al centro
-    grid.set_explosion(p);
+    map.set_explosion(p);
 
     // Esplosione nelle 4 direzioni (croce)
-    start_explosion(grid, UP);
-    start_explosion(grid, LEFT);
-    start_explosion(grid, DOWN);
-    start_explosion(grid, RIGHT);
+    start_explosion(map, UP);
+    start_explosion(map, LEFT);
+    start_explosion(map, DOWN);
+    start_explosion(map, RIGHT);
 }
 
 
-void Bomb::update(Grid& grid, double game_timer) {
+void Bomb::update(Map& map, double game_timer) {
     if (!exploding && placement_time - game_timer >= EXPLOSION_TIMER) {
-        explode(grid, game_timer);
+        explode(map, game_timer);
     }
     else if (!exploding && blink_state_start - game_timer >= BLINK_DELTA) {
         blink_state_start = game_timer;
         blink_state = !blink_state;
     }
     else if (exploding && explosion_time - game_timer >= EXPLOSION_DURATION) {
-        grid.unset_explosion(p);
-        end_explosion(grid, UP);
-        end_explosion(grid, LEFT);
-        end_explosion(grid, DOWN);
-        end_explosion(grid, RIGHT);
+        map.unset_explosion(p);
+        end_explosion(map, UP);
+        end_explosion(map, LEFT);
+        end_explosion(map, DOWN);
+        end_explosion(map, RIGHT);
 
         reset();
     }

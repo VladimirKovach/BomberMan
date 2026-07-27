@@ -13,13 +13,13 @@ protected:
     void plan_move();
 
     // duplicati di DummyEnemy (non posso usare virtual e override)
-    bool is_valid_move(Grid& grid, Position _p);
-    void move(Grid& grid, double game_timer);
+    bool is_valid_move(Map& map, Position _p);
+    void move(Map& map, double game_timer);
 
 public:
     SmartEnemy(Position _p = {-1, -1}, int _speed = 0);
 
-    void update(Grid& grid, double game_timer, Position _player_p);
+    void update(Map& map, double game_timer, Position _player_p);
 };
 
 #endif

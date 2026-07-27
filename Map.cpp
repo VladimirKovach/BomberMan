@@ -1,152 +1,234 @@
 #include "Map.hpp"
-#include <iostream>
+#include <algorithm>
+#include <cstdlib>
+using namespace std;
 
-Map::Map() {
-    head = NULL;
-    current = NULL;
-
-    Node* prev_node = NULL;
-
-    for (int i = 1; i <= NUM_LEVELS; i++) {
-        Node* node = new Node;
-
-        node->level = Level(i);
-        node->next = NULL;
-        node->prev = prev_node;
-
-        (node->level).spawn_enemies();
-
-        if (prev_node != NULL) {
-            prev_node->next = node;
-        }
-        else {
-            head = node;
-        }
-
-        prev_node = node;
-    }
-
-    current = head;
+bool equal(Position p, Position q) {
+    return p.y == q.y && p.x == q.x;
 }
 
-Map::~Map() {
-    Node* node = head;
-    while (node != NULL) {
-        Node* next = node->next;
-        delete node;
-        node = next;
-    }
-    head = NULL;
-    current = NULL;
-}
-
-Level& Map::get_current_level() {
-    return current->level;
-}
-
-bool Map::has_next_level() {
-    return (current != NULL && current->next != NULL);
-}
-
-bool Map::has_prev_level() {
-    return (current != NULL && current->prev != NULL);
-}
-
-void Map::go_to_next_level() {
-    if (current != NULL && current->next != NULL) {
-        current = current->next;
-    }
-}
-
-void Map::go_to_prev_level() {
-    if (current != NULL && current->prev != NULL) {
-        current = current->prev;
-    }
-}
-
-bool Map::is_current_completed() {
-    if (current != NULL) {
-        return (current->level).is_completed();
-    }
-    return false;
-}
-
-bool Map::all_levels_completed() {
-    Node* node = head;
-    while (node != NULL) {
-        if (!(node->level).is_completed()) {
-            return false;
-        }
-        node = node->next;
-    }
-    return (head != NULL);
-}
-
-
-void Map::update_all_bombs(double game_timer) {
-    Node* tmp = head;
-    while (tmp != NULL) {
-        (tmp->level).update_bombs(game_timer);
-        tmp = tmp->next;
-    }
-}
-
-void Map::update_doors() {
-    if (current != NULL) {
-        Grid& grid = (current->level).get_grid();
-
-        if (current->next != NULL) {
-            grid.open_exit();
-        }
-        else {
-            grid.close_exit();
-        }
-
-        if (current->prev != NULL) {
-            grid.open_entrance();
-        }
-        else {
-            grid.close_entrance();
+void Map::save_state() {
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            start_grid[y][x] = grid[y][x];
         }
     }
 }
 
-
-bool Map::remove_current_level(bool forward) {
-    if (current == NULL) {
-        return false;
+// Fisher-Yates Shuffle
+void Map::shuffle_spawns() {
+    for (int i = spawn_count - 1; i >= 0; i--) {
+        int j = rand() % (i + 1);
+        if (j != i) {
+            Position tmp = spawns[i];
+            spawns[i] = spawns[j];
+            spawns[j] = tmp;
+        }
     }
+}
 
-    Node* to_remove = current;
-    Node* new_current;
+bool Map::in_bounds(Position p) {
+    return (p.y >= 0 && p.y < MAP_HEIGHT) && (p.x >= 0 && p.x < MAP_WIDTH);
+}
 
-    if (forward) {
-        new_current = to_remove->next;
+// Controlla se la cella (y, x) non deve mai ricevere muri distruttibili
+// Protegge solo la zona spawn del giocatore: (1, 1), (1, 2), (2, 1)
+// Senza questo, il giocatore potrebbe iniziare intrappolato
+bool Map::is_safe_zone(Position p) {
+    if (p.y == 1 && p.x == 1) {
+        return true;
+    }
+    else if (p.y == 1 && p.x == 2) {
+        return true;
+    }
+    else if (p.y == 2 && p.x == 1) {
+        return true;
     }
     else {
-        new_current = to_remove->prev;
-    }
-
-    if (new_current == NULL) {
         return false;
     }
+}
 
-    Node* prev_node = to_remove->prev;
-    Node* next_node = to_remove->next;
-
-    if (prev_node != NULL) {
-        prev_node->next = next_node;
+void Map::place_unbreakable_walls() {
+    for (int y = 2; y < MAP_HEIGHT - 1; y += 2) {
+        for (int x = 2; x < MAP_WIDTH - 1; x += 2) {
+            int place = rand() % 2;
+            if (place == 0) {  // successo
+                grid[y][x] = UNBREAKABLE_WALL;
+            }
+        }
     }
-    if (next_node != NULL) {
-        next_node->prev = prev_node;
+}
+
+
+void Map::place_breakable_walls(int difficulty) {
+    difficulty = max(difficulty, 1);
+    difficulty = min(difficulty, MAX_DIFFICULTY);
+
+    int percentage[MAX_DIFFICULTY] = {5, 10, 15, 20, 25};
+
+    int empty_cells = 0;
+    for (int y = 1; y < MAP_HEIGHT - 1; y++) {
+        for (int x = 1; x < MAP_WIDTH - 1; x++) {
+            if (grid[y][x] == EMPTY && !is_safe_zone({y, x})) {
+                empty_cells++;
+            }
+        }
     }
 
-    if (head == to_remove) {
-        head = next_node;
+    int walls_to_place = empty_cells * percentage[difficulty - 1] / 100;
+
+    int placed = 0;
+    int max_attempts = walls_to_place * 10;
+    int attempts = 0;
+
+    while (placed < walls_to_place && attempts < max_attempts) {
+        int x = 1 + rand() % (MAP_WIDTH);
+        int y = 1 + rand() % (MAP_HEIGHT - 2);
+
+        if (grid[y][x] == EMPTY && !is_safe_zone({y, x})) {
+            grid[y][x] = BREAKABLE_WALL;
+            placed++;
+        }
+        attempts++;
+    }
+}
+
+
+Map::Map(int difficulty) {
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            explosions[y][x] = false;
+        }
     }
 
-    current = new_current;
-    delete to_remove;
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            grid[y][x] = EMPTY;
+        }
+    }
 
-    return true;
+    // Bordi della griglia (muri indistruttibili)
+    for (int x = 0; x < MAP_WIDTH; x++) {
+        grid[0][x] = UNBREAKABLE_WALL;
+        grid[MAP_HEIGHT - 1][x] = UNBREAKABLE_WALL;
+    }
+    for (int y = 1; y < MAP_HEIGHT - 1; y++) {
+        grid[y][0] = UNBREAKABLE_WALL;
+        grid[y][MAP_WIDTH - 1] = UNBREAKABLE_WALL;
+    }
+
+    // Muri indistruttibili interni (pattern a scacchiera, con buchi)
+    place_unbreakable_walls();
+
+    // Muri distruttibili (quantita' basata sulla difficolta')
+    place_breakable_walls(difficulty);
+
+    spawn_count = 0;
+
+    // Secondo quadrante (primo quadrante escluso)
+    for (int y = 0; y < MAP_HEIGHT / 2; y++) {
+        for (int x = MAP_WIDTH / 2; x < MAP_WIDTH; x++) {
+            if (grid[y][x] == EMPTY) {
+                spawns[spawn_count] = {y, x};
+                spawn_count++;
+            }
+        }
+    }
+
+    // Terzo e quarto quadrante
+    for (int y = MAP_HEIGHT / 2; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            if (grid[y][x] == EMPTY) {
+                spawns[spawn_count] = {y, x};
+                spawn_count++;
+            }
+        }
+    }
+
+    shuffle_spawns();
+
+    save_state();
+}
+
+
+void Map::reset() {
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            grid[y][x] = start_grid[y][x];
+            explosions[y][x] = false;
+        }
+    }
+}
+
+Position Map::get_random_spawn() {
+    Position spawn = spawns[spawn_count - 1];
+    spawn_count--;
+    return spawn;
+}
+
+Cell Map::get_cell(Position p) {
+    if (in_bounds(p)) {
+        return grid[p.y][p.x];
+    }
+    else {
+        return NONE;  // fallback
+    }
+}
+
+void Map::set_cell(Position p, Cell c) {
+    if (in_bounds(p)) {
+        grid[p.y][p.x] = c;
+    }
+}
+
+bool Map::is_walkable(Position p) {
+    if (in_bounds(p)) {
+        Cell c = grid[p.y][p.x];
+        return c != BREAKABLE_WALL && c != UNBREAKABLE_WALL;
+    }
+    else {
+        return false;
+    }
+}
+
+bool Map::is_door(Position p) {
+    if (in_bounds(p)) {
+        return grid[p.y][p.x] == ENTRANCE || grid[p.y][p.x] == EXIT;
+    }
+    else {
+        return false;
+    }
+}
+
+bool Map::is_explosion(Position p) {
+    return in_bounds(p) && explosions[p.y][p.x];
+}
+
+void Map::set_explosion(Position p) {
+    if (in_bounds(p)) {
+        explosions[p.y][p.x] = true;
+    }
+}
+
+void Map::unset_explosion(Position p) {
+    if (in_bounds(p)) {
+        explosions[p.y][p.x] = false;
+    }
+}
+
+void Map::open_entrance() {
+    grid[1][0] = ENTRANCE;
+}
+
+void Map::close_entrance() {
+    grid[1][0] = UNBREAKABLE_WALL;
+}
+
+void Map::open_exit() {
+    grid[1][MAP_WIDTH - 1] = EXIT;
+}
+
+void Map::close_exit() {
+    grid[1][MAP_WIDTH - 1] = UNBREAKABLE_WALL;
 }

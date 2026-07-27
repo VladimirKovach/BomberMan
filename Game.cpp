@@ -6,7 +6,7 @@ using namespace std;
 void Game::spawn_player(bool forward) {
     Position spawn = {1, 1};  // vicino alla porta di entrata
     if (!forward) {
-        spawn = {1, GRID_COLS - 2};  // vicino alla porta di uscita
+        spawn = {1, MAP_WIDTH - 2};  // vicino alla porta di uscita
     }
     player.set_position(spawn);
 }
@@ -29,7 +29,7 @@ bool Game::game_over() {
 }
 
 bool Game::win() {
-    return map.all_levels_completed();
+    return level_manager.all_levels_completed();
 }
 
 
@@ -49,11 +49,11 @@ void Game::update_timer(chrono::steady_clock::time_point start) {
 }
 
 bool Game::bomb_under_player() {
-    Bomb* bombs = map.get_current_level().get_bombs();
+    Bomb* bombs = level_manager.get_current_level().get_bombs();
     for (int i = 0; i < MAX_BOMBS; i++) {
         Position player_p = player.get_position();
         Position bomb_p = bombs[i].get_position();
-        if (bombs[i].is_active() && positions_equal(player_p, bomb_p)) {
+        if (bombs[i].is_active() && equal(player_p, bomb_p)) {
             return true;
         }
     }
@@ -62,8 +62,8 @@ bool Game::bomb_under_player() {
 
 
 void Game::handle_input() {
-    Level& level = map.get_current_level();
-    Grid& grid = level.get_grid();
+    Level& level = level_manager.get_current_level();
+    Map& map = level.get_map();
 
     // La tastiera in auto-repeat genera piu' eventi di quanti frame
     // consumiamo (~30/s contro ~20 fps), quindi i tasti si accumulano nel
@@ -112,25 +112,25 @@ void Game::handle_input() {
         case KEY_UP:
         case 'w':
         case 'W':
-            player.move(grid, UP);
+            player.move(map, UP);
             break;
 
         case KEY_LEFT:
         case 'a':
         case 'A':
-            player.move(grid, LEFT);
+            player.move(map, LEFT);
             break;
 
         case KEY_DOWN:
         case 's':
         case 'S':
-            player.move(grid, DOWN);
+            player.move(map, DOWN);
             break;
 
         case KEY_RIGHT:
         case 'd':
         case 'D':
-            player.move(grid, RIGHT);
+            player.move(map, RIGHT);
             break;
 
         default:
@@ -141,8 +141,8 @@ void Game::handle_input() {
 
 void Game::handle_collisions() {
     Position player_p = player.get_position();
-    Level& level = map.get_current_level();
-    Grid& grid = level.get_grid();
+    Level& level = level_manager.get_current_level();
+    Map& map = level.get_map();
     Bomb* bombs = level.get_bombs();
     DummyEnemy* dummy_enemies = level.get_dummy_enemies();
     SmartEnemy* smart_enemies = level.get_smart_enemies();
@@ -150,7 +150,7 @@ void Game::handle_collisions() {
 
     // Raccolta item (il giocatore ci cammina sopra)
     for (int i = 0; i < MAX_ITEMS; i++) {
-        if (items[i].is_active() && positions_equal(player_p, items[i].get_position())) {
+        if (items[i].is_active() && equal(player_p, items[i].get_position())) {
             switch (items[i].get_type()) {
                 case ITEM_RANGE:
                     player.apply_range_buff(items[i].get_duration(), game_clock);
@@ -176,7 +176,7 @@ void Game::handle_collisions() {
     for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
         if (!dummy_enemies[i].is_dead()) {
             Position dummy_enemy_p = dummy_enemies[i].get_position();
-            if (positions_equal(player_p, dummy_enemy_p)) {
+            if (equal(player_p, dummy_enemy_p)) {
                 player.lose_life();
                 level.reset();
                 player.reset();
@@ -187,7 +187,7 @@ void Game::handle_collisions() {
     for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
         if (!smart_enemies[i].is_dead()) {
             Position smart_enemy_p = smart_enemies[i].get_position();
-            if (positions_equal(player_p, smart_enemy_p)) {
+            if (equal(player_p, smart_enemy_p)) {
                 player.lose_life();
                 level.reset();
                 player.reset();
@@ -196,18 +196,18 @@ void Game::handle_collisions() {
     }
 
     // Collisioni giocatore-esplosioni
-    if (grid.is_explosion(player_p)) {
+    if (map.is_explosion(player_p)) {
         player.lose_life();
         level.reset();
         player.reset();
     }
 
     // Collisioni muri-esplosioni
-    for (int y = 0; y < GRID_ROWS; y++) {
-        for (int x = 0; x < GRID_COLS; x++) {
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
             Position p = {y, x};
-            if (grid.is_explosion(p) && grid.get_cell(p) == BREAKABLE_WALL) {
-                grid.set_cell({y, x}, EMPTY);
+            if (map.is_explosion(p) && map.get_cell(p) == BREAKABLE_WALL) {
+                map.set_cell({y, x}, EMPTY);
                 score++;
                 try_drop_item(level, p, WALL_DROP_CHANCE);
             }
@@ -218,7 +218,7 @@ void Game::handle_collisions() {
     for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
         if (!dummy_enemies[i].is_dead()) {
             Position dummy_enemy_p = dummy_enemies[i].get_position();
-            if (grid.is_explosion(dummy_enemy_p)) {
+            if (map.is_explosion(dummy_enemy_p)) {
                 dummy_enemies[i].kill();
                 score += 3;
                 if (dummy_enemies[i].is_dead()) {
@@ -231,7 +231,7 @@ void Game::handle_collisions() {
     for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
         if (!smart_enemies[i].is_dead()) {
             Position smart_enemy_p = smart_enemies[i].get_position();
-            if (grid.is_explosion(smart_enemy_p)) {
+            if (map.is_explosion(smart_enemy_p)) {
                 smart_enemies[i].kill();
                 score += 5;
                 if (smart_enemies[i].is_dead()) {
@@ -246,29 +246,29 @@ void Game::handle_collisions() {
         if (bombs[i].is_active()) {
             Position bomb_p = bombs[i].get_position();
             // Reazione a catena
-            if (!bombs[i].is_exploding() && grid.is_explosion(bomb_p)) {
-                bombs[i].explode(grid, game_clock);
+            if (!bombs[i].is_exploding() && map.is_explosion(bomb_p)) {
+                bombs[i].explode(map, game_clock);
             }
         }
     }
 
     // Collisioni giocatore-porte
-    Cell c = grid.get_cell(player_p);
-    if (c == EXIT && map.has_next_level()) {
-        if (map.is_current_completed()) {
-            map.remove_current_level(true);
+    Cell c = map.get_cell(player_p);
+    if (c == EXIT && level_manager.has_next_level()) {
+        if (level_manager.is_current_completed()) {
+            level_manager.remove_current_level(true);
         }
         else {
-            map.go_to_next_level();
+            level_manager.go_to_next_level();
         }
         spawn_player(true);
     }
-    else if (c == ENTRANCE && map.has_prev_level()) {
-        if (map.is_current_completed()) {
-            map.remove_current_level(false);
+    else if (c == ENTRANCE && level_manager.has_prev_level()) {
+        if (level_manager.is_current_completed()) {
+            level_manager.remove_current_level(false);
         }
         else {
-            map.go_to_prev_level();
+            level_manager.go_to_prev_level();
         }
         spawn_player(false);
     }
@@ -277,18 +277,18 @@ void Game::handle_collisions() {
 
 void Game::run() {
     while (!game_over() && !win() && !quit) {
-        Level& level = map.get_current_level();
+        Level& level = level_manager.get_current_level();
 
         handle_input();
         handle_collisions();
 
         update_timer(start);
         player.update_buff(game_clock);
-        map.update_doors();
-        map.update_all_bombs(game_clock);
+        level_manager.update_doors();
+        level_manager.update_all_bombs(game_clock);
         level.update_enemies(game_clock, player.get_position());
 
-        renderer.render(map, player, score, timer, game_clock);
+        renderer.render(level_manager, player, score, timer, game_clock);
         napms(DELAY);
     }
 }

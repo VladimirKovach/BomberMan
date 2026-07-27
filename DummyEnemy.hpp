@@ -1,7 +1,7 @@
 #ifndef ENEMY_HPP
 #define ENEMY_HPP
 
-#include "Grid.hpp"
+#include "Map.hpp"
 
 const int NEIGHBORS_COUNT = 4;
 
@@ -24,8 +24,8 @@ protected:
     bool can_move(double game_timer);
     void plan_move();
 
-    bool is_valid_move(Grid& grid, Position _p);
-    void move(Grid& grid, double game_timer);
+    bool is_valid_move(Map& map, Position _p);
+    void move(Map& map, double game_timer);
 
 public:
     DummyEnemy(Position _p = {-1, -1}, int _speed = 0);
@@ -38,7 +38,7 @@ public:
     void kill();
     bool is_dead();
 
-    void update(Grid& grid, double game_timer);
+    void update(Map& map, double game_timer);
 
     void reset();
 };

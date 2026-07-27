@@ -63,9 +63,9 @@ bool Player::is_dead() {
     return lives <= 0;
 }
 
-void Player::move(Grid& grid, Direction d) {
+void Player::move(Map& map, Direction d) {
     Position next = next_position(d);
-    if (grid.is_walkable(next)) {
+    if (map.is_walkable(next)) {
         p = next;
     }
 }

@@ -3,7 +3,7 @@
 
 #include "Bomb.hpp"
 #include "DummyEnemy.hpp"
-#include "Map.hpp"
+#include "LevelManager.hpp"
 #include "Player.hpp"
 #include "Renderer.hpp"
 #include "SmartEnemy.hpp"
@@ -26,7 +26,7 @@ protected:
     double time_bonus;   // secondi accumulati dagli item tempo
     int score;
 
-    Map map;
+    LevelManager level_manager;
     Player player;
     Renderer renderer;
 

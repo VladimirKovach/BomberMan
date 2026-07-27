@@ -1,44 +1,73 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 
-#include "Level.hpp"
-
-const int NUM_LEVELS = 5;
-
-struct Node {
-    Level level;
-    Node* next;
-    Node* prev;
+enum Cell {
+    NONE,
+    EMPTY,
+    BREAKABLE_WALL,
+    UNBREAKABLE_WALL,
+    ENTRANCE,
+    EXIT
 };
+
+struct Position {
+    int y;
+    int x;
+};
+
+bool equal(Position p, Position q);
+
+const int MAP_HEIGHT = 21;
+const int MAP_WIDTH = 41;
+const int MAX_SPAWNS = MAP_HEIGHT * MAP_WIDTH;
+const int MAX_DIFFICULTY = 5;
 
 class Map {
 protected:
-    Node* head;
-    Node* current;
+    Cell grid[MAP_HEIGHT][MAP_WIDTH];
+    Cell start_grid[MAP_HEIGHT][MAP_WIDTH];
+
+    bool explosions[MAP_HEIGHT][MAP_WIDTH];
+
+    void save_state();
+
+    // Possibili posizioni in cui piazzare nemici
+    Position spawns[MAX_SPAWNS];
+    int spawn_count;
+
+    void shuffle_spawns();
+
+    bool in_bounds(Position p);
+
+    bool is_safe_zone(Position p);
+    void place_unbreakable_walls();
+    void place_breakable_walls(int difficulty);  // da migliorare
 
 public:
-    Map();
-    ~Map();
+    Map(int difficulty = 1);
 
-    Level& get_current_level();
+    void reset();
 
-    bool has_next_level();
-    bool has_prev_level();
+    Position get_random_spawn();
 
-    void go_to_next_level();
-    void go_to_prev_level();
+    // Gestione celle
+    Cell get_cell(Position p);
+    void set_cell(Position p, Cell c);
+    bool is_walkable(Position p);
+    bool is_door(Position p);
 
-    // Rimuove dalla lista il nodo corrente e sposta 'current'
-    // al nodo adiacente (next se forward=true, prev se forward=false).
-    // Aggiorna 'head' se necessario.
-    // Restituisce false se non c'e' un nodo adiacente nella direzione richiesta.
-    bool remove_current_level(bool forward);
+    // Gestione esplosioni
+    bool is_explosion(Position p);
+    void set_explosion(Position p);
+    void unset_explosion(Position p);
 
-    bool is_current_completed();
-    bool all_levels_completed();
-
-    void update_doors();
-    void update_all_bombs(double game_timer);
+    // Porte tra livelli
+    // ENTRANCE: bordo superiore sinistro
+    // EXIT: bordo superiore destro
+    void open_entrance();
+    void close_entrance();
+    void open_exit();
+    void close_exit();
 };
 
 #endif

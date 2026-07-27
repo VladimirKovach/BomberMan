@@ -3,15 +3,15 @@
 Level::Level(int _difficulty) {
     difficulty = _difficulty;
     completed = false;
-    grid = Grid(_difficulty);
+    map = Map(_difficulty);
 }
 
 bool Level::is_completed() {
     return completed;
 }
 
-Grid& Level::get_grid() {
-    return grid;
+Map& Level::get_map() {
+    return map;
 }
 
 Bomb* Level::get_bombs() {
@@ -74,7 +74,7 @@ bool Level::all_enemies_dead() {
 void Level::update_bombs(double game_timer) {
     for (int i = 0; i < MAX_BOMBS; i++) {
         if (bombs[i].is_active()) {
-            bombs[i].update(grid, game_timer);
+            bombs[i].update(map, game_timer);
         }
     }
 }
@@ -84,13 +84,13 @@ void Level::update_enemies(double game_timer, Position player_p) {
     if (!completed) {
         for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
             if (!dummy_enemies[i].is_dead()) {
-                dummy_enemies[i].update(grid, game_timer);
+                dummy_enemies[i].update(map, game_timer);
             }
         }
 
         for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
             if (!smart_enemies[i].is_dead()) {
-                smart_enemies[i].update(grid, game_timer, player_p);
+                smart_enemies[i].update(map, game_timer, player_p);
             }
         }
 
@@ -103,12 +103,12 @@ void Level::update_enemies(double game_timer, Position player_p) {
 
 void Level::spawn_enemies() {
     for (int i = 0; i < difficulty; i++) {
-        Position spawn_p = grid.get_random_spawn();
+        Position spawn_p = map.get_random_spawn();
         dummy_enemies[i] = DummyEnemy(spawn_p, 1);
     }
 
     for (int i = 0; i < difficulty; i++) {
-        Position spawn_p = grid.get_random_spawn();
+        Position spawn_p = map.get_random_spawn();
         smart_enemies[i] = SmartEnemy(spawn_p, 2);
     }
 }
@@ -128,5 +128,5 @@ void Level::reset() {
     for (int i = 0; i < MAX_ITEMS; i++) {
         items[i].reset();
     }
-    grid.reset();
+    map.reset();
 }

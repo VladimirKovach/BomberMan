@@ -49,14 +49,14 @@ void Renderer::paint_it_black() {
 
 Renderer::Renderer() {
     getmaxyx(stdscr, max_y, max_x);
-    if (max_y < GRID_ROWS || max_x < GRID_COLS) {
+    if (max_y < MAP_HEIGHT || max_x < MAP_WIDTH) {
         endwin();
         cout << "Error: terminal size is not sufficient\n";
         exit(1);
     }
 
     // Mappa al centro dello schermo
-    map_start_p = {(max_y - GRID_ROWS) / 2, (max_x - GRID_COLS) / 2};
+    map_start_p = {(max_y - MAP_HEIGHT) / 2, (max_x - MAP_WIDTH) / 2};
     init_colors();
     paint_it_black();
 }
@@ -79,7 +79,7 @@ void Renderer::display_title() {
     attron(COLOR_PAIR(CP_TITLE) | A_BOLD);
     if (top >= 0 && max_x >= banner_w) {
         // Centrato rispetto alla griglia (che a sua volta e' centrata)
-        int left = map_start_p.x + (GRID_COLS - banner_w) / 2;
+        int left = map_start_p.x + (MAP_WIDTH - banner_w) / 2;
         if (left < 0) {
             left = 0;
         }
@@ -127,7 +127,7 @@ void Renderer::display_effect(double buff_remaining) {
 void Renderer::display_score(int score) {
     const int SCORE_MAX_LENGTH = 6;         // fino a 999999
     const int SCORE_LABEL_MAX_LENGTH = 13;  // length(SCORE: 999999) = 13
-    int x = map_start_p.x + GRID_COLS - SCORE_LABEL_MAX_LENGTH;
+    int x = map_start_p.x + MAP_WIDTH - SCORE_LABEL_MAX_LENGTH;
     move(map_start_p.y - 1, x);
     printw("SCORE: %-*d", SCORE_MAX_LENGTH, score);
 }
@@ -137,15 +137,15 @@ void Renderer::display_time(double time) {
     // Stessa colonna di partenza di SCORE (l'etichetta piu' larga), cosi'
     // le due righe risultano incolonnate
     const int HUD_RIGHT_LABEL_LENGTH = 13;  // length(SCORE: 999999) = 13
-    int x = map_start_p.x + GRID_COLS - HUD_RIGHT_LABEL_LENGTH;
+    int x = map_start_p.x + MAP_WIDTH - HUD_RIGHT_LABEL_LENGTH;
     move(map_start_p.y - 2, x);
     printw("TIME: %-*d", TIME_MAX_LENGTH, (int) time);
 }
 
 void Renderer::display_colors_debug() {
     // Info di debug sotto la griglia
-    if (map_start_p.y + GRID_ROWS < max_y) {
-        move(map_start_p.y + GRID_ROWS, map_start_p.x);
+    if (map_start_p.y + MAP_HEIGHT < max_y) {
+        move(map_start_p.y + MAP_HEIGHT, map_start_p.x);
         printw("COLORS: %d", COLORS);
     }
 }
@@ -196,10 +196,10 @@ ColorPair Renderer::get_cell_color(Cell c) {
 }
 
 
-void Renderer::draw_grid(Grid& grid) {
-    for (int y = 0; y < GRID_ROWS; y++) {
-        for (int x = 0; x < GRID_COLS; x++) {
-            Cell c = grid.get_cell({y, x});
+void Renderer::draw_map(Map& map) {
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            Cell c = map.get_cell({y, x});
             char cell_view = get_cell_view(c);
             ColorPair cell_color = get_cell_color(c);
 
@@ -286,10 +286,10 @@ void Renderer::draw_smart_enemies(SmartEnemy* smart_enemies) {
     }
 }
 
-void Renderer::draw_explosions(Grid& grid) {
-    for (int y = 0; y < GRID_ROWS; y++) {
-        for (int x = 0; x < GRID_COLS; x++) {
-            if (grid.is_explosion({y, x})) {
+void Renderer::draw_explosions(Map& map) {
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            if (map.is_explosion({y, x})) {
                 int ny = y + map_start_p.y;
                 int nx = x + map_start_p.x;
                 mvaddch(ny, nx, '*' | COLOR_PAIR(CP_EXPLOSION));
@@ -299,8 +299,8 @@ void Renderer::draw_explosions(Grid& grid) {
 }
 
 
-void Renderer::render(Map& map, Player& player, int score, int time, double game_clock) {
-    Level& level = map.get_current_level();
+void Renderer::render(LevelManager& level_manager, Player& player, int score, int time, double game_clock) {
+    Level& level = level_manager.get_current_level();
     Position player_p = player.get_position();
 
     display_title();
@@ -310,13 +310,13 @@ void Renderer::render(Map& map, Player& player, int score, int time, double game
     display_time(time);
     display_colors_debug();
 
-    draw_grid(level.get_grid());
+    draw_map(level.get_map());
     draw_items(level.get_items());
     draw_bombs(level.get_bombs());
     draw_player(player_p);
     draw_dummy_enemies(level.get_dummy_enemies());
     draw_smart_enemies(level.get_smart_enemies());
-    draw_explosions(level.get_grid());
+    draw_explosions(level.get_map());
 
     refresh();
 }
