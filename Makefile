@@ -1,5 +1,5 @@
-bomberman: main.o Bomb.o Character.o DummyEnemy.o Game.o Grid.o Item.o Leaderboard.o Level.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o Ncurses.o
-	g++ main.o Bomb.o Character.o DummyEnemy.o Game.o Grid.o Item.o Leaderboard.o Level.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o Ncurses.o -lncurses -o bomberman
+bomberman: main.o Bomb.o Character.o DummyEnemy.o Game.o Grid.o Item.o Leaderboard.o Level.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o
+	g++ main.o Bomb.o Character.o DummyEnemy.o Game.o Grid.o Item.o Leaderboard.o Level.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o -lncurses -o bomberman
 
 main.o: main.cpp Game.hpp
 	g++ -c main.cpp
@@ -18,6 +18,9 @@ Game.o: Game.cpp Game.hpp Map.hpp Player.hpp Renderer.hpp
 
 Grid.o: Grid.cpp Grid.hpp
 	g++ -c Grid.cpp
+
+Item.o: Item.cpp Item.hpp Grid.hpp
+	g++ -c Item.cpp
 
 Leaderboard.o: Leaderboard.cpp Leaderboard.hpp
 	g++ -c Leaderboard.cpp
@@ -40,11 +43,6 @@ Renderer.o: Renderer.cpp Renderer.hpp Map.hpp
 SmartEnemy.o: SmartEnemy.cpp SmartEnemy.hpp
 	g++ -c SmartEnemy.cpp
 
-Ncurses.o: Ncurses.cpp Ncurses.hpp
-	g++ -c Ncurses.cpp
-
 clean:
 	rm -f *.o
 	rm -f bomberman
-Item.o: Item.cpp Item.hpp Grid.hpp
-	g++ -c Item.cpp

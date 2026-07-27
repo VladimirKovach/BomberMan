@@ -1,5 +1,5 @@
-# Object files
-*.o
-
-# Executable files
+# executable file
 bomberman
+
+# object files
+*.o

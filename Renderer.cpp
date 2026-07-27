@@ -65,11 +65,11 @@ Renderer::Renderer() {
 // disegnata usando il suo stesso carattere come inchiostro.
 const int TITLE_ROWS = 5;
 const char* TITLE_BANNER[TITLE_ROWS] = {
-    "BBBB   OOO  M   M BBBB  EEEEE RRRR  M   M  AAA  N   N",
-    "B   B O   O MM MM B   B E     R   R MM MM A   A NN  N",
-    "BBBB  O   O M M M BBBB  EEE   RRRR  M M M AAAAA N N N",
-    "B   B O   O M   M B   B E     R  R  M   M A   A N  NN",
-    "BBBB   OOO  M   M BBBB  EEEEE R   R M   M A   A N   N",
+    "BBBB    OOO   M   M  BBBB   EEEEE  RRRR   M   M   AAA   N   N",
+    "B   B  O   O  MM MM  B   B  E      R   R  MM MM  A   A  NN  N",
+    "BBBB   O   O  M M M  BBBB   EEE    RRRR   M M M  AAAAA  N N N",
+    "B   B  O   O  M   M  B   B  E      R  R   M   M  A   A  N  NN",
+    "BBBB    OOO   M   M  BBBB   EEEEE  R   R  M   M  A   A  N   N",
 };
 
 void Renderer::display_title() {
