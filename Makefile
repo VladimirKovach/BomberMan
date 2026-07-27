@@ -1,14 +1,11 @@
-bomberman: main.o Bomb.o Character.o DummyEnemy.o Game.o Grid.o Item.o Leaderboard.o Level.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o
-	g++ main.o Bomb.o Character.o DummyEnemy.o Game.o Grid.o Item.o Leaderboard.o Level.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o -lncurses -o bomberman
+bomberman: main.o Bomb.o DummyEnemy.o Game.o Grid.o Item.o Leaderboard.o Level.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o
+	g++ main.o Bomb.o DummyEnemy.o Game.o Grid.o Item.o Leaderboard.o Level.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o -lncurses -o bomberman
 
 main.o: main.cpp Game.hpp
 	g++ -c main.cpp
 
 Bomb.o: Bomb.cpp Bomb.hpp Grid.hpp
 	g++ -c Bomb.cpp
-
-Character.o: Character.cpp Character.hpp Grid.hpp
-	g++ -c Character.cpp
 
 DummyEnemy.o: DummyEnemy.cpp DummyEnemy.hpp
 	g++ -c DummyEnemy.cpp

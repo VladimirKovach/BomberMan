@@ -104,12 +104,12 @@ void Level::update_enemies(double game_timer, Position player_p) {
 void Level::spawn_enemies() {
     for (int i = 0; i < difficulty; i++) {
         Position spawn_p = grid.get_random_spawn();
-        dummy_enemies[i] = DummyEnemy(spawn_p, 1, 1);
+        dummy_enemies[i] = DummyEnemy(spawn_p, 1);
     }
 
     for (int i = 0; i < difficulty; i++) {
         Position spawn_p = grid.get_random_spawn();
-        smart_enemies[i] = SmartEnemy(spawn_p, 1, 2);
+        smart_enemies[i] = SmartEnemy(spawn_p, 2);
     }
 }
 

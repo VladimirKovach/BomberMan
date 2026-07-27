@@ -1,9 +1,36 @@
 #include "Bomb.hpp"
 
+Position Bomb::next_position(Position _p, Direction d) {
+    Position next = _p;
+
+    switch (d) {
+        case UP:
+            next.y--;
+            break;
+
+        case LEFT:
+            next.x--;
+            break;
+
+        case DOWN:
+            next.y++;
+            break;
+
+        case RIGHT:
+            next.x++;
+            break;
+
+        default:
+            break;
+    }
+
+    return next;
+}
+
 void Bomb::start_explosion(Grid& grid, Direction d) {
     Position target = p;
     for (int i = 0; i < range; i++) {
-        target = get_next_position(target, d);
+        target = next_position(target, d);
         if (grid.get_cell(target) == UNBREAKABLE_WALL) {
             break;
         }
@@ -16,7 +43,7 @@ void Bomb::start_explosion(Grid& grid, Direction d) {
 void Bomb::end_explosion(Grid& grid, Direction d) {
     Position target = p;
     for (int i = 0; i < range; i++) {
-        target = get_next_position(target, d);
+        target = next_position(target, d);
         if (grid.get_cell(target) == UNBREAKABLE_WALL) {
             break;
         }

@@ -1,7 +1,6 @@
 #ifndef SMARTENEMY_HPP
 #define SMARTENEMY_HPP
 
-#include "Character.hpp"
 #include "DummyEnemy.hpp"
 
 class SmartEnemy: public DummyEnemy {
@@ -18,7 +17,7 @@ protected:
     void move(Grid& grid, double game_timer);
 
 public:
-    SmartEnemy(Position _p = {-1, -1}, int _lives = 0, int _speed = 0);
+    SmartEnemy(Position _p = {-1, -1}, int _speed = 0);
 
     void update(Grid& grid, double game_timer, Position _player_p);
 };

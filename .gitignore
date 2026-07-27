@@ -1,5 +1,8 @@
-# executable file
+# eseguibile
 bomberman
 
-# object files
+# file oggetto
 *.o
+
+# altro
+leaderboard.txt

@@ -1,18 +1,21 @@
 #ifndef ENEMY_HPP
 #define ENEMY_HPP
 
-#include "Character.hpp"
+#include "Grid.hpp"
 
 const int NEIGHBORS_COUNT = 4;
 
-class DummyEnemy : public Character {
+class DummyEnemy {
 protected:
+    Position p;
+    Position start_p;
+
     int speed;
+    int start_speed;
     double move_timer;
     double last_move_time;
-    Position start_p;
-    int start_lives;
-    int start_speed;
+
+    bool dead;
 
     Position neighbors[NEIGHBORS_COUNT];
 
@@ -25,7 +28,15 @@ protected:
     void move(Grid& grid, double game_timer);
 
 public:
-    DummyEnemy(Position _p = {-1, -1}, int _lives = 0, int _speed = 0);
+    DummyEnemy(Position _p = {-1, -1}, int _speed = 0);
+
+    Position get_position();
+    void set_position(Position _p);
+
+    int get_speed();
+
+    void kill();
+    bool is_dead();
 
     void update(Grid& grid, double game_timer);
 

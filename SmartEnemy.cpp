@@ -1,7 +1,7 @@
 #include "SmartEnemy.hpp"
 #include <cstdlib>
 
-SmartEnemy::SmartEnemy(Position _p, int _lives, int _speed) : DummyEnemy(_p, _lives, _speed) {
+SmartEnemy::SmartEnemy(Position _p, int _speed) : DummyEnemy(_p, _speed) {
     player_p = {-1, -1};
 }
 

@@ -157,7 +157,7 @@ void Game::handle_collisions() {
                     break;
 
                 case ITEM_LIFE:
-                    player.heal();
+                    player.gain_life();
                     break;
 
                 case ITEM_TIME:
@@ -177,7 +177,7 @@ void Game::handle_collisions() {
         if (!dummy_enemies[i].is_dead()) {
             Position dummy_enemy_p = dummy_enemies[i].get_position();
             if (positions_equal(player_p, dummy_enemy_p)) {
-                player.take_damage();
+                player.lose_life();
                 level.reset();
                 player.reset();
             }
@@ -188,7 +188,7 @@ void Game::handle_collisions() {
         if (!smart_enemies[i].is_dead()) {
             Position smart_enemy_p = smart_enemies[i].get_position();
             if (positions_equal(player_p, smart_enemy_p)) {
-                player.take_damage();
+                player.lose_life();
                 level.reset();
                 player.reset();
             }
@@ -197,7 +197,7 @@ void Game::handle_collisions() {
 
     // Collisioni giocatore-esplosioni
     if (grid.is_explosion(player_p)) {
-        player.take_damage();
+        player.lose_life();
         level.reset();
         player.reset();
     }
@@ -219,7 +219,7 @@ void Game::handle_collisions() {
         if (!dummy_enemies[i].is_dead()) {
             Position dummy_enemy_p = dummy_enemies[i].get_position();
             if (grid.is_explosion(dummy_enemy_p)) {
-                dummy_enemies[i].take_damage();
+                dummy_enemies[i].kill();
                 score += 3;
                 if (dummy_enemies[i].is_dead()) {
                     try_drop_item(level, dummy_enemy_p, ENEMY_DROP_CHANCE);
@@ -232,7 +232,7 @@ void Game::handle_collisions() {
         if (!smart_enemies[i].is_dead()) {
             Position smart_enemy_p = smart_enemies[i].get_position();
             if (grid.is_explosion(smart_enemy_p)) {
-                smart_enemies[i].take_damage();
+                smart_enemies[i].kill();
                 score += 5;
                 if (smart_enemies[i].is_dead()) {
                     try_drop_item(level, smart_enemy_p, ENEMY_DROP_CHANCE);

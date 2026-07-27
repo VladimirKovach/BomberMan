@@ -22,8 +22,10 @@ protected:
     double placement_time;
     double explosion_time;
 
-    // momento di inizio dello stato (lampeggio | non lampeggio)
+    // momento di inizio dello stato
     double blink_state_start;
+
+    Position next_position(Position _p, Direction d);
 
     void start_explosion(Grid& grid, Direction d);
     void end_explosion(Grid& grid, Direction d);

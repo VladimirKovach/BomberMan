@@ -1,49 +1,72 @@
 #include "Player.hpp"
 
-Position get_next_position(Position p, Direction d) {
-    Position next_p = p;
+Position Player::next_position(Direction d) {
+    Position next = p;
 
     switch (d) {
         case UP:
-            (next_p.y)--;
+            next.y--;
             break;
 
         case LEFT:
-            (next_p.x)--;
+            next.x--;
             break;
 
         case DOWN:
-            (next_p.y)++;
+            next.y++;
             break;
 
         case RIGHT:
-            (next_p.x)++;
+            next.x++;
             break;
 
-        default:  // NONE
+        default:
             break;
     }
 
-    return next_p;
+    return next;
 }
 
-
-Player::Player(Position _p, int _lives): Character(_p, _lives) {
+Player::Player(Position _p, int _lives) {
+    p = _p;
     start_p = _p;
+    lives = _lives;
     bomb_range = 1;
     buff_end = 0.0;
 }
 
-void Player::heal() {
+Position Player::get_position() {
+    return p;
+}
+
+void Player::set_position(Position _p) {
+    p = _p;
+}
+
+int Player::get_lives() {
+    return lives;
+}
+
+void Player::gain_life() {
     if (lives < MAX_LIVES) {
         lives++;
     }
 }
 
+void Player::lose_life() {
+    if (lives > 0) {
+        lives--;
+    }
+}
+
+bool Player::is_dead() {
+    return lives <= 0;
+}
+
 void Player::move(Grid& grid, Direction d) {
-    Position next_p = get_next_position(p, d);
-    if (grid.is_walkable(next_p)) {
-        p = next_p;
+    Position next = next_position(d);
+    if (grid.is_walkable(next)) {
+        p = next;
     }
 }
 

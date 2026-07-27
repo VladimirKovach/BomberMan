@@ -23,7 +23,6 @@ add_executable(BomberMan
         Level.cpp
         Map.cpp
         Menu.cpp
-        Ncurses.cpp
         Player.cpp
         Renderer.cpp
         SmartEnemy.cpp

@@ -1,7 +1,6 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-#include "Character.hpp"
 #include "Grid.hpp"
 #include "Item.hpp"
 
@@ -10,24 +9,32 @@ enum Direction {
     LEFT,
     DOWN,
     RIGHT,
-    NONE,
 };
 
-Position get_next_position(Position p, Direction d);
+const int MAX_LIVES = 3;  // aumentare a 5?
 
-const int MAX_LIVES = 3;
-
-class Player : public Character {
+class Player {
 protected:
+    Position p;
     Position start_p;
+
+    int lives;
 
     int bomb_range;    // raggio corrente delle bombe (1 = base)
     double buff_end;   // valore dell'orologio di gioco a cui scade il buff raggio
 
+    Position next_position(Direction d);
+
 public:
     Player(Position _p = {1, 1}, int _lives = 3);
 
-    void heal();
+    Position get_position();
+    void set_position(Position _p);
+
+    int get_lives();
+    void gain_life();
+    void lose_life();
+    bool is_dead();
 
     void move(Grid& grid, Direction d);
 
