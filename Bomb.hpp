@@ -4,11 +4,11 @@
 #include "Map.hpp"
 #include "Player.hpp"
 
-const double EXPLOSION_TIMER = 3.0;  // tempo che la bomba impiega a esplodere
-const double EXPLOSION_DURATION = 2.0;  // tempo di persistenza dell'esplosione
+//const double EXPLOSION_TIMER = 3.0;  // tempo che la bomba impiega a esplodere
+//const double EXPLOSION_DURATION = 2.0;  // tempo di persistenza dell'esplosione
 
 // intervallo di tempo tra due lampeggi consecutivi della bomba
-const double BLINK_DELTA = 0.5;
+//const double BLINK_DELTA = 0.5;
 
 class Bomb {
 protected:
@@ -17,13 +17,11 @@ protected:
 
     bool active;
     bool exploding;
-    bool blink_state;
+    bool blinking;
 
-    double placement_time;
-    double explosion_time;
-
-    // momento di inizio dello stato
-    double blink_state_start;
+    int blink_timer;
+    int explosion_timer;
+    int explosion_duration;
 
     Position next_position(Position _p, Direction d);
 
@@ -39,11 +37,11 @@ public:
     bool is_exploding();
     bool is_blinking();
 
-    void place(Position _p, int _range, double game_timer);
+    void place(Position _p, int _range);
 
-    void explode(Map& map, double game_timer);
+    void explode(Map& map);
 
-    void update(Map& map, double game_timer);
+    void update(Map& map);
 
     void reset();
 };

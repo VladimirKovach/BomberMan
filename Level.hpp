@@ -5,12 +5,12 @@
 #include "Bomb.hpp"
 #include "DummyEnemy.hpp"
 #include "SmartEnemy.hpp"
-#include "Item.hpp"
+//#include "Item.hpp"
 
 const int MAX_BOMBS = 3;
 const int MAX_DUMMY_ENEMIES = 5;
 const int MAX_SMART_ENEMIES = 5;
-const int MAX_ITEMS = 10;
+//const int MAX_ITEMS = 10;
 
 class Level {
 protected:
@@ -22,7 +22,7 @@ protected:
     Bomb bombs[MAX_BOMBS];
     DummyEnemy dummy_enemies[MAX_DUMMY_ENEMIES];
     SmartEnemy smart_enemies[MAX_SMART_ENEMIES];
-    Item items[MAX_ITEMS];
+    //Item items[MAX_ITEMS];
 
 public:
     Level(int _difficulty = 1);
@@ -33,17 +33,17 @@ public:
     Bomb* get_bombs();
     DummyEnemy* get_dummy_enemies();
     SmartEnemy* get_smart_enemies();
-    Item* get_items();
+    //Item* get_items();
 
     // Posiziona un item del tipo dato sulla cella p, se c'e' uno slot libero.
     // Restituisce true se l'item e' stato posizionato.
-    bool spawn_item(Position p, ItemType type);
+    //bool spawn_item(Position p, ItemType type);
 
     int get_bombs_count();
     bool all_enemies_dead();
 
-    void update_bombs(double game_timer);
-    void update_enemies(double game_timer, Position player_p);
+    void update_bombs();
+    void update_enemies(Position player_p);
 
     void spawn_enemies();
 

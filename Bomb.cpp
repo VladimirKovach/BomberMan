@@ -61,12 +61,13 @@ Bomb::Bomb(Position _p, int _range) {
     p = _p;
     range = _range;
 
-    reset();
+    active = false;
+    exploding = false;
+    blinking = false;
 
-    // per convenzione
-    placement_time = -1.0;
-    explosion_time = -1.0;
-    blink_state_start = -1.0;
+    blink_timer = 10;         // 0.5 secondi
+    explosion_timer = 60;     // 3.0 secondi
+    explosion_duration = 30;  // 1.5 secondi
 }
 
 
@@ -83,25 +84,20 @@ bool Bomb::is_exploding() {
 }
 
 bool Bomb::is_blinking() {
-    return blink_state;
+    return blinking;
 }
 
 
-void Bomb::place(Position _p, int _range, double game_timer) {
+void Bomb::place(Position _p, int _range) {
     p = _p;
     range = _range;
 
     active = true;
-    blink_state = true;
-
-    placement_time = game_timer;
-    blink_state_start = game_timer;
 }
 
 
-void Bomb::explode(Map& map, double game_timer) {
+void Bomb::explode(Map& map) {
     exploding = true;
-    explosion_time = game_timer;
 
     // Esplosione al centro
     map.set_explosion(p);
@@ -114,21 +110,37 @@ void Bomb::explode(Map& map, double game_timer) {
 }
 
 
-void Bomb::update(Map& map, double game_timer) {
-    if (!exploding && placement_time - game_timer >= EXPLOSION_TIMER) {
-        explode(map, game_timer);
+void Bomb::update(Map& map) {
+    if (!exploding) {
+        if (blink_timer > 0) {
+            blink_timer--;
+        }
+        if (explosion_timer > 0) {
+            explosion_timer--;
+        }
     }
-    else if (!exploding && blink_state_start - game_timer >= BLINK_DELTA) {
-        blink_state_start = game_timer;
-        blink_state = !blink_state;
+    else if (exploding && explosion_duration > 0) {
+        explosion_duration--;
     }
-    else if (exploding && explosion_time - game_timer >= EXPLOSION_DURATION) {
+
+    if (!exploding) {
+        if (blink_timer <= 0) {
+            blinking = !blinking;
+            blink_timer = 10;
+        }
+        if (explosion_timer <= 0) {
+            explode(map);
+            explosion_timer = 60;
+        }
+    }
+    else if (exploding && explosion_duration <= 0) {
         map.unset_explosion(p);
         end_explosion(map, UP);
         end_explosion(map, LEFT);
         end_explosion(map, DOWN);
         end_explosion(map, RIGHT);
 
+        explosion_duration = 30;
         reset();
     }
 }
@@ -136,5 +148,5 @@ void Bomb::update(Map& map, double game_timer) {
 void Bomb::reset() {
     active = false;
     exploding = false;
-    blink_state = false;
+    blinking = false;
 }

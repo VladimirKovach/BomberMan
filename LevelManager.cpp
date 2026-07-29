@@ -82,15 +82,6 @@ bool LevelManager::all_levels_completed() {
     return (head != NULL);
 }
 
-
-void LevelManager::update_all_bombs(double game_timer) {
-    Node* tmp = head;
-    while (tmp != NULL) {
-        (tmp->level).update_bombs(game_timer);
-        tmp = tmp->next;
-    }
-}
-
 void LevelManager::update_doors() {
     if (current != NULL) {
         Map& map = (current->level).get_map();

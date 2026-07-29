@@ -12,8 +12,7 @@ protected:
 
     int speed;
     int start_speed;
-    double move_timer;
-    double last_move_time;
+    int move_timer;
 
     bool dead;
 
@@ -21,14 +20,12 @@ protected:
 
     void update_neighbors();
 
-    bool can_move(double game_timer);
     void plan_move();
-
     bool is_valid_move(Map& map, Position _p);
-    void move(Map& map, double game_timer);
+    void move(Map& map);
 
 public:
-    DummyEnemy(Position _p = {-1, -1}, int _speed = 0);
+    DummyEnemy(Position _p = {-1, -1}, int _speed = 1);
 
     Position get_position();
     void set_position(Position _p);
@@ -38,7 +35,7 @@ public:
     void kill();
     bool is_dead();
 
-    void update(Map& map, double game_timer);
+    void update(Map& map);
 
     void reset();
 };

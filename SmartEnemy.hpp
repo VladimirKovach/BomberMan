@@ -8,18 +8,18 @@ protected:
     Position player_p;
 
     void update_player_position(Position _player_p);
-    double get_player_distance(Position _p);
+    int get_player_distance(Position _p);
 
     void plan_move();
 
     // duplicati di DummyEnemy (non posso usare virtual e override)
     bool is_valid_move(Map& map, Position _p);
-    void move(Map& map, double game_timer);
+    void move(Map& map);
 
 public:
-    SmartEnemy(Position _p = {-1, -1}, int _speed = 0);
+    SmartEnemy(Position _p = {-1, -1}, int _speed = 1);
 
-    void update(Map& map, double game_timer, Position _player_p);
+    void update(Map& map, Position _player_p);
 };
 
 #endif

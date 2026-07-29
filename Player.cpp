@@ -32,7 +32,7 @@ Player::Player(Position _p, int _lives) {
     start_p = _p;
     lives = _lives;
     bomb_range = 1;
-    buff_end = 0.0;
+    //buff_end = 0.0;
 }
 
 Position Player::get_position() {
@@ -73,7 +73,7 @@ void Player::move(Map& map, Direction d) {
 int Player::get_bomb_range() {
     return bomb_range;
 }
-
+/*
 double Player::get_buff_remaining(double game_clock) {
     // Orologio decrescente: il buff e' attivo finche' game_clock > buff_end
     if (bomb_range > 1 && game_clock > buff_end) {
@@ -100,7 +100,7 @@ void Player::update_buff(double game_clock) {
         bomb_range = 1;
     }
 }
-
+*/
 void Player::reset() {
     p = start_p;
     bomb_range = 1;  // morendo si perde anche il buff raggio

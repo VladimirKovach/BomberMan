@@ -1,9 +1,7 @@
 #include "Renderer.hpp"
 #include "Bomb.hpp"
 #include <cstdio>
-#include <iostream>
 #include <ncurses.h>
-using namespace std;
 
 void Renderer::init_colors() {
     start_color();
@@ -57,7 +55,7 @@ const char* TITLE_BANNER[TITLE_ROWS] = {
     "****    ***   *   *  ****   ****  ****   *   *   ***   *   *",
     "*   *  *   *  ** **  *   *  *     *   *  ** **  *   *  **  *",
     "****   *   *  * * *  ****   ****  ****   * * *  *****  * * *",
-    "*   *  *   *  *   *  *   *  *     *   *  *   *  *   *  *  **",
+    "*   *  *   *  *   *  *   *  *     *  *   *   *  *   *  *  **",
     "****    ***   *   *  ****   ****  *   *  *   *  *   *  *   *",
 };
 
@@ -100,7 +98,7 @@ void Renderer::display_lives(int lives) {
         addch(' ');
     }
 }
-
+/*
 void Renderer::display_effect(double buff_remaining) {
     move(map_start_p.y - 1, map_start_p.x);
 
@@ -112,7 +110,7 @@ void Renderer::display_effect(double buff_remaining) {
     // %-9s: padding a destra per cancellare il testo del frame precedente
     printw("EFFETTO: %-9s", text);
 }
-
+*/
 void Renderer::display_score(int score) {
     const int SCORE_MAX_LENGTH = 6;         // fino a 999999
     const int SCORE_LABEL_MAX_LENGTH = 13;  // length(SCORE: 999999) = 13
@@ -121,14 +119,14 @@ void Renderer::display_score(int score) {
     printw("SCORE: %-*d", SCORE_MAX_LENGTH, score);
 }
 
-void Renderer::display_time(double time) {
+void Renderer::display_time(int time) {
     const int TIME_MAX_LENGTH = 4;         // length(1000) = 4
     // Stessa colonna di partenza di SCORE (l'etichetta piu' larga), cosi'
     // le due righe risultano incolonnate
     const int HUD_RIGHT_LABEL_LENGTH = 13;  // length(SCORE: 999999) = 13
     int x = map_start_p.x + MAP_WIDTH - HUD_RIGHT_LABEL_LENGTH;
     move(map_start_p.y - 2, x);
-    printw("TIME: %-*d", TIME_MAX_LENGTH, (int) time);
+    printw("TIME: %-*d", TIME_MAX_LENGTH, time);
 }
 
 void Renderer::display_colors_debug() {
@@ -188,7 +186,7 @@ void Renderer::draw_bombs(Bomb* bombs) {
         }
     }
 }
-
+/*
 void Renderer::draw_items(Item* items) {
     for (int i = 0; i < MAX_ITEMS; i++) {
         if (items[i].is_active()) {
@@ -221,6 +219,7 @@ void Renderer::draw_items(Item* items) {
         }
     }
 }
+*/
 
 void Renderer::draw_player(Position player_p) {
     int y = player_p.y + map_start_p.y;
@@ -265,19 +264,19 @@ void Renderer::draw_explosions(Map& map) {
 }
 
 
-void Renderer::render(LevelManager& level_manager, Player& player, int score, int time, double game_clock) {
+void Renderer::render(LevelManager& level_manager, Player& player, int score, int time) {
     Level& level = level_manager.get_current_level();
     Position player_p = player.get_position();
 
     display_title();
     display_lives(player.get_lives());
-    display_effect(player.get_buff_remaining(game_clock));
+    //display_effect(player.get_buff_remaining(game_clock));
     display_score(score);
     display_time(time);
     //display_colors_debug();
 
     draw_map(level.get_map());
-    draw_items(level.get_items());
+    //draw_items(level.get_items());
     draw_bombs(level.get_bombs());
     draw_player(player_p);
     draw_dummy_enemies(level.get_dummy_enemies());

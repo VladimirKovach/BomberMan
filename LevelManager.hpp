@@ -38,7 +38,6 @@ public:
     bool all_levels_completed();
 
     void update_doors();
-    void update_all_bombs(double game_timer);
 };
 
 #endif

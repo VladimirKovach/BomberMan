@@ -25,7 +25,7 @@ DummyEnemy* Level::get_dummy_enemies() {
 SmartEnemy* Level::get_smart_enemies() {
     return smart_enemies;
 }
-
+/*
 Item* Level::get_items() {
     return items;
 }
@@ -40,7 +40,7 @@ bool Level::spawn_item(Position p, ItemType type) {
     }
     return false;  // nessuno slot disponibile
 }
-
+*/
 int Level::get_bombs_count() {
     int count = 0;
     for (int i = 0; i < MAX_BOMBS; i++) {
@@ -71,26 +71,26 @@ bool Level::all_enemies_dead() {
     }
 }
 
-void Level::update_bombs(double game_timer) {
+void Level::update_bombs() {
     for (int i = 0; i < MAX_BOMBS; i++) {
         if (bombs[i].is_active()) {
-            bombs[i].update(map, game_timer);
+            bombs[i].update(map);
         }
     }
 }
 
 
-void Level::update_enemies(double game_timer, Position player_p) {
+void Level::update_enemies(Position player_p) {
     if (!completed) {
         for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
             if (!dummy_enemies[i].is_dead()) {
-                dummy_enemies[i].update(map, game_timer);
+                dummy_enemies[i].update(map);
             }
         }
 
         for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
             if (!smart_enemies[i].is_dead()) {
-                smart_enemies[i].update(map, game_timer, player_p);
+                smart_enemies[i].update(map, player_p);
             }
         }
 
@@ -123,10 +123,12 @@ void Level::reset() {
     for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
         smart_enemies[i].reset();
     }
+    /*
     // Gli item a terra vanno rimossi: la griglia torna allo stato iniziale
     // e i muri ripristinati potrebbero coprire item rimasti a terra
     for (int i = 0; i < MAX_ITEMS; i++) {
         items[i].reset();
     }
+    */
     map.reset();
 }
