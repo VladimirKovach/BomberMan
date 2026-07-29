@@ -29,10 +29,12 @@ Position Bomb::next_position(Position _p, Direction d) {
 
 void Bomb::start_explosion(Map& map, Direction d) {
     Position target = p;
+
     for (int i = 0; i < range; i++) {
         target = next_position(target, d);
+
         if (map.get_cell(target) == UNBREAKABLE_WALL) {
-            break;
+            return;
         }
         else {
             map.set_explosion(target);
@@ -42,10 +44,12 @@ void Bomb::start_explosion(Map& map, Direction d) {
 
 void Bomb::end_explosion(Map& map, Direction d) {
     Position target = p;
+
     for (int i = 0; i < range; i++) {
         target = next_position(target, d);
+
         if (map.get_cell(target) == UNBREAKABLE_WALL) {
-            break;
+            return;
         }
         else {
             map.unset_explosion(target);

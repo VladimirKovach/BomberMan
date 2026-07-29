@@ -4,12 +4,12 @@
 #include "LevelManager.hpp"
 #include "Player.hpp"
 
-enum Color {
+enum {
     ORANGE = 208,
     GREY = 244
 };
 
-enum ColorPair {
+enum {
     CP_NONE,
     CP_SCREEN,
     CP_BREAKABLE_WALL,
@@ -39,9 +39,6 @@ protected:
     void display_score(int score);
     void display_time(double time);
     void display_colors_debug();
-
-    char get_cell_view(Cell c);
-    ColorPair get_cell_color(Cell c);
 
     void draw_map(Map& map);
     void draw_bombs(Bomb* bombs);

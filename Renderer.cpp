@@ -6,37 +6,30 @@
 using namespace std;
 
 void Renderer::init_colors() {
-    if (has_colors()) {
-        start_color();
+    start_color();
 
-        // Fallback per terminali senza 256 colori (es. pdcurses su Windows):
-        // GREY (244) e ORANGE (208) non esistono e init_pair fallisce,
-        // rendendo invisibili muri distruttibili e bombe
-        short grey = GREY;
-        short orange = ORANGE;
-        if (COLORS < 256) {
-            grey = COLOR_YELLOW;
-            orange = COLOR_YELLOW;
-        }
+    // fallback per terminali senza 256 colori, per esempio pdcurses (Windows)
+    // GREY (244) e ORANGE (208) non esistono, quindi init_pair fallisce,
+    // rendendo invisibili muri distruttibili e bombe
+    short grey = GREY;
+    short orange = ORANGE;
+    if (COLORS < 256) {
+        grey = COLOR_YELLOW;
+        orange = COLOR_YELLOW;
+    }
 
-        init_pair(CP_SCREEN, COLOR_BLACK, COLOR_BLACK);
-        init_pair(CP_UNBREAKABLE_WALL, COLOR_WHITE, COLOR_WHITE);
-        init_pair(CP_BREAKABLE_WALL, grey, grey);
-        init_pair(CP_DOOR, COLOR_GREEN, COLOR_BLACK);
-        init_pair(CP_PLAYER, COLOR_CYAN, COLOR_BLACK);
-        init_pair(CP_ENEMY, COLOR_RED, COLOR_BLACK);
-        init_pair(CP_BOMB, orange, COLOR_BLACK);
-        init_pair(CP_EXPLOSION, COLOR_YELLOW, COLOR_RED);
-        init_pair(CP_BLINK, COLOR_WHITE, COLOR_BLACK);
-        init_pair(CP_ITEM, COLOR_MAGENTA, COLOR_BLACK);
-        init_pair(CP_LIFE, COLOR_RED, COLOR_BLACK);
-        init_pair(CP_TITLE, COLOR_WHITE, COLOR_BLACK);
-    }
-    else {
-        endwin();
-        cout << "Error: terminal does not support colors\n";
-        exit(1);
-    }
+    init_pair(CP_SCREEN, COLOR_BLACK, COLOR_BLACK);
+    init_pair(CP_UNBREAKABLE_WALL, COLOR_WHITE, COLOR_WHITE);
+    init_pair(CP_BREAKABLE_WALL, grey, grey);
+    init_pair(CP_DOOR, COLOR_GREEN, COLOR_BLACK);
+    init_pair(CP_PLAYER, COLOR_CYAN, COLOR_BLACK);
+    init_pair(CP_ENEMY, COLOR_RED, COLOR_BLACK);
+    init_pair(CP_BOMB, orange, COLOR_BLACK);
+    init_pair(CP_EXPLOSION, COLOR_YELLOW, COLOR_RED);
+    init_pair(CP_BLINK, COLOR_WHITE, COLOR_BLACK);
+    init_pair(CP_ITEM, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(CP_LIFE, COLOR_RED, COLOR_BLACK);
+    init_pair(CP_TITLE, COLOR_WHITE, COLOR_BLACK);
 }
 
 void Renderer::paint_it_black() {
@@ -49,31 +42,27 @@ void Renderer::paint_it_black() {
 
 Renderer::Renderer() {
     getmaxyx(stdscr, max_y, max_x);
-    if (max_y < MAP_HEIGHT || max_x < MAP_WIDTH) {
-        endwin();
-        cout << "Error: terminal size is not sufficient\n";
-        exit(1);
-    }
 
-    // Mappa al centro dello schermo
-    map_start_p = {(max_y - MAP_HEIGHT) / 2, (max_x - MAP_WIDTH) / 2};
+    int center_y = (max_y - MAP_HEIGHT) / 2;
+    int center_x = (max_x - MAP_WIDTH) / 2;
+    map_start_p = {center_y, center_x};
+
     init_colors();
     paint_it_black();
 }
 
-// Titolo in stile "banner" da vecchio terminale: ogni lettera grande e'
-// disegnata usando il suo stesso carattere come inchiostro.
+// Titolo in stile "banner" da vecchio terminale
 const int TITLE_ROWS = 5;
 const char* TITLE_BANNER[TITLE_ROWS] = {
-    "BBBB    OOO   M   M  BBBB   EEEEE  RRRR   M   M   AAA   N   N",
-    "B   B  O   O  MM MM  B   B  E      R   R  MM MM  A   A  NN  N",
-    "BBBB   O   O  M M M  BBBB   EEE    RRRR   M M M  AAAAA  N N N",
-    "B   B  O   O  M   M  B   B  E      R  R   M   M  A   A  N  NN",
-    "BBBB    OOO   M   M  BBBB   EEEEE  R   R  M   M  A   A  N   N",
+    "****    ***   *   *  ****   ****  ****   *   *   ***   *   *",
+    "*   *  *   *  ** **  *   *  *     *   *  ** **  *   *  **  *",
+    "****   *   *  * * *  ****   ****  ****   * * *  *****  * * *",
+    "*   *  *   *  *   *  *   *  *     *   *  *   *  *   *  *  **",
+    "****    ***   *   *  ****   ****  *   *  *   *  *   *  *   *",
 };
 
 void Renderer::display_title() {
-    int banner_w = 53;  // larghezza delle righe di TITLE_BANNER
+    int banner_w = 61;  // larghezza delle righe di TITLE_BANNER
     int top = map_start_p.y - 2 - 1 - TITLE_ROWS;  // sopra la riga HUD, con una riga vuota
 
     attron(COLOR_PAIR(CP_TITLE) | A_BOLD);
@@ -150,78 +139,52 @@ void Renderer::display_colors_debug() {
     }
 }
 
-
-char Renderer::get_cell_view(Cell c) {
-    char view = ' ';
-
-    switch (c) {
-        case ENTRANCE:
-            view = '<';
-            break;
-
-        case EXIT:
-            view = '>';
-            break;
-
-        default:  // BREAKABLE_WALL, UNBREAKABLE_WALL, EMPTY, UNKNOWN
-            break;
-    }
-
-    return view;
-}
-
-
-ColorPair Renderer::get_cell_color(Cell c) {
-    ColorPair color = CP_SCREEN;
-
-    switch (c) {
-        case BREAKABLE_WALL:
-            color = CP_BREAKABLE_WALL;
-            break;
-
-        case UNBREAKABLE_WALL:
-            color = CP_UNBREAKABLE_WALL;
-            break;
-
-        case ENTRANCE:
-        case EXIT:
-            color = CP_DOOR;
-            break;
-
-        default:  // EMPTY, UNKNOWN
-            break;
-    }
-
-    return color;
-}
-
-
 void Renderer::draw_map(Map& map) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
             Cell c = map.get_cell({y, x});
-            char cell_view = get_cell_view(c);
-            ColorPair cell_color = get_cell_color(c);
-
             int ny = y + map_start_p.y;
             int nx = x + map_start_p.x;
-            mvaddch(ny, nx, cell_view | COLOR_PAIR(cell_color));
+
+            switch (c) {
+                case BREAKABLE_WALL:
+                    mvaddch(ny, nx, ' ' | COLOR_PAIR(CP_BREAKABLE_WALL));
+                    break;
+
+                case UNBREAKABLE_WALL:
+                    mvaddch(ny, nx, ' ' | COLOR_PAIR(CP_UNBREAKABLE_WALL));
+                    break;
+
+                case ENTRANCE:
+                    mvaddch(ny, nx, '<' | COLOR_PAIR(CP_DOOR));
+                    break;
+
+                case EXIT:
+                    mvaddch(ny, nx, '>' | COLOR_PAIR(CP_DOOR));
+                    break;
+
+                default:
+                    mvaddch(ny, nx, ' ' | COLOR_PAIR(CP_SCREEN));
+                    break;
+            }
         }
     }
 }
-
 
 void Renderer::draw_bombs(Bomb* bombs) {
     for (int i = 0; i < MAX_BOMBS; i++) {
         if (bombs[i].is_active()) {
             Position bomb_p = bombs[i].get_position();
-            ColorPair bomb_color = CP_BOMB;
-            if (bombs[i].is_blinking()) {
-                bomb_color = CP_BLINK;
-            }
             int y = bomb_p.y + map_start_p.y;
             int x = bomb_p.x + map_start_p.x;
-            mvaddch(y, x, 'O' | COLOR_PAIR(bomb_color));
+
+            if (bombs[i].is_blinking()) {
+                mvaddch(y, x, 'O' | COLOR_PAIR(CP_BLINK));
+            }
+            else {
+                mvaddch(y, x, 'O' | COLOR_PAIR(CP_BOMB));
+            }
+            
         }
     }
 }
@@ -231,20 +194,21 @@ void Renderer::draw_items(Item* items) {
         if (items[i].is_active()) {
             Position item_p = items[i].get_position();
 
-            // chtype, non char: i simboli ACS_* sono definiti da curses
+            // chtype (non char): i simboli ACS_* sono definiti da ncurses
             // e non entrano in un singolo byte
-            chtype glyph = 'R';  // ITEM_RANGE
+            chtype glyph = 'R';
+
             switch (items[i].get_type()) {
                 case ITEM_LIFE:
                     glyph = ACS_DIAMOND;
                     break;
 
-                case ITEM_TIME:
-                    glyph = 'T';
-                    break;
-
                 case ITEM_SCORE:
                     glyph = ACS_STERLING;
+                    break;
+
+                case ITEM_TIME:
+                    glyph = 'T';
                     break;
 
                 default:  // ITEM_RANGE
@@ -268,6 +232,7 @@ void Renderer::draw_dummy_enemies(DummyEnemy* dummy_enemies) {
     for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
         if (!dummy_enemies[i].is_dead()) {
             Position dummy_p = dummy_enemies[i].get_position();
+
             int y = dummy_p.y + map_start_p.y;
             int x = dummy_p.x + map_start_p.x;
             mvaddch(y, x, '?' | COLOR_PAIR(CP_ENEMY));
@@ -279,6 +244,7 @@ void Renderer::draw_smart_enemies(SmartEnemy* smart_enemies) {
     for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
         if (!smart_enemies[i].is_dead()) {
             Position smart_p = smart_enemies[i].get_position();
+
             int y = smart_p.y + map_start_p.y;
             int x = smart_p.x + map_start_p.x;
             mvaddch(y, x, '!' | COLOR_PAIR(CP_ENEMY));
@@ -308,7 +274,7 @@ void Renderer::render(LevelManager& level_manager, Player& player, int score, in
     display_effect(player.get_buff_remaining(game_clock));
     display_score(score);
     display_time(time);
-    display_colors_debug();
+    //display_colors_debug();
 
     draw_map(level.get_map());
     draw_items(level.get_items());

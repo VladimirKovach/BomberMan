@@ -65,7 +65,7 @@ bool Player::is_dead() {
 
 void Player::move(Map& map, Direction d) {
     Position next = next_position(d);
-    if (map.is_walkable(next)) {
+    if (!map.is_wall(next)) {
         p = next;
     }
 }

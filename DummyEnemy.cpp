@@ -64,7 +64,7 @@ void DummyEnemy::plan_move() {
 }
 
 bool DummyEnemy::is_valid_move(Map& map, Position _p) {
-    return map.is_walkable(_p) && !map.is_door(_p);
+    return !map.is_wall(_p) && !map.is_door(_p);
 }
 
 void DummyEnemy::move(Map& map, double game_timer) {

@@ -25,24 +25,26 @@ int main() {
         MenuChoice choice = menu.show();
 
         switch (choice) {
-            case NEW_GAME: {
+            case NEW_GAME:
+            {
                 // Game viene costruito qui dentro, a fine partita il distruttore fa pulizia automaticamente.
                 // La prossima volta costruisce un Game nuovo di zecca, senza bisogno di un reset() esplicito.
                 Game game;
                 game.run();
-                //if (game.get_score() > 0) {
-                    menu.prompt_save_score(game.get_score());
-                    menu.show_leaderboard();
-                //}
+                menu.prompt_save_score(game.get_score());
+                menu.show_leaderboard();
                 break;
             }
+
+            case LEADERBOARD:
+                menu.show_leaderboard();
+                break;
 
             case QUIT:
                 running = false;
                 break;
 
-            case LEADERBOARD:
-                menu.show_leaderboard();
+            default:
                 break;
         }
     }
