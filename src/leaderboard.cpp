@@ -1,4 +1,4 @@
-#include "Leaderboard.hpp"
+#include "leaderboard.hpp"
 #include <fstream>
 
 // Formato di ogni riga: "<nome>;<score>\n"

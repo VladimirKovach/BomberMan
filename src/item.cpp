@@ -1,4 +1,5 @@
-#include "Item.hpp"
+#include "item.hpp"
+#include "map.hpp"
 #include <cstdlib>
 
 Item::Item(Position _p, ItemType _type) {

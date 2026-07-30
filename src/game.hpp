@@ -1,12 +1,9 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include "Bomb.hpp"
-#include "DummyEnemy.hpp"
-#include "LevelManager.hpp"
-#include "Player.hpp"
-#include "Renderer.hpp"
-#include "SmartEnemy.hpp"
+#include "level_manager.hpp"
+#include "player.hpp"
+#include "renderer.hpp"
 
 const int DELAY = 50;  // millisecondi
 

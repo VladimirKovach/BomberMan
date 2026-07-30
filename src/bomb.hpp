@@ -1,14 +1,8 @@
 #ifndef BOMB_HPP
 #define BOMB_HPP
 
-#include "Map.hpp"
-#include "Player.hpp"
-
-//const double EXPLOSION_TIMER = 3.0;  // tempo che la bomba impiega a esplodere
-//const double EXPLOSION_DURATION = 2.0;  // tempo di persistenza dell'esplosione
-
-// intervallo di tempo tra due lampeggi consecutivi della bomba
-//const double BLINK_DELTA = 0.5;
+#include "map.hpp"
+#include "player.hpp"
 
 class Bomb {
 protected:

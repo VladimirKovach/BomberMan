@@ -1,7 +1,7 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-#include "Map.hpp"
+#include "map.hpp"
 //#include "Item.hpp"
 
 enum Direction {

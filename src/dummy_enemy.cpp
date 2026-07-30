@@ -1,4 +1,5 @@
-#include "DummyEnemy.hpp"
+#include "dummy_enemy.hpp"
+#include "map.hpp"
 #include <cstdlib>
 
 DummyEnemy::DummyEnemy(Position _p, int _speed) {

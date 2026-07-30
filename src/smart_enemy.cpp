@@ -1,4 +1,6 @@
-#include "SmartEnemy.hpp"
+#include "smart_enemy.hpp"
+#include "dummy_enemy.hpp"
+#include "map.hpp"
 #include <cstdlib>
 
 SmartEnemy::SmartEnemy(Position _p, int _speed) : DummyEnemy(_p, _speed) {

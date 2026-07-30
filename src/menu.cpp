@@ -1,5 +1,5 @@
-#include "Menu.hpp"
-#include "Leaderboard.hpp"
+#include "menu.hpp"
+#include "leaderboard.hpp"
 #include <ncurses.h>
 #include <cstdio>
 

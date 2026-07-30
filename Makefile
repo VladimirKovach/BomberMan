@@ -1,41 +1,41 @@
-bomberman: main.o Bomb.o DummyEnemy.o Game.o Leaderboard.o Level.o LevelManager.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o
-	g++ main.o Bomb.o DummyEnemy.o Game.o Leaderboard.o Level.o LevelManager.o Map.o Menu.o Player.o Renderer.o SmartEnemy.o -lncurses -o bomberman
+bomberman: main.o bomb.o dummy_enemy.o game.o leaderboard.o level.o level_manager.o map.o menu.o player.o renderer.o smart_enemy.o
+	g++ main.o bomb.o dummy_enemy.o game.o leaderboard.o level.o level_manager.o map.o menu.o player.o renderer.o smart_enemy.o -lncurses -o bomberman
 
-main.o: main.cpp Game.hpp
-	g++ -c main.cpp
+main.o: src/main.cpp src/game.hpp src/menu.hpp
+	g++ -c src/main.cpp
 
-Bomb.o: Bomb.cpp Bomb.hpp Map.hpp
-	g++ -c Bomb.cpp
+bomb.o: src/bomb.cpp src/bomb.hpp src/map.hpp src/player.hpp
+	g++ -c src/bomb.cpp
 
-DummyEnemy.o: DummyEnemy.cpp DummyEnemy.hpp
-	g++ -c DummyEnemy.cpp
+dummy_enemy.o: src/dummy_enemy.cpp src/dummy_enemy.hpp src/map.hpp
+	g++ -c src/dummy_enemy.cpp
 
-Game.o: Game.cpp Game.hpp LevelManager.hpp Player.hpp Renderer.hpp
-	g++ -c Game.cpp
+game.o: src/game.cpp src/game.hpp src/level_manager.hpp src/player.hpp src/renderer.hpp
+	g++ -c src/game.cpp
 
-Map.o: Map.cpp Map.hpp
-	g++ -c Map.cpp
+leaderboard.o: src/leaderboard.cpp src/leaderboard.hpp
+	g++ -c src/leaderboard.cpp
 
-Leaderboard.o: Leaderboard.cpp Leaderboard.hpp
-	g++ -c Leaderboard.cpp
+level.o: src/level.cpp src/level.hpp src/bomb.hpp src/dummy_enemy.hpp src/map.hpp src/smart_enemy.hpp
+	g++ -c src/level.cpp
 
-Level.o: Level.cpp Level.hpp Map.hpp Bomb.hpp DummyEnemy.hpp SmartEnemy.hpp
-	g++ -c Level.cpp
+level_manager.o: src/level_manager.cpp src/level_manager.hpp src/level.hpp
+	g++ -c src/level_manager.cpp
 
-LevelManager.o: LevelManager.cpp LevelManager.hpp Level.hpp
-	g++ -c LevelManager.cpp
+map.o: src/map.cpp src/map.hpp
+	g++ -c src/map.cpp
 
-Menu.o: Menu.cpp Menu.hpp
-	g++ -c Menu.cpp
+menu.o: src/menu.cpp src/menu.hpp src/leaderboard.hpp
+	g++ -c src/menu.cpp
 
-Player.o: Player.cpp Player.hpp
-	g++ -c Player.cpp
+player.o: src/player.cpp src/player.hpp src/map.hpp
+	g++ -c src/player.cpp
 
-Renderer.o: Renderer.cpp Renderer.hpp LevelManager.hpp
-	g++ -c Renderer.cpp
+renderer.o: src/renderer.cpp src/renderer.hpp src/level_manager.hpp src/player.hpp
+	g++ -c src/renderer.cpp
 
-SmartEnemy.o: SmartEnemy.cpp SmartEnemy.hpp
-	g++ -c SmartEnemy.cpp
+smart_enemy.o: src/smart_enemy.cpp src/smart_enemy.hpp src/dummy_enemy.hpp src/map.hpp
+	g++ -c src/smart_enemy.cpp
 
 clean:
 	rm -f *.o

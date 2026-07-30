@@ -1,7 +1,7 @@
 #ifndef ITEM_HPP
 #define ITEM_HPP
 
-#include "Map.hpp"
+#include "map.hpp"
 
 // Tipi di item raccoglibili dal giocatore
 enum ItemType {

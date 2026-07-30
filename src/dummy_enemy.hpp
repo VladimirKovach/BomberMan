@@ -1,7 +1,7 @@
 #ifndef ENEMY_HPP
 #define ENEMY_HPP
 
-#include "Map.hpp"
+#include "map.hpp"
 
 const int NEIGHBORS_COUNT = 4;
 

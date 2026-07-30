@@ -1,4 +1,8 @@
-#include "Level.hpp"
+#include "level.hpp"
+#include "bomb.hpp"
+#include "dummy_enemy.hpp"
+#include "map.hpp"
+#include "smart_enemy.hpp"
 
 Level::Level(int _difficulty) {
     difficulty = _difficulty;

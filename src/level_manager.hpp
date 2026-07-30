@@ -1,7 +1,7 @@
 #ifndef LEVEL_MANAGER_HPP
 #define LEVEL_MANAGER_HPP
 
-#include "Level.hpp"
+#include "level.hpp"
 
 const int NUM_LEVELS = 5;
 

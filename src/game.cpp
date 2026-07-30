@@ -1,7 +1,9 @@
-#include "Game.hpp"
+#include "game.hpp"
+#include "level_manager.hpp"
+#include "player.hpp"
+#include "renderer.hpp"
 #include <cstdlib>
 #include <ncurses.h>
-using namespace std;
 
 void Game::spawn_player(bool forward) {
     Position spawn = {1, 1};  // vicino alla porta di entrata

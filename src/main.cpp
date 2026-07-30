@@ -1,5 +1,5 @@
-#include "Game.hpp"
-#include "Menu.hpp"
+#include "game.hpp"
+#include "menu.hpp"
 #include <cstdlib>
 #include <ctime>
 #include <ncurses.h>

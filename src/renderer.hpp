@@ -1,8 +1,8 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
-#include "LevelManager.hpp"
-#include "Player.hpp"
+#include "level_manager.hpp"
+#include "player.hpp"
 
 enum {
     ORANGE = 208,

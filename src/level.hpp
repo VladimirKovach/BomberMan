@@ -1,10 +1,10 @@
 #ifndef LEVEL_HPP
 #define LEVEL_HPP
 
-#include "Map.hpp"
-#include "Bomb.hpp"
-#include "DummyEnemy.hpp"
-#include "SmartEnemy.hpp"
+#include "bomb.hpp"
+#include "dummy_enemy.hpp"
+#include "map.hpp"
+#include "smart_enemy.hpp"
 //#include "Item.hpp"
 
 const int MAX_BOMBS = 3;

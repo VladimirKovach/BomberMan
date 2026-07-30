@@ -1,4 +1,6 @@
-#include "Bomb.hpp"
+#include "bomb.hpp"
+#include "map.hpp"
+#include "player.hpp"
 
 Position Bomb::next_position(Position _p, Direction d) {
     Position next = _p;

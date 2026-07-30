@@ -1,6 +1,7 @@
-#include "Renderer.hpp"
-#include "Bomb.hpp"
-#include <cstdio>
+#include "renderer.hpp"
+#include "level_manager.hpp"
+#include "player.hpp"
+#include <cstdio>    // togliere 
 #include <ncurses.h>
 
 void Renderer::init_colors() {

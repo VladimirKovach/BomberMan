@@ -1,4 +1,5 @@
-#include "Player.hpp"
+#include "player.hpp"
+#include "map.hpp"
 
 Position Player::next_position(Direction d) {
     Position next = p;

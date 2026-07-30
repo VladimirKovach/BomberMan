@@ -1,6 +1,5 @@
-#include "Map.hpp"
+#include "map.hpp"
 #include <cstdlib>
-using namespace std;
 
 bool equal(Position p, Position q) {
     return p.y == q.y && p.x == q.x;

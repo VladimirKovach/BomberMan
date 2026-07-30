@@ -1,7 +1,8 @@
 #ifndef SMARTENEMY_HPP
 #define SMARTENEMY_HPP
 
-#include "DummyEnemy.hpp"
+#include "dummy_enemy.hpp"
+#include "map.hpp"
 
 class SmartEnemy: public DummyEnemy {
 protected:
