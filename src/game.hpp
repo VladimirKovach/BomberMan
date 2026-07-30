@@ -4,6 +4,7 @@
 #include "level_manager.hpp"
 #include "player.hpp"
 #include "renderer.hpp"
+#include "utils.hpp"
 
 const int DELAY = 50;  // millisecondi
 

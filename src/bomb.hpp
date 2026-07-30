@@ -3,6 +3,11 @@
 
 #include "map.hpp"
 #include "player.hpp"
+#include "utils.hpp"
+
+const int BOMB_TIMER_START = 60;       // 3.0 secondi
+const int EXPLOSION_TIMER_START = 30;  // 1.5 secondi
+const int BLINK_TIMER_START = 10;      // 0.5 secondi
 
 class Bomb {
 protected:
@@ -13,14 +18,11 @@ protected:
     bool exploding;
     bool blinking;
 
-    int blink_timer;
+    int bomb_timer;
     int explosion_timer;
-    int explosion_duration;
+    int blink_timer;
 
-    Position next_position(Position _p, Direction d);
-
-    void start_explosion(Map& map, Direction d);
-    void end_explosion(Map& map, Direction d);
+    void update_explosion(Map& map, Direction d, bool set);
 
 public:
     Bomb(Position _p = {-1, -1}, int _range = 1);

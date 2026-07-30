@@ -1,32 +1,6 @@
 #include "player.hpp"
 #include "map.hpp"
-
-Position Player::next_position(Direction d) {
-    Position next = p;
-
-    switch (d) {
-        case UP:
-            next.y--;
-            break;
-
-        case LEFT:
-            next.x--;
-            break;
-
-        case DOWN:
-            next.y++;
-            break;
-
-        case RIGHT:
-            next.x++;
-            break;
-
-        default:
-            break;
-    }
-
-    return next;
-}
+#include "utils.hpp"
 
 Player::Player(Position _p, int _lives) {
     p = _p;
@@ -65,7 +39,7 @@ bool Player::is_dead() {
 }
 
 void Player::move(Map& map, Direction d) {
-    Position next = next_position(d);
+    Position next = next_position(p, d);
     if (!map.is_wall(next)) {
         p = next;
     }

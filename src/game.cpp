@@ -2,6 +2,7 @@
 #include "level_manager.hpp"
 #include "player.hpp"
 #include "renderer.hpp"
+#include "utils.hpp"
 #include <cstdlib>
 #include <ncurses.h>
 

@@ -2,14 +2,8 @@
 #define PLAYER_HPP
 
 #include "map.hpp"
+#include "utils.hpp"
 //#include "Item.hpp"
-
-enum Direction {
-    UP,
-    LEFT,
-    DOWN,
-    RIGHT,
-};
 
 const int MAX_LIVES = 3;  // aumentare a 5?
 
@@ -22,8 +16,6 @@ protected:
 
     int bomb_range;    // raggio corrente delle bombe (1 = base)
     //double buff_end;   // valore dell'orologio di gioco a cui scade il buff raggio
-
-    Position next_position(Direction d);
 
 public:
     Player(Position _p = {1, 1}, int _lives = 3);

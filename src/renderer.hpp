@@ -3,10 +3,11 @@
 
 #include "level_manager.hpp"
 #include "player.hpp"
+#include "utils.hpp"
 
 enum {
-    ORANGE = 208,
-    GREY = 244
+    COLOR_DEFAULT = -1,
+    COLOR_GREY = 244,
 };
 
 enum {
@@ -31,7 +32,6 @@ protected:
     int max_y, max_x;
 
     void init_colors();
-    void paint_it_black();
 
     void display_title();
     void display_lives(int lives);

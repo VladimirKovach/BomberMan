@@ -1,42 +1,34 @@
 #include "renderer.hpp"
 #include "level_manager.hpp"
 #include "player.hpp"
+#include "utils.hpp"
 #include <cstdio>    // togliere 
 #include <ncurses.h>
 
 void Renderer::init_colors() {
     start_color();
+    use_default_colors();
 
     // fallback per terminali senza 256 colori, per esempio pdcurses (Windows)
-    // GREY (244) e ORANGE (208) non esistono, quindi init_pair fallisce,
-    // rendendo invisibili muri distruttibili e bombe
-    short grey = GREY;
-    short orange = ORANGE;
+    // GREY (244) non esiste, quindi init_pair fallisce, rendendo invisibili i
+    // muri distruttibili
+    short grey = COLOR_GREY;
     if (COLORS < 256) {
         grey = COLOR_YELLOW;
-        orange = COLOR_YELLOW;
     }
 
-    init_pair(CP_SCREEN, COLOR_BLACK, COLOR_BLACK);
+    init_pair(CP_SCREEN, COLOR_DEFAULT, COLOR_DEFAULT);
     init_pair(CP_UNBREAKABLE_WALL, COLOR_WHITE, COLOR_WHITE);
     init_pair(CP_BREAKABLE_WALL, grey, grey);
-    init_pair(CP_DOOR, COLOR_GREEN, COLOR_BLACK);
-    init_pair(CP_PLAYER, COLOR_CYAN, COLOR_BLACK);
-    init_pair(CP_ENEMY, COLOR_RED, COLOR_BLACK);
-    init_pair(CP_BOMB, orange, COLOR_BLACK);
+    init_pair(CP_DOOR, COLOR_GREEN, COLOR_DEFAULT);
+    init_pair(CP_PLAYER, COLOR_CYAN, COLOR_DEFAULT);
+    init_pair(CP_ENEMY, COLOR_RED, COLOR_DEFAULT);
+    init_pair(CP_BOMB, COLOR_RED, COLOR_DEFAULT);
     init_pair(CP_EXPLOSION, COLOR_YELLOW, COLOR_RED);
-    init_pair(CP_BLINK, COLOR_WHITE, COLOR_BLACK);
-    init_pair(CP_ITEM, COLOR_MAGENTA, COLOR_BLACK);
-    init_pair(CP_LIFE, COLOR_RED, COLOR_BLACK);
-    init_pair(CP_TITLE, COLOR_WHITE, COLOR_BLACK);
-}
-
-void Renderer::paint_it_black() {
-    for (int y = 0; y < max_y; y++) {
-        for (int x = 0; x < max_x; x++) {
-            mvaddch(y, x, ' ' | COLOR_PAIR(CP_SCREEN));
-        }
-    }
+    init_pair(CP_BLINK, COLOR_WHITE, COLOR_DEFAULT);
+    init_pair(CP_ITEM, COLOR_MAGENTA, COLOR_DEFAULT);
+    init_pair(CP_LIFE, COLOR_RED, COLOR_DEFAULT);
+    init_pair(CP_TITLE, COLOR_WHITE, COLOR_DEFAULT);
 }
 
 Renderer::Renderer() {
@@ -47,7 +39,6 @@ Renderer::Renderer() {
     map_start_p = {center_y, center_x};
 
     init_colors();
-    paint_it_black();
 }
 
 // Titolo in stile "banner" da vecchio terminale

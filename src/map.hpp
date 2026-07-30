@@ -1,21 +1,16 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 
+#include "utils.hpp"
+
 enum Cell {
     NONE,
     EMPTY,
     BREAKABLE_WALL,
     UNBREAKABLE_WALL,
     ENTRANCE,
-    EXIT
+    EXIT,
 };
-
-struct Position {
-    int y;
-    int x;
-};
-
-bool equal(Position p, Position q);
 
 const int MAP_HEIGHT = 21;
 const int MAP_WIDTH = 41;
@@ -26,7 +21,7 @@ protected:
     Cell grid[MAP_HEIGHT][MAP_WIDTH];
     Cell start_grid[MAP_HEIGHT][MAP_WIDTH];
 
-    bool explosions[MAP_HEIGHT][MAP_WIDTH];
+    bool explosion[MAP_HEIGHT][MAP_WIDTH];
 
     // Possibili posizioni in cui spawnare nemici
     Position spawns[MAX_SPAWNS];

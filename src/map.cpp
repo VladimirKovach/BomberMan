@@ -1,9 +1,6 @@
 #include "map.hpp"
+#include "utils.hpp"
 #include <cstdlib>
-
-bool equal(Position p, Position q) {
-    return p.y == q.y && p.x == q.x;
-}
 
 void Map::get_spawns() {
     spawns_count = 0;
@@ -59,7 +56,7 @@ Map::Map(int difficulty) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
             grid[y][x] = EMPTY;
-            explosions[y][x] = false;
+            explosion[y][x] = false;
         }
     }
 
@@ -98,7 +95,7 @@ void Map::reset() {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
             grid[y][x] = start_grid[y][x];
-            explosions[y][x] = false;
+            explosion[y][x] = false;
         }
     }
 }
@@ -142,18 +139,18 @@ bool Map::is_door(Position p) {
 }
 
 bool Map::is_explosion(Position p) {
-    return !out_of_bounds(p) && explosions[p.y][p.x];
+    return !out_of_bounds(p) && explosion[p.y][p.x];
 }
 
 void Map::set_explosion(Position p) {
     if (!out_of_bounds(p)) {
-        explosions[p.y][p.x] = true;
+        explosion[p.y][p.x] = true;
     }
 }
 
 void Map::unset_explosion(Position p) {
     if (!out_of_bounds(p)) {
-        explosions[p.y][p.x] = false;
+        explosion[p.y][p.x] = false;
     }
 }
 

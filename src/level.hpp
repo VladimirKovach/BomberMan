@@ -5,6 +5,7 @@
 #include "dummy_enemy.hpp"
 #include "map.hpp"
 #include "smart_enemy.hpp"
+#include "utils.hpp"
 //#include "Item.hpp"
 
 const int MAX_BOMBS = 3;

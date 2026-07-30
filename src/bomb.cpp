@@ -1,35 +1,10 @@
 #include "bomb.hpp"
 #include "map.hpp"
 #include "player.hpp"
+#include "utils.hpp"
+#include <algorithm>
 
-Position Bomb::next_position(Position _p, Direction d) {
-    Position next = _p;
-
-    switch (d) {
-        case UP:
-            next.y--;
-            break;
-
-        case LEFT:
-            next.x--;
-            break;
-
-        case DOWN:
-            next.y++;
-            break;
-
-        case RIGHT:
-            next.x++;
-            break;
-
-        default:
-            break;
-    }
-
-    return next;
-}
-
-void Bomb::start_explosion(Map& map, Direction d) {
+void Bomb::update_explosion(Map& map, Direction d, bool set) {
     Position target = p;
 
     for (int i = 0; i < range; i++) {
@@ -38,20 +13,9 @@ void Bomb::start_explosion(Map& map, Direction d) {
         if (map.get_cell(target) == UNBREAKABLE_WALL) {
             return;
         }
-        else {
+
+        if (set) {
             map.set_explosion(target);
-        }
-    }
-}
-
-void Bomb::end_explosion(Map& map, Direction d) {
-    Position target = p;
-
-    for (int i = 0; i < range; i++) {
-        target = next_position(target, d);
-
-        if (map.get_cell(target) == UNBREAKABLE_WALL) {
-            return;
         }
         else {
             map.unset_explosion(target);
@@ -67,11 +31,10 @@ Bomb::Bomb(Position _p, int _range) {
     exploding = false;
     blinking = false;
 
-    blink_timer = 10;         // 0.5 secondi
-    explosion_timer = 60;     // 3.0 secondi
-    explosion_duration = 30;  // 1.5 secondi
+    bomb_timer = BOMB_TIMER_START;
+    explosion_timer = EXPLOSION_TIMER_START;
+    blink_timer = BLINK_TIMER_START;
 }
-
 
 Position Bomb::get_position() {
     return p;
@@ -89,14 +52,12 @@ bool Bomb::is_blinking() {
     return blinking;
 }
 
-
 void Bomb::place(Position _p, int _range) {
     p = _p;
     range = _range;
 
     active = true;
 }
-
 
 void Bomb::explode(Map& map) {
     exploding = true;
@@ -105,45 +66,39 @@ void Bomb::explode(Map& map) {
     map.set_explosion(p);
 
     // Esplosione nelle 4 direzioni (croce)
-    start_explosion(map, UP);
-    start_explosion(map, LEFT);
-    start_explosion(map, DOWN);
-    start_explosion(map, RIGHT);
+    update_explosion(map, UP, true);
+    update_explosion(map, LEFT, true);
+    update_explosion(map, DOWN, true);
+    update_explosion(map, RIGHT, true);
 }
-
 
 void Bomb::update(Map& map) {
     if (!exploding) {
-        if (blink_timer > 0) {
-            blink_timer--;
-        }
-        if (explosion_timer > 0) {
-            explosion_timer--;
-        }
-    }
-    else if (exploding && explosion_duration > 0) {
-        explosion_duration--;
-    }
+        blink_timer = std::max(0, blink_timer - 1);
+        bomb_timer = std::max(0, bomb_timer - 1);
 
-    if (!exploding) {
-        if (blink_timer <= 0) {
+        if (blink_timer == 0) {
             blinking = !blinking;
-            blink_timer = 10;
+            blink_timer = BLINK_TIMER_START;
         }
-        if (explosion_timer <= 0) {
+
+        if (bomb_timer == 0) {
             explode(map);
-            explosion_timer = 60;
         }
     }
-    else if (exploding && explosion_duration <= 0) {
-        map.unset_explosion(p);
-        end_explosion(map, UP);
-        end_explosion(map, LEFT);
-        end_explosion(map, DOWN);
-        end_explosion(map, RIGHT);
+    else {
+        explosion_timer = std::max(0, explosion_timer - 1);
+        
+        if (explosion_timer == 0) {
+            map.unset_explosion(p);
 
-        explosion_duration = 30;
-        reset();
+            update_explosion(map, UP, false);
+            update_explosion(map, LEFT, false);
+            update_explosion(map, DOWN, false);
+            update_explosion(map, RIGHT, false);
+
+            reset();
+        }
     }
 }
 
@@ -151,4 +106,8 @@ void Bomb::reset() {
     active = false;
     exploding = false;
     blinking = false;
+
+    bomb_timer = BOMB_TIMER_START;
+    explosion_timer = EXPLOSION_TIMER_START;
+    blink_timer = BLINK_TIMER_START;
 }

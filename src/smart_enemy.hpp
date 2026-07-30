@@ -3,6 +3,7 @@
 
 #include "dummy_enemy.hpp"
 #include "map.hpp"
+#include "utils.hpp"
 
 class SmartEnemy: public DummyEnemy {
 protected:
