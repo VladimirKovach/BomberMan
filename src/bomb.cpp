@@ -2,7 +2,6 @@
 #include "map.hpp"
 #include "player.hpp"
 #include "utils.hpp"
-#include <algorithm>
 
 void Bomb::update_explosion(Map& map, Direction d, bool set) {
     Position target = p;
@@ -74,8 +73,12 @@ void Bomb::explode(Map& map) {
 
 void Bomb::update(Map& map) {
     if (!exploding) {
-        blink_timer = std::max(0, blink_timer - 1);
-        bomb_timer = std::max(0, bomb_timer - 1);
+        if (blink_timer > 0) {
+            blink_timer--;
+        }
+        if (bomb_timer > 0) {
+            bomb_timer--;
+        }
 
         if (blink_timer == 0) {
             blinking = !blinking;
@@ -87,8 +90,10 @@ void Bomb::update(Map& map) {
         }
     }
     else {
-        explosion_timer = std::max(0, explosion_timer - 1);
-        
+        if (explosion_timer > 0) {
+            explosion_timer--;
+        }
+
         if (explosion_timer == 0) {
             map.unset_explosion(p);
 
