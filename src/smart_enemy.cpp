@@ -67,6 +67,6 @@ void SmartEnemy::update(Map& map, Position _player_p) {
         plan_move();
         move(map);
 
-        move_timer = 20 / speed;
+        move_timer = TICKS_PER_SECOND / speed;
     }
 }

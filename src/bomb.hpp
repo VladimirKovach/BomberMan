@@ -5,9 +5,9 @@
 #include "player.hpp"
 #include "utils.hpp"
 
-const int BOMB_TIMER_START = 60;       // 3.0 secondi
-const int EXPLOSION_TIMER_START = 30;  // 1.5 secondi
-const int BLINK_TIMER_START = 10;      // 0.5 secondi
+const int BOMB_TIMER_START = 3 * TICKS_PER_SECOND;
+const int EXPLOSION_TIMER_START = 2 * TICKS_PER_SECOND;
+const int BLINK_TIMER_START = TICKS_PER_SECOND / 2;
 
 class Bomb {
 protected:

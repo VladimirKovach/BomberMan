@@ -14,12 +14,7 @@ class Game {
 protected:
     bool quit;
     int timer;  // tick rimanenti nella partita
-
-    //double game_clock;  // orologio monotono decrescente per bombe, buff e nemici
-    //double time_bonus;  // secondi accumulati dagli item tempo
-
     int score;
-    int level_start_score; // punteggio all'ingresso nel livello corrente
 
     LevelManager level_manager;
     Player player;

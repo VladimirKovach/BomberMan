@@ -9,7 +9,7 @@ DummyEnemy::DummyEnemy(Position _p, int _speed) {
 
     speed = _speed;
     start_speed = _speed;
-    move_timer = 20 / speed;
+    move_timer = TICKS_PER_SECOND / speed;
 
     if (equal(p, {-1, -1})) {
         dead = true;
@@ -84,14 +84,14 @@ void DummyEnemy::update(Map& map) {
         plan_move();
         move(map);
 
-        move_timer = 20 / speed;
+        move_timer = TICKS_PER_SECOND / speed;
     }
 }
 
 void DummyEnemy::reset() {
     p = start_p;
     speed = start_speed;
-    move_timer = 20 / speed;
+    move_timer = TICKS_PER_SECOND / speed;
 
     if (equal(p, {-1, -1})) {
         dead = true;

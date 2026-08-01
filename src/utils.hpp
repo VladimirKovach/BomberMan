@@ -1,8 +1,9 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
-const int DELAY = 50;                        // millisecondi
-const int TICKS_PER_SECOND = 1000 / DELAY;   // = 20 tick al secondo
+const int DELAY = 50;  // millisecondi
+
+const int TICKS_PER_SECOND = 1000 / DELAY;
 
 enum Direction {
     UP,

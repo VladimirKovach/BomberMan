@@ -30,6 +30,13 @@ Esegui il programma:
 
 ## Comandi
 
+### Gioco
+| Tasto | Descrizione |
+| :--- | :--- |
+| `FRECCE` / `WASD` | muovi giocatore |
+| `SPAZIO` | piazza bomba |
+| `Q` | termina partita |
+
 ### Menu
 | Tasto | Descrizione |
 | :--- | :--- |
@@ -37,15 +44,7 @@ Esegui il programma:
 | `INVIO` | seleziona |
 | `Q` | esci |
 
-### Gioco
-| Tasto | Descrizione |
-| :--- | :--- |
-| `FRECCE` / `WASD` | muovi giocatore |
-| `SPAZIO` | piazza bomba |
-| `Q` | esci |
 
----
-
-*Simone Coppola*  
-*Vladimir Covaci*  
-*A.A. 2025/2026*
+## Autori
+- Simone Coppola
+- Vladimir Covaci

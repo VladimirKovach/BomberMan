@@ -12,15 +12,12 @@ void Game::spawn_player(bool forward) {
         spawn = {1, MAP_WIDTH - 2};  // vicino alla porta di uscita
     }
     player.set_position(spawn);
-
-    level_start_score = score;
 }
 
 Game::Game() {
     quit = false;
     timer = 300 *  TICKS_PER_SECOND;  // 300 secondi
     score = 0;
-    level_start_score = 0;
 }
 
 bool Game::game_over() {
@@ -34,21 +31,11 @@ bool Game::win() {
 // Il livello riparte com'era: muri, nemici, item e punteggio insieme
 void Game::player_death(Level& level) {
     player.lose_life();
-    level.reset();
     player.reset();
-    score = level_start_score;
+    level.reset();
 }
 
 void Game::update_timer() {
-    //chrono::steady_clock::time_point now = chrono::steady_clock::now();
-    //double elapsed = chrono::duration<double>(now - start).count();
-
-    // Orologio monotono decrescente (senza bonus): riferimento stabile per
-    // bombe, buff e nemici, che NON deve saltare quando si raccoglie un item tempo
-    //game_clock = TIMER_START_VALUE - elapsed;
-
-    // Tempo mostrato e usato per vittoria/sconfitta: include il bonus accumulato
-    //timer = game_clock + time_bonus;
     if (timer > 0) {
         timer--;
     }
@@ -152,9 +139,31 @@ void Game::handle_collisions() {
     Bomb* bombs = level.get_bombs();
     DummyEnemy* dummy_enemies = level.get_dummy_enemies();
     SmartEnemy* smart_enemies = level.get_smart_enemies();
-
-
     Item* items = level.get_items();
+
+    // Collisioni giocatore-porte
+    Cell c = map.get_cell(player_p);
+
+    if (c == EXIT && level_manager.has_next_level()) {
+        if (level_manager.is_current_completed()) {
+            level_manager.remove_current_level(true);
+        }
+        else {
+            level_manager.go_to_next_level();
+        }
+
+        spawn_player(true);
+    }
+    else if (c == ENTRANCE && level_manager.has_prev_level()) {
+        if (level_manager.is_current_completed()) {
+            level_manager.remove_current_level(false);
+        }
+        else {
+            level_manager.go_to_prev_level();
+        }
+
+        spawn_player(false);
+    }
 
     // Raccolta item (il giocatore ci cammina sopra)
     for (int i = 0; i < MAX_ITEMS; i++) {
@@ -255,27 +264,6 @@ void Game::handle_collisions() {
                 bombs[i].explode(map);
             }
         }
-    }
-
-    // Collisioni giocatore-porte
-    Cell c = map.get_cell(player_p);
-    if (c == EXIT && level_manager.has_next_level()) {
-        if (level_manager.is_current_completed()) {
-            level_manager.remove_current_level(true);
-        }
-        else {
-            level_manager.go_to_next_level();
-        }
-        spawn_player(true);
-    }
-    else if (c == ENTRANCE && level_manager.has_prev_level()) {
-        if (level_manager.is_current_completed()) {
-            level_manager.remove_current_level(false);
-        }
-        else {
-            level_manager.go_to_prev_level();
-        }
-        spawn_player(false);
     }
 }
 
