@@ -4,7 +4,7 @@
 #include "Grid.hpp"
 #include "Player.hpp"
 
-const double EXPLOSION_TIMER = 3.0;  // tempo che la bomba impiega a esplodere
+const double EXPLOSION_TIMER = 2.0;  // tempo che la bomba impiega a esplodere
 const double EXPLOSION_DURATION = 2.0;  // tempo di persistenza dell'esplosione
 
 // intervallo di tempo tra due lampeggi consecutivi della bomba
@@ -25,8 +25,9 @@ protected:
     // momento di inizio dello stato (lampeggio | non lampeggio)
     double blink_state_start;
 
-    void start_explosion(Grid& grid, Direction d);
-    void end_explosion(Grid& grid, Direction d);
+    // Applica (set = true) o rimuove (set = false) l'esplosione a rombo:
+    // tutte le celle a distanza Manhattan <= range, propagate per adiacenza
+    void apply_explosion(Grid& grid, bool set);
 
 public:
     Bomb(Position _p = {-1, -1}, int _range = 1);

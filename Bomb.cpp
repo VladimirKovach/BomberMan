@@ -1,27 +1,50 @@
 #include "Bomb.hpp"
 
-void Bomb::start_explosion(Grid& grid, Direction d) {
-    Position target = p;
-    for (int i = 0; i < range; i++) {
-        target = get_next_position(target, d);
-        if (grid.get_cell(target) == UNBREAKABLE_WALL) {
-            break;
-        }
-        else {
-            grid.set_explosion(target);
-        }
-    }
-}
+void Bomb::apply_explosion(Grid& grid, bool set) {
+    // Onda d'urto a rombo: visita in ampiezza (BFS) dal centro, fino a
+    // distanza Manhattan == range. I muri solidi bloccano la propagazione,
+    // quelli distruttibili la lasciano passare (come nella vecchia croce).
+    // La stessa visita e' deterministica, quindi set e unset coprono
+    // esattamente le stesse celle.
+    bool visited[GRID_ROWS][GRID_COLS] = {false};
 
-void Bomb::end_explosion(Grid& grid, Direction d) {
-    Position target = p;
-    for (int i = 0; i < range; i++) {
-        target = get_next_position(target, d);
-        if (grid.get_cell(target) == UNBREAKABLE_WALL) {
-            break;
+    // Coda a dimensione fissa: nel caso peggiore contiene tutte le celle
+    Position queue[GRID_ROWS * GRID_COLS];
+    int dist[GRID_ROWS * GRID_COLS];
+    int head = 0;
+    int tail = 0;
+
+    queue[tail] = p;
+    dist[tail] = 0;
+    tail++;
+    visited[p.y][p.x] = true;
+
+    Direction dirs[4] = {UP, LEFT, DOWN, RIGHT};
+
+    while (head < tail) {
+        Position cur = queue[head];
+        int d = dist[head];
+        head++;
+
+        if (set) {
+            grid.set_explosion(cur);
         }
         else {
-            grid.unset_explosion(target);
+            grid.unset_explosion(cur);
+        }
+
+        if (d == range) {
+            continue;  // bordo del rombo raggiunto, non si espande oltre
+        }
+
+        for (int i = 0; i < 4; i++) {
+            Position next = get_next_position(cur, dirs[i]);
+            if (!visited[next.y][next.x] && grid.get_cell(next) != UNBREAKABLE_WALL) {
+                visited[next.y][next.x] = true;
+                queue[tail] = next;
+                dist[tail] = d + 1;
+                tail++;
+            }
         }
     }
 }
@@ -72,14 +95,8 @@ void Bomb::explode(Grid& grid, double game_timer) {
     exploding = true;
     explosion_time = game_timer;
 
-    // Esplosione al centro
-    grid.set_explosion(p);
-
-    // Esplosione nelle 4 direzioni (croce)
-    start_explosion(grid, UP);
-    start_explosion(grid, LEFT);
-    start_explosion(grid, DOWN);
-    start_explosion(grid, RIGHT);
+    // Esplosione a rombo (centro incluso)
+    apply_explosion(grid, true);
 }
 
 
@@ -92,11 +109,7 @@ void Bomb::update(Grid& grid, double game_timer) {
         blink_state = !blink_state;
     }
     else if (exploding && explosion_time - game_timer >= EXPLOSION_DURATION) {
-        grid.unset_explosion(p);
-        end_explosion(grid, UP);
-        end_explosion(grid, LEFT);
-        end_explosion(grid, DOWN);
-        end_explosion(grid, RIGHT);
+        apply_explosion(grid, false);
 
         reset();
     }

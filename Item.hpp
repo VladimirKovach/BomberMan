@@ -12,7 +12,7 @@ enum ItemType {
 };
 
 // Parametri degli effetti
-const int RANGE_BONUS = 2;                 // raggio aggiuntivo durante il buff
+const int RANGE_BONUS = 1;                 // raggio aggiuntivo durante il buff
 const double RANGE_DURATION_SHORT = 5.0;   // durata corta del buff (secondi)
 const double RANGE_DURATION_LONG = 10.0;   // durata lunga del buff (secondi)
 const int TIME_BONUS = 30;                 // secondi aggiunti dall'item tempo

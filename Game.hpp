@@ -10,7 +10,7 @@
 #include <chrono>
 using namespace std;
 
-const double TIMER_START_VALUE = 1000.0;  // secondi
+const double TIMER_START_VALUE = 300.0;  // secondi
 const int DELAY = 50;  // millisecondi
 
 // Probabilita' (in percentuale) che un drop di item avvenga
