@@ -16,7 +16,7 @@ void Game::spawn_player(bool forward) {
 
 Game::Game() {
     quit = false;
-    timer = 300 *  TICKS_PER_SECOND;  // 300 secondi
+    timer = 300 * TICKS_PER_SECOND;  // 300 secondi
     score = 0;
 }
 
@@ -82,11 +82,14 @@ void Game::handle_input() {
             {
                 Bomb* bombs = level.get_bombs();
                 Position player_p = player.get_position();
-                if (level.get_bombs_count() < MAX_BOMBS && !bomb_under_player()) {
+
+                if (level.get_bombs_count() < player.get_bomb_slots() && !bomb_under_player()) {
                     int i = 0;
+
                     while (i < MAX_BOMBS && bombs[i].is_active()) {
                         i++;
                     }
+
                     if (i < MAX_BOMBS) {
                         bombs[i].place(player_p, player.get_bomb_range());
                     }
@@ -125,6 +128,12 @@ void Game::handle_input() {
         case 'D':
             player.move(map, RIGHT);
             break;
+
+        /*
+        case '+':
+            player.increase_bomb_slots();
+            break;
+        */
 
         default:
             break;

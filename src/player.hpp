@@ -5,7 +5,7 @@
 #include "utils.hpp"
 #include "item.hpp"
 
-const int MAX_LIVES = 3;  // aumentare a 5?
+const int MAX_LIVES = 5;
 
 class Player {
 protected:
@@ -14,11 +14,16 @@ protected:
 
     int lives;
 
-    int bomb_range;    // raggio corrente delle bombe (1 = base)
+    int bomb_range;   // raggio corrente delle bombe (1 = base)
     int buff_timer;   // tick rimanenti del buff raggio (0 = nessun buff)
+
+    int bomb_slots;
 
 public:
     Player(Position _p = {1, 1}, int _lives = 3);
+
+    int get_bomb_slots();
+    void increase_bomb_slots();
 
     Position get_position();
     void set_position(Position _p);

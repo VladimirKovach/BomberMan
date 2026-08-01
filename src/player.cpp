@@ -7,7 +7,19 @@ Player::Player(Position _p, int _lives) {
     start_p = _p;
     lives = _lives;
     bomb_range = 1;
-    buff_timer = 0; // nessun buff attivo all'inizio
+    buff_timer = 0;  // nessun buff attivo all'inizio
+
+    bomb_slots = 1;
+}
+
+int Player::get_bomb_slots() {
+    return bomb_slots;
+}
+
+void Player::increase_bomb_slots() {
+    if (bomb_slots < 3) {
+        bomb_slots++;
+    }
 }
 
 Position Player::get_position() {
