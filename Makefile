@@ -1,6 +1,5 @@
-bomberman: main.o bomb.o dummy_enemy.o game.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o smart_enemy.o utils.o
-	g++ main.o bomb.o dummy_enemy.o game.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o smart_enemy.o utils.o -lncurses -o bomberman
-
+bomberman: main.o bomb.o dummy_enemy.o game.o item.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o smart_enemy.o utils.o
+	g++ main.o bomb.o dummy_enemy.o game.o item.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o smart_enemy.o utils.o -lncurses -o bomberman
 main.o: src/main.cpp src/game.hpp src/menu.hpp
 	g++ -c src/main.cpp
 
@@ -12,6 +11,9 @@ dummy_enemy.o: src/dummy_enemy.cpp src/dummy_enemy.hpp src/map.hpp src/utils.hpp
 
 game.o: src/game.cpp src/game.hpp src/level_manager.hpp src/player.hpp src/renderer.hpp src/utils.hpp
 	g++ -c src/game.cpp
+
+item.o: src/item.cpp src/item.hpp src/map.hpp src/utils.hpp
+	g++ -c src/item.cpp
 
 leaderboard.o: src/leaderboard.cpp src/leaderboard.hpp
 	g++ -c src/leaderboard.cpp

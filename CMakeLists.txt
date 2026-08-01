@@ -13,20 +13,20 @@ endif()
 include_directories(${CURSES_INCLUDE_DIR})
 
 add_executable(BomberMan
-        main.cpp
-        Bomb.cpp
-        Character.cpp
-        DummyEnemy.cpp
-        Game.cpp
-        Grid.cpp
-        Leaderboard.cpp
-        Level.cpp
-        Map.cpp
-        Menu.cpp
-        Player.cpp
-        Renderer.cpp
-        SmartEnemy.cpp
-        Item.cpp
+        src/main.cpp
+        src/bomb.cpp
+        src/dummy_enemy.cpp
+        src/game.cpp
+        src/item.cpp
+        src/leaderboard.cpp
+        src/level.cpp
+        src/level_manager.cpp
+        src/map.cpp
+        src/menu.cpp
+        src/player.cpp
+        src/renderer.cpp
+        src/smart_enemy.cpp
+        src/utils.cpp
 )
 
 target_link_libraries(BomberMan ${CURSES_LIBRARIES})
