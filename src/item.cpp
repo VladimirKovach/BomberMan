@@ -6,7 +6,7 @@
 Item::Item(Position _p, ItemType _type) {
     p = _p;
     type = _type;
-    duration = 0.0;
+    duration = 0;
     reset();
 }
 
@@ -18,7 +18,7 @@ ItemType Item::get_type() {
     return type;
 }
 
-double Item::get_duration() {
+int Item::get_duration() {
     return duration;
 }
 
@@ -41,7 +41,7 @@ void Item::spawn(Position _p, ItemType _type) {
         }
     }
     else {
-        duration = 0.0;
+        duration = 0;
     }
 }
 

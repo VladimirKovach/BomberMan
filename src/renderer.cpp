@@ -9,26 +9,39 @@ void Renderer::init_colors() {
     start_color();
     use_default_colors();
 
+    //  ----- ADATTAMENTO DELLA GRAFICA PER WINDOWS -----
+
+    // su pdcurses (Windows) use_default_colors() fallisce e
+    // ogni init_pair che usa -1 viene ignorato, lasciando i caratteri bianco su nero
+    short bg = COLOR_DEFAULT;
+    if (use_default_colors() == ERR) {
+        bg = COLOR_BLACK;
+    }
+
     // fallback per terminali senza 256 colori, per esempio pdcurses (Windows)
     // GREY (244) non esiste, quindi init_pair fallisce, rendendo invisibili i
-    // muri distruttibili
+    // muri distruttibili.
     short grey = COLOR_GREY;
     if (COLORS < 256) {
         grey = COLOR_YELLOW;
     }
 
-    init_pair(CP_SCREEN, COLOR_DEFAULT, COLOR_DEFAULT);
+    //  -----------------------------------------------
+
+
+    // COLOR_DEFAULT = -1 significa "usa lo sfondo nativo del terminale"
+    init_pair(CP_SCREEN, bg, bg);
     init_pair(CP_UNBREAKABLE_WALL, COLOR_WHITE, COLOR_WHITE);
     init_pair(CP_BREAKABLE_WALL, grey, grey);
-    init_pair(CP_DOOR, COLOR_GREEN, COLOR_DEFAULT);
-    init_pair(CP_PLAYER, COLOR_CYAN, COLOR_DEFAULT);
-    init_pair(CP_ENEMY, COLOR_RED, COLOR_DEFAULT);
-    init_pair(CP_BOMB, COLOR_RED, COLOR_DEFAULT);
+    init_pair(CP_DOOR, COLOR_GREEN, bg);
+    init_pair(CP_PLAYER, COLOR_CYAN, bg);
+    init_pair(CP_ENEMY, COLOR_RED, bg);
+    init_pair(CP_BOMB, COLOR_RED, bg);
     init_pair(CP_EXPLOSION, COLOR_YELLOW, COLOR_RED);
-    init_pair(CP_BLINK, COLOR_WHITE, COLOR_DEFAULT);
-    init_pair(CP_ITEM, COLOR_MAGENTA, COLOR_DEFAULT);
-    init_pair(CP_LIFE, COLOR_RED, COLOR_DEFAULT);
-    init_pair(CP_TITLE, COLOR_WHITE, COLOR_DEFAULT);
+    init_pair(CP_BLINK, COLOR_WHITE, bg);
+    init_pair(CP_ITEM, COLOR_MAGENTA, bg);
+    init_pair(CP_LIFE, COLOR_RED, bg);
+    init_pair(CP_TITLE, COLOR_WHITE, bg);
 }
 
 Renderer::Renderer() {
@@ -90,19 +103,21 @@ void Renderer::display_lives(int lives) {
         addch(' ');
     }
 }
-/*
-void Renderer::display_effect(double buff_remaining) {
+
+void Renderer::display_effect(int buff_remaining) {
     move(map_start_p.y - 1, map_start_p.x);
 
     char text[32] = "None";
-    if (buff_remaining > 0.0) {
-        // +1 = arrotondamento per eccesso: il conto parte da 10 e finisce a 1
-        snprintf(text, sizeof(text), "Range %ds", (int) buff_remaining + 1);
+    if (buff_remaining > 0) {
+        int seconds = (buff_remaining + TICKS_PER_SECOND - 1) / TICKS_PER_SECOND;
+        snprintf(text, sizeof(text), "Range %ds", seconds);
     }
-    // %-9s: padding a destra per cancellare il testo del frame precedente
+
+    // %-9s: padding a destra per cancellare il testo del frame precedente.
+    // 9 = length("Range 10s"), la stringa piu' lunga prevista
     printw("EFFETTO: %-9s", text);
 }
-*/
+
 void Renderer::display_score(int score) {
     const int SCORE_MAX_LENGTH = 6;         // fino a 999999
     const int SCORE_LABEL_MAX_LENGTH = 13;  // length(SCORE: 999999) = 13
@@ -178,7 +193,7 @@ void Renderer::draw_bombs(Bomb* bombs) {
         }
     }
 }
-/*
+
 void Renderer::draw_items(Item* items) {
     for (int i = 0; i < MAX_ITEMS; i++) {
         if (items[i].is_active()) {
@@ -211,7 +226,7 @@ void Renderer::draw_items(Item* items) {
         }
     }
 }
-*/
+
 
 void Renderer::draw_player(Position player_p) {
     int y = player_p.y + map_start_p.y;
@@ -262,13 +277,13 @@ void Renderer::render(LevelManager& level_manager, Player& player, int score, in
 
     display_title();
     display_lives(player.get_lives());
-    //display_effect(player.get_buff_remaining(game_clock));
+    display_effect(player.get_buff_remaining());
     display_score(score);
     display_time(time);
     //display_colors_debug();
 
     draw_map(level.get_map());
-    //draw_items(level.get_items());
+    draw_items(level.get_items());
     draw_bombs(level.get_bombs());
     draw_player(player_p);
     draw_dummy_enemies(level.get_dummy_enemies());

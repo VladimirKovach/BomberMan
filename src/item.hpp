@@ -13,25 +13,25 @@ enum ItemType {
 };
 
 // Parametri degli effetti
-const int RANGE_BONUS = 2;                 // raggio aggiuntivo durante il buff
-const double RANGE_DURATION_SHORT = 5.0;   // durata corta del buff (secondi)
-const double RANGE_DURATION_LONG = 10.0;   // durata lunga del buff (secondi)
-const int TIME_BONUS = 30;                 // secondi aggiunti dall'item tempo
-const int SCORE_BONUS = 4;                 // punti aggiunti dall'item punteggio
+const int RANGE_BONUS = 1;                                  // raggio aggiuntivo durante il buff
+const int RANGE_DURATION_SHORT = 5 * TICKS_PER_SECOND;      // 5 s  = 100 tick
+const int RANGE_DURATION_LONG = 10 * TICKS_PER_SECOND;      // 10 s = 200 tick
+const int TIME_BONUS = 30 * TICKS_PER_SECOND;               // 30 s = 600 tick
+const int SCORE_BONUS = 4;                                  // punti
 
 class Item {
 protected:
-    Position p;       // posizione sulla griglia
-    ItemType type;    // tipo di effetto
-    double duration;  // durata del buff (usata solo da ITEM_RANGE)
-    bool active;      // true se l'item e' ancora a terra (non raccolto)
+    Position p;     // posizione sulla griglia
+    ItemType type;  // tipo di effetto
+    int duration;   // durata del buff in tick (usata solo da ITEM_RANGE)
+    bool active;    // true se l'item e' ancora a terra (non raccolto)
 
 public:
     Item(Position _p = {-1, -1}, ItemType _type = ITEM_RANGE);
 
     Position get_position();
     ItemType get_type();
-    double get_duration();
+    int get_duration();
     bool is_active();
 
     // Posiziona/attiva l'item sul terreno; per ITEM_RANGE sorteggia la durata

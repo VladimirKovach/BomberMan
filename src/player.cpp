@@ -7,7 +7,7 @@ Player::Player(Position _p, int _lives) {
     start_p = _p;
     lives = _lives;
     bomb_range = 1;
-    //buff_end = 0.0;
+    buff_timer = 0; // nessun buff attivo all'inizio
 }
 
 Position Player::get_position() {
@@ -16,6 +16,7 @@ Position Player::get_position() {
 
 void Player::set_position(Position _p) {
     p = _p;
+    start_p = _p;
 }
 
 int Player::get_lives() {
@@ -48,35 +49,29 @@ void Player::move(Map& map, Direction d) {
 int Player::get_bomb_range() {
     return bomb_range;
 }
-/*
-double Player::get_buff_remaining(double game_clock) {
-    // Orologio decrescente: il buff e' attivo finche' game_clock > buff_end
-    if (bomb_range > 1 && game_clock > buff_end) {
-        return game_clock - buff_end;
-    }
-    return 0.0;
+int Player::get_buff_remaining() {
+    return buff_timer;
 }
 
-void Player::apply_range_buff(double duration, double game_clock) {
-    // L'orologio di gioco e' decrescente: scadenza piu' bassa = buff piu' lungo.
-    if (bomb_range > 1) {
-        // Buff gia' attivo: la durata si somma (il raggio resta al bonus singolo)
-        buff_end -= duration;
-    }
-    else {
-        bomb_range = 1 + RANGE_BONUS;
-        buff_end = game_clock - duration;
+void Player::apply_range_buff(int duration) {
+    // Raccogliere un secondo item raggio non aumenta il bonus:
+    // prolunga la durata di quello gia' attivo
+    bomb_range = 1 + RANGE_BONUS;
+    buff_timer += duration;
+}
+
+void Player::update_buff() {
+    if (buff_timer > 0) {
+        buff_timer--;
+
+        if (buff_timer == 0) {
+            bomb_range = 1;
+        }
     }
 }
 
-void Player::update_buff(double game_clock) {
-    // Se il buff e' attivo ed e' scaduto, torno al raggio base
-    if (bomb_range > 1 && game_clock <= buff_end) {
-        bomb_range = 1;
-    }
-}
-*/
 void Player::reset() {
     p = start_p;
     bomb_range = 1;  // morendo si perde anche il buff raggio
+    buff_timer = 0;
 }

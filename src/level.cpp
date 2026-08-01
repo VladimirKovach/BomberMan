@@ -30,7 +30,7 @@ DummyEnemy* Level::get_dummy_enemies() {
 SmartEnemy* Level::get_smart_enemies() {
     return smart_enemies;
 }
-/*
+
 Item* Level::get_items() {
     return items;
 }
@@ -45,7 +45,7 @@ bool Level::spawn_item(Position p, ItemType type) {
     }
     return false;  // nessuno slot disponibile
 }
-*/
+
 int Level::get_bombs_count() {
     int count = 0;
     for (int i = 0; i < MAX_BOMBS; i++) {
@@ -119,6 +119,8 @@ void Level::spawn_enemies() {
 }
 
 void Level::reset() {
+    completed = false;
+
     for (int i = 0; i < MAX_BOMBS; i++) {
         bombs[i].reset();
     }
@@ -128,12 +130,11 @@ void Level::reset() {
     for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
         smart_enemies[i].reset();
     }
-    /*
+
     // Gli item a terra vanno rimossi: la griglia torna allo stato iniziale
     // e i muri ripristinati potrebbero coprire item rimasti a terra
     for (int i = 0; i < MAX_ITEMS; i++) {
         items[i].reset();
     }
-    */
     map.reset();
 }

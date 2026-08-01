@@ -6,8 +6,6 @@
 #include "renderer.hpp"
 #include "utils.hpp"
 
-const int DELAY = 50;  // millisecondi
-
 // Probabilita' (in percentuale) che un drop di item avvenga
 const int WALL_DROP_CHANCE = 25;   // alla rottura di un muro
 const int ENEMY_DROP_CHANCE = 50;  // alla morte di un nemico
@@ -15,12 +13,13 @@ const int ENEMY_DROP_CHANCE = 50;  // alla morte di un nemico
 class Game {
 protected:
     bool quit;
-    int timer;  // tempo rimanente mostrato (include il bonus tempo)
+    int timer;  // tick rimanenti nella partita
 
     //double game_clock;  // orologio monotono decrescente per bombe, buff e nemici
     //double time_bonus;  // secondi accumulati dagli item tempo
 
     int score;
+    int level_start_score; // punteggio all'ingresso nel livello corrente
 
     LevelManager level_manager;
     Player player;
@@ -30,6 +29,7 @@ protected:
     bool win();
 
     void spawn_player(bool forward);
+    void player_death(Level& level);
 
     void update_timer();
 
@@ -38,7 +38,7 @@ protected:
     void handle_collisions();
 
     // Prova a generare un item di tipo casuale in p con probabilita' 'chance'
-    //void try_drop_item(Level& level, Position p, int chance);
+    void try_drop_item(Level& level, Position p, int chance);
 
 public:
     Game();

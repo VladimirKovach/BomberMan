@@ -12,19 +12,15 @@ void Game::spawn_player(bool forward) {
         spawn = {1, MAP_WIDTH - 2};  // vicino alla porta di uscita
     }
     player.set_position(spawn);
+
+    level_start_score = score;
 }
 
 Game::Game() {
     quit = false;
-    timer = 20000;  // 1000 secondi
-    
-    //game_clock = TIMER_START_VALUE;
-    //time_bonus = 0.0;
-    
+    timer = 300 *  TICKS_PER_SECOND;  // 300 secondi
     score = 0;
-
-    // Entra nel primo livello
-    //spawn_player(true);
+    level_start_score = 0;
 }
 
 bool Game::game_over() {
@@ -33,6 +29,14 @@ bool Game::game_over() {
 
 bool Game::win() {
     return level_manager.all_levels_completed();
+}
+
+// Il livello riparte com'era: muri, nemici, item e punteggio insieme
+void Game::player_death(Level& level) {
+    player.lose_life();
+    level.reset();
+    player.reset();
+    score = level_start_score;
 }
 
 void Game::update_timer() {
@@ -149,7 +153,7 @@ void Game::handle_collisions() {
     DummyEnemy* dummy_enemies = level.get_dummy_enemies();
     SmartEnemy* smart_enemies = level.get_smart_enemies();
 
-    /*
+
     Item* items = level.get_items();
 
     // Raccolta item (il giocatore ci cammina sopra)
@@ -157,7 +161,7 @@ void Game::handle_collisions() {
         if (items[i].is_active() && equal(player_p, items[i].get_position())) {
             switch (items[i].get_type()) {
                 case ITEM_RANGE:
-                    //player.apply_range_buff(items[i].get_duration(), game_clock);
+                    player.apply_range_buff(items[i].get_duration());
                     break;
 
                 case ITEM_LIFE:
@@ -165,7 +169,7 @@ void Game::handle_collisions() {
                     break;
 
                 case ITEM_TIME:
-                    time_bonus += TIME_BONUS;
+                    timer += TIME_BONUS;
                     break;
 
                 case ITEM_SCORE:
@@ -175,16 +179,14 @@ void Game::handle_collisions() {
             items[i].collect();
         }
     }
-    */
 
     // Collisioni giocatore-nemici
     for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
         if (!dummy_enemies[i].is_dead()) {
             Position dummy_enemy_p = dummy_enemies[i].get_position();
             if (equal(player_p, dummy_enemy_p)) {
-                player.lose_life();
-                level.reset();
-                player.reset();
+                player_death(level);
+                return;
             }
         }
     }
@@ -193,18 +195,16 @@ void Game::handle_collisions() {
         if (!smart_enemies[i].is_dead()) {
             Position smart_enemy_p = smart_enemies[i].get_position();
             if (equal(player_p, smart_enemy_p)) {
-                player.lose_life();
-                level.reset();
-                player.reset();
+                player_death(level);
+                return;
             }
         }
     }
 
     // Collisioni giocatore-esplosioni
     if (map.is_explosion(player_p)) {
-        player.lose_life();
-        level.reset();
-        player.reset();
+        player_death(level);
+        return;
     }
 
     // Collisioni muri-esplosioni
@@ -214,7 +214,7 @@ void Game::handle_collisions() {
             if (map.is_explosion(p) && map.get_cell(p) == BREAKABLE_WALL) {
                 map.set_cell({y, x}, EMPTY);
                 score++;
-                //try_drop_item(level, p, WALL_DROP_CHANCE);
+                try_drop_item(level, p, WALL_DROP_CHANCE);
             }
         }
     }
@@ -227,7 +227,7 @@ void Game::handle_collisions() {
                 dummy_enemies[i].kill();
                 score += 3;
                 if (dummy_enemies[i].is_dead()) {
-                    //try_drop_item(level, dummy_enemy_p, ENEMY_DROP_CHANCE);
+                    try_drop_item(level, dummy_enemy_p, ENEMY_DROP_CHANCE);
                 }
             }
         }
@@ -240,7 +240,7 @@ void Game::handle_collisions() {
                 smart_enemies[i].kill();
                 score += 5;
                 if (smart_enemies[i].is_dead()) {
-                    //try_drop_item(level, smart_enemy_p, ENEMY_DROP_CHANCE);
+                    try_drop_item(level, smart_enemy_p, ENEMY_DROP_CHANCE);
                 }
             }
         }
@@ -288,17 +288,17 @@ void Game::run() {
         handle_collisions();
 
         update_timer();
-        //player.update_buff(game_clock);
+        player.update_buff();
         level_manager.update_doors();
         level.update_bombs();
         level.update_enemies(player.get_position());
 
-        renderer.render(level_manager, player, score, (timer * DELAY) / 1000);
+        renderer.render(level_manager, player, score, timer / TICKS_PER_SECOND);
 
         napms(DELAY);
     }
 }
-/*
+
 void Game::try_drop_item(Level& level, Position p, int chance) {
     if (rand() % 100 < chance) {
         // Tipo casuale tra i quattro disponibili
@@ -316,7 +316,7 @@ void Game::try_drop_item(Level& level, Position p, int chance) {
         level.spawn_item(p, type);
     }
 }
-*/
+
 int Game::get_score() {
     return score;
 }
