@@ -11,8 +11,8 @@ void Renderer::init_colors() {
 
     //  ----- ADATTAMENTO DELLA GRAFICA PER WINDOWS -----
 
-    // su pdcurses (Windows) use_default_colors() fallisce e
-    // ogni init_pair che usa -1 viene ignorato, lasciando i caratteri bianco su nero
+    // su pdcurses (Windows) use_default_colors() fallisce e ogni init_pair che
+    // usa -1 viene ignorato, lasciando i caratteri bianco su nero
     short bg = COLOR_DEFAULT;
     if (use_default_colors() == ERR) {
         bg = COLOR_BLACK;
@@ -27,7 +27,6 @@ void Renderer::init_colors() {
     }
 
     //  -----------------------------------------------
-
 
     // COLOR_DEFAULT = -1 significa "usa lo sfondo nativo del terminale"
     init_pair(CP_SCREEN, bg, bg);
@@ -47,11 +46,18 @@ void Renderer::init_colors() {
 Renderer::Renderer() {
     getmaxyx(stdscr, max_y, max_x);
 
-    int center_y = (max_y - MAP_HEIGHT) / 2;
-    int center_x = (max_x - MAP_WIDTH) / 2;
-    map_start_p = {center_y, center_x};
+    map_start_y = (max_y - MAP_HEIGHT) / 2;
+    map_start_x = (max_x - MAP_WIDTH) / 2;
+
+    map_window = newwin(MAP_HEIGHT, MAP_WIDTH, map_start_y, map_start_x);
+    info_window = newwin(MAP_HEIGHT, 20, map_start_y, map_start_x + MAP_WIDTH + 2);
 
     init_colors();
+}
+
+Renderer::~Renderer() {
+    delwin(map_window);
+    delwin(info_window);
 }
 
 // Titolo in stile "banner" da vecchio terminale
@@ -66,12 +72,12 @@ const char* TITLE_BANNER[TITLE_ROWS] = {
 
 void Renderer::display_title() {
     int banner_w = 61;  // larghezza delle righe di TITLE_BANNER
-    int top = map_start_p.y - 2 - 1 - TITLE_ROWS;  // sopra la riga HUD, con una riga vuota
+    int top = map_start_y - 2 - TITLE_ROWS;  // sopra la riga HUD, con una riga vuota
 
     attron(COLOR_PAIR(CP_TITLE) | A_BOLD);
     if (top >= 0 && max_x >= banner_w) {
         // Centrato rispetto alla griglia (che a sua volta e' centrata)
-        int left = map_start_p.x + (MAP_WIDTH - banner_w) / 2;
+        int left = map_start_x + (MAP_WIDTH - banner_w) / 2;
         if (left < 0) {
             left = 0;
         }
@@ -79,33 +85,17 @@ void Renderer::display_title() {
             mvprintw(top + i, left, "%s", TITLE_BANNER[i]);
         }
     }
-    else if (map_start_p.y - 3 >= 0) {
+    else if (map_start_y - 3 >= 0) {
         // Terminale piccolo: titolo compatto
         const char* small_title = "B O M B E R M A N";
         int left = (max_x - 17) / 2;
-        mvprintw(map_start_p.y - 3, left, "%s", small_title);
+        mvprintw(map_start_y - 3, left, "%s", small_title);
     }
     attroff(COLOR_PAIR(CP_TITLE) | A_BOLD);
 }
 
-void Renderer::display_lives(int lives) {
-    move(map_start_p.y - 2, map_start_p.x);
-    printw("VITE: ");
-
-    // Disegno sempre MAX_LIVES slot: quelli persi diventano spazi,
-    // cosi' i rombi vecchi vengono cancellati dal frame precedente
-    for (int i = 0; i < MAX_LIVES; i++) {
-        chtype glyph = ' ';
-        if (i < lives) {
-            glyph = ACS_DIAMOND | COLOR_PAIR(CP_LIFE) | A_BOLD;
-        }
-        addch(glyph);
-        addch(' ');
-    }
-}
-
 void Renderer::display_effect(int buff_remaining) {
-    move(map_start_p.y - 1, map_start_p.x);
+    move(map_start_y - 1, map_start_x);
 
     char text[32] = "None";
     if (buff_remaining > 0) {
@@ -118,58 +108,38 @@ void Renderer::display_effect(int buff_remaining) {
     printw("EFFETTO: %-9s", text);
 }
 
-void Renderer::display_score(int score) {
-    const int SCORE_MAX_LENGTH = 6;         // fino a 999999
-    const int SCORE_LABEL_MAX_LENGTH = 13;  // length(SCORE: 999999) = 13
-    int x = map_start_p.x + MAP_WIDTH - SCORE_LABEL_MAX_LENGTH;
-    move(map_start_p.y - 1, x);
-    printw("SCORE: %-*d", SCORE_MAX_LENGTH, score);
-}
-
-void Renderer::display_time(int time) {
-    const int TIME_MAX_LENGTH = 4;         // length(1000) = 4
-    // Stessa colonna di partenza di SCORE (l'etichetta piu' larga), cosi'
-    // le due righe risultano incolonnate
-    const int HUD_RIGHT_LABEL_LENGTH = 13;  // length(SCORE: 999999) = 13
-    int x = map_start_p.x + MAP_WIDTH - HUD_RIGHT_LABEL_LENGTH;
-    move(map_start_p.y - 2, x);
-    printw("TIME: %-*d", TIME_MAX_LENGTH, time);
-}
-
 void Renderer::display_colors_debug() {
     // Info di debug sotto la griglia
-    if (map_start_p.y + MAP_HEIGHT < max_y) {
-        move(map_start_p.y + MAP_HEIGHT, map_start_p.x);
+    if (map_start_y + MAP_HEIGHT < max_y) {
+        move(map_start_y + MAP_HEIGHT, map_start_x);
         printw("COLORS: %d", COLORS);
     }
 }
 
-void Renderer::draw_map(Map& map) {
+void Renderer::draw_grid(Map& map) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
             Cell c = map.get_cell({y, x});
-            int ny = y + map_start_p.y;
-            int nx = x + map_start_p.x;
 
             switch (c) {
                 case BREAKABLE_WALL:
-                    mvaddch(ny, nx, ' ' | COLOR_PAIR(CP_BREAKABLE_WALL));
+                    mvwaddch(map_window, y, x, ' ' | COLOR_PAIR(CP_BREAKABLE_WALL));
                     break;
 
                 case UNBREAKABLE_WALL:
-                    mvaddch(ny, nx, ' ' | COLOR_PAIR(CP_UNBREAKABLE_WALL));
+                    mvwaddch(map_window, y, x, ' ' | COLOR_PAIR(CP_UNBREAKABLE_WALL));
                     break;
 
                 case ENTRANCE:
-                    mvaddch(ny, nx, '<' | COLOR_PAIR(CP_DOOR));
+                    mvwaddch(map_window, y, x, '<' | COLOR_PAIR(CP_DOOR));
                     break;
 
                 case EXIT:
-                    mvaddch(ny, nx, '>' | COLOR_PAIR(CP_DOOR));
+                    mvwaddch(map_window, y, x, '>' | COLOR_PAIR(CP_DOOR));
                     break;
 
                 default:
-                    mvaddch(ny, nx, ' ' | COLOR_PAIR(CP_SCREEN));
+                    mvwaddch(map_window, y, x, ' ' | COLOR_PAIR(CP_SCREEN));
                     break;
             }
         }
@@ -179,15 +149,13 @@ void Renderer::draw_map(Map& map) {
 void Renderer::draw_bombs(Bomb* bombs) {
     for (int i = 0; i < MAX_BOMBS; i++) {
         if (bombs[i].is_active()) {
-            Position bomb_p = bombs[i].get_position();
-            int y = bomb_p.y + map_start_p.y;
-            int x = bomb_p.x + map_start_p.x;
+            Position p = bombs[i].get_position();
 
             if (bombs[i].is_blinking()) {
-                mvaddch(y, x, 'O' | COLOR_PAIR(CP_BLINK));
+                mvwaddch(map_window, p.y, p.x, 'O' | COLOR_PAIR(CP_BLINK));
             }
             else {
-                mvaddch(y, x, 'O' | COLOR_PAIR(CP_BOMB));
+                mvwaddch(map_window, p.y, p.x, 'O' | COLOR_PAIR(CP_BOMB));
             }
             
         }
@@ -197,7 +165,7 @@ void Renderer::draw_bombs(Bomb* bombs) {
 void Renderer::draw_items(Item* items) {
     for (int i = 0; i < MAX_ITEMS; i++) {
         if (items[i].is_active()) {
-            Position item_p = items[i].get_position();
+            Position p = items[i].get_position();
 
             // chtype (non char): i simboli ACS_* sono definiti da ncurses
             // e non entrano in un singolo byte
@@ -220,28 +188,21 @@ void Renderer::draw_items(Item* items) {
                     break;
             }
 
-            int y = item_p.y + map_start_p.y;
-            int x = item_p.x + map_start_p.x;
-            mvaddch(y, x, glyph | COLOR_PAIR(CP_ITEM));
+            mvwaddch(map_window, p.y, p.x, glyph | COLOR_PAIR(CP_ITEM));
         }
     }
 }
 
-
-void Renderer::draw_player(Position player_p) {
-    int y = player_p.y + map_start_p.y;
-    int x = player_p.x + map_start_p.x;
-    mvaddch(y, x, '@' | COLOR_PAIR(CP_PLAYER));
+void Renderer::draw_player(Player& player) {
+    Position p = player.get_position();
+    mvwaddch(map_window, p.y, p.x, '@' | COLOR_PAIR(CP_PLAYER));
 }
 
 void Renderer::draw_dummy_enemies(DummyEnemy* dummy_enemies) {
     for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
         if (!dummy_enemies[i].is_dead()) {
-            Position dummy_p = dummy_enemies[i].get_position();
-
-            int y = dummy_p.y + map_start_p.y;
-            int x = dummy_p.x + map_start_p.x;
-            mvaddch(y, x, '?' | COLOR_PAIR(CP_ENEMY));
+            Position p = dummy_enemies[i].get_position();
+            mvwaddch(map_window, p.y, p.x, '?' | COLOR_PAIR(CP_ENEMY));
         }
     }
 }
@@ -249,11 +210,8 @@ void Renderer::draw_dummy_enemies(DummyEnemy* dummy_enemies) {
 void Renderer::draw_smart_enemies(SmartEnemy* smart_enemies) {
     for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
         if (!smart_enemies[i].is_dead()) {
-            Position smart_p = smart_enemies[i].get_position();
-
-            int y = smart_p.y + map_start_p.y;
-            int x = smart_p.x + map_start_p.x;
-            mvaddch(y, x, '!' | COLOR_PAIR(CP_ENEMY));
+            Position p = smart_enemies[i].get_position();
+            mvwaddch(map_window, p.y, p.x, '!' | COLOR_PAIR(CP_ENEMY));
         }
     }
 }
@@ -262,33 +220,62 @@ void Renderer::draw_explosions(Map& map) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
             if (map.is_explosion({y, x})) {
-                int ny = y + map_start_p.y;
-                int nx = x + map_start_p.x;
-                mvaddch(ny, nx, '*' | COLOR_PAIR(CP_EXPLOSION));
+                mvwaddch(map_window, y, x, '*' | COLOR_PAIR(CP_EXPLOSION));
             }
         }
     }
 }
 
+void Renderer::draw_map(Level& level, Player& player) {
+    werase(map_window);
 
-void Renderer::render(LevelManager& level_manager, Player& player, int score, int time) {
-    Level& level = level_manager.get_current_level();
-    Position player_p = player.get_position();
-
-    display_title();
-    display_lives(player.get_lives());
-    display_effect(player.get_buff_remaining());
-    display_score(score);
-    display_time(time);
-    //display_colors_debug();
-
-    draw_map(level.get_map());
+    draw_grid(level.get_map());
     draw_items(level.get_items());
     draw_bombs(level.get_bombs());
-    draw_player(player_p);
+    draw_player(player);
     draw_dummy_enemies(level.get_dummy_enemies());
     draw_smart_enemies(level.get_smart_enemies());
     draw_explosions(level.get_map());
 
-    refresh();
+    wnoutrefresh(map_window);
+}
+
+void Renderer::draw_info(Level& level, Player& player, int score, int time) {
+    werase(info_window);
+
+    box(info_window, 0, 0);
+
+    mvwprintw(info_window, 1, 1, "LEVEL: %d", level.get_number());
+
+    int lives = player.get_lives();
+    mvwprintw(info_window, 3, 1, "LIVES:");
+    for (int i = 0; i < lives; i++) {
+        waddch(info_window, ' ');
+        waddch(info_window, ACS_DIAMOND | COLOR_PAIR(CP_LIFE));
+    }
+
+    int bombs = player.get_bomb_slots() - level.get_bomb_count();
+    mvwprintw(info_window, 5, 1, "BOMBS:");
+    for (int i = 0; i < bombs; i++) {
+        waddch(info_window, ' ');
+        waddch(info_window, '*');
+    }
+
+    mvwprintw(info_window, 7, 1, "SCORE: %d", score);
+    mvwprintw(info_window, 9, 1, "TIME: %d", time);
+
+    wnoutrefresh(info_window);
+}
+
+void Renderer::render(LevelManager& level_manager, Player& player, int score, int time) {
+    Level& level = level_manager.get_current_level();
+
+    //display_title();
+    //display_effect(player.get_buff_remaining());
+    //display_colors_debug();
+
+    draw_map(level, player);
+    draw_info(level, player, score, time);
+
+    doupdate();
 }

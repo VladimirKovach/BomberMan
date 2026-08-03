@@ -4,31 +4,20 @@
 #include "utils.hpp"
 #include <cstdlib>
 
-SmartEnemy::SmartEnemy(Position _p, int _speed) : DummyEnemy(_p, _speed) {
-    player_p = {-1, -1};
-}
+SmartEnemy::SmartEnemy(Position _p, int _speed) : DummyEnemy(_p, _speed) {}
 
-void SmartEnemy::update_player_position(Position _player_p) {
-    player_p = _player_p;
+// distanza di Manhattan
+int SmartEnemy::distance(Position a, Position b) {
+    return abs(a.y - b.y) + abs(a.x - b.x);
 }
-
-// Distanza di Manhattan
-int SmartEnemy::get_player_distance(Position _p) {
-    int dx = (_p.x - player_p.x);
-    int dy = (_p.y - player_p.y);
-    return abs(dx) + abs(dy);
-}
-
 
 // selection sort: ordina i vicini in base alla distanza dal giocatore (greedy)
-void SmartEnemy::plan_move() {
+void SmartEnemy::sort_neighbors(Position player_p) {
     for (int i = 0; i < NEIGHBORS_COUNT - 1; i++) {
         int min = i;
 
         for (int j = i + 1; j < NEIGHBORS_COUNT; j++) {
-            Position min_p = neighbors[min];
-            Position np = neighbors[j];
-            if (get_player_distance(np) < get_player_distance(min_p)) {
+            if (distance(neighbors[j], player_p) < distance(neighbors[min], player_p)) {
                 min = j;
             }
         }
@@ -41,30 +30,28 @@ void SmartEnemy::plan_move() {
     }
 }
 
-
 // evita esplosioni
-bool SmartEnemy::is_valid_move(Map& map, Position _p) {
-    return DummyEnemy::is_valid_move(map, _p) && !map.is_explosion(_p);
+bool SmartEnemy::can_move(Map& map, Position _p) {
+    return DummyEnemy::can_move(map, _p) && !map.is_explosion(_p);
 }
 
 void SmartEnemy::move(Map& map) {
     for (int i = 0; i < NEIGHBORS_COUNT; i++) {
-        if (is_valid_move(map, neighbors[i])) {
+        if (can_move(map, neighbors[i])) {
             p = neighbors[i];
             return;
         }
     }
 }
 
-void SmartEnemy::update(Map& map, Position _player_p) {
+void SmartEnemy::update(Map& map, Position player_p) {
     if (move_timer > 0) {
         move_timer--;
     }
 
-    if (move_timer <= 0) {
-        update_neighbors();
-        update_player_position(_player_p);
-        plan_move();
+    if (move_timer == 0) {
+        DummyEnemy::update_neighbors();
+        sort_neighbors(player_p);
         move(map);
 
         move_timer = TICKS_PER_SECOND / speed;

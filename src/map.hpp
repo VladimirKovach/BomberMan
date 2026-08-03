@@ -10,6 +10,7 @@ enum Cell {
     UNBREAKABLE_WALL,
     ENTRANCE,
     EXIT,
+    BOMB,
 };
 
 const int MAP_HEIGHT = 21;
@@ -33,8 +34,6 @@ protected:
 
     void place_breakable_walls(int percentage);
 
-    bool out_of_bounds(Position p);
-
 public:
     Map(int difficulty = 1);
 
@@ -44,8 +43,10 @@ public:
     Cell get_cell(Position p);
     void set_cell(Position p, Cell c);
 
+    bool out_of_bounds(Position p);
     bool is_wall(Position p);
     bool is_door(Position p);
+    bool is_bomb(Position p);
 
     // Gestione esplosioni
     bool is_explosion(Position p);

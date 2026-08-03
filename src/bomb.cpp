@@ -51,7 +51,8 @@ bool Bomb::is_blinking() {
     return blinking;
 }
 
-void Bomb::place(Position _p, int _range) {
+void Bomb::place(Map& map, Position _p, int _range) {
+    map.set_cell(_p, BOMB);
     p = _p;
     range = _range;
 
@@ -87,6 +88,7 @@ void Bomb::update(Map& map) {
 
         if (bomb_timer == 0) {
             explode(map);
+            map.set_cell(p, EMPTY);
         }
     }
     else {

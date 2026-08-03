@@ -15,7 +15,7 @@ const int MAX_ITEMS = 10;
 
 class Level {
 protected:
-    int difficulty;
+    int number;
     bool completed;
 
     Map map;
@@ -26,8 +26,9 @@ protected:
     Item items[MAX_ITEMS];
 
 public:
-    Level(int _difficulty = 1);
+    Level(int _number = 1);
 
+    int get_number();
     bool is_completed();
 
     Map& get_map();
@@ -40,7 +41,7 @@ public:
     // Restituisce true se l'item e' stato posizionato.
     bool spawn_item(Position p, ItemType type);
 
-    int get_bombs_count();
+    int get_bomb_count();
     bool all_enemies_dead();
 
     void update_bombs();

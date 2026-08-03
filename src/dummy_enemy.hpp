@@ -1,5 +1,5 @@
-#ifndef ENEMY_HPP
-#define ENEMY_HPP
+#ifndef DUMMY_ENEMY_HPP
+#define DUMMY_ENEMY_HPP
 
 #include "map.hpp"
 #include "utils.hpp"
@@ -20,9 +20,9 @@ protected:
     Position neighbors[NEIGHBORS_COUNT];
 
     void update_neighbors();
+    void shuffle_neighbors();
 
-    void plan_move();
-    bool is_valid_move(Map& map, Position _p);
+    bool can_move(Map& map, Position _p);
     void move(Map& map);
 
 public:

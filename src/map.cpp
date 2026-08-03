@@ -48,10 +48,6 @@ void Map::place_breakable_walls(int percentage) {
     grid[2][1] = EMPTY;
 }
 
-bool Map::out_of_bounds(Position p) {
-    return p.y < 0 || p.y >= MAP_HEIGHT || p.x < 0 || p.x >= MAP_WIDTH;
-}
-
 Map::Map(int difficulty) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
@@ -60,20 +56,22 @@ Map::Map(int difficulty) {
         }
     }
 
-    // muri indistruttibili esterni
+    // muri indistruttibili esterni (a destra e a sinistra)
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        grid[y][0] = UNBREAKABLE_WALL;
+        grid[y][MAP_WIDTH - 1] = UNBREAKABLE_WALL;
+    }
+
+    // muri indistruttibili esterni (in alto e in basso)
     for (int x = 0; x < MAP_WIDTH; x++) {
         grid[0][x] = UNBREAKABLE_WALL;
         grid[MAP_HEIGHT - 1][x] = UNBREAKABLE_WALL;
-    }
-    for (int y = 1; y < MAP_HEIGHT - 1; y++) {
-        grid[y][0] = UNBREAKABLE_WALL;
-        grid[y][MAP_WIDTH - 1] = UNBREAKABLE_WALL;
     }
 
     // muri indistruttibili interni (pattern a scacchiera con buchi)
     for (int y = 1; y < MAP_HEIGHT - 1; y++) {
         for (int x = 1; x < MAP_WIDTH - 1; x++) {
-            if (y % 2 == 0 && x % 2 == 0 && rand() % 2 == 0) {
+            if (y % 2 == 0 && x % 2 == 0) {
                 grid[y][x] = UNBREAKABLE_WALL;
             }
         }
@@ -120,6 +118,10 @@ void Map::set_cell(Position p, Cell c) {
     }
 }
 
+bool Map::out_of_bounds(Position p) {
+    return p.y < 0 || p.y >= MAP_HEIGHT || p.x < 0 || p.x >= MAP_WIDTH;
+}
+
 bool Map::is_wall(Position p) {
     if (out_of_bounds(p)) {
         return false;
@@ -136,6 +138,10 @@ bool Map::is_door(Position p) {
 
     Cell c = grid[p.y][p.x];
     return c == ENTRANCE || c == EXIT;
+}
+
+bool Map::is_bomb(Position p) {
+    return !out_of_bounds(p) && grid[p.y][p.x] == BOMB;
 }
 
 bool Map::is_explosion(Position p) {

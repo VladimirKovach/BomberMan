@@ -5,21 +5,12 @@
 Player::Player(Position _p, int _lives) {
     p = _p;
     start_p = _p;
+
     lives = _lives;
-    bomb_range = 1;
-    buff_timer = 0;  // nessun buff attivo all'inizio
 
     bomb_slots = 1;
-}
-
-int Player::get_bomb_slots() {
-    return bomb_slots;
-}
-
-void Player::increase_bomb_slots() {
-    if (bomb_slots < 3) {
-        bomb_slots++;
-    }
+    bomb_range = 1;
+    buff_timer = 0;  // nessun buff attivo all'inizio
 }
 
 Position Player::get_position() {
@@ -48,13 +39,27 @@ void Player::lose_life() {
 }
 
 bool Player::is_dead() {
-    return lives <= 0;
+    return lives == 0;
+}
+
+bool Player::can_move(Map& map, Position _p) {
+    return !map.out_of_bounds(_p) && !map.is_wall(_p) && !map.is_bomb(_p);
 }
 
 void Player::move(Map& map, Direction d) {
     Position next = next_position(p, d);
-    if (!map.is_wall(next)) {
+    if (can_move(map, next)) {
         p = next;
+    }
+}
+
+int Player::get_bomb_slots() {
+    return bomb_slots;
+}
+
+void Player::increase_bomb_slots() {
+    if (bomb_slots < MAX_BOMB_SLOTS) {
+        bomb_slots++;
     }
 }
 
@@ -84,6 +89,7 @@ void Player::update_buff() {
 
 void Player::reset() {
     p = start_p;
+    bomb_slots = 1;
     bomb_range = 1;  // morendo si perde anche il buff raggio
     buff_timer = 0;
 }

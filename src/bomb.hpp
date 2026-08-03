@@ -33,7 +33,7 @@ public:
     bool is_exploding();
     bool is_blinking();
 
-    void place(Position _p, int _range);
+    void place(Map& map, Position _p, int _range);
 
     void explode(Map& map);
 

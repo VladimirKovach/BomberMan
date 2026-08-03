@@ -19,8 +19,8 @@ add_executable(BomberMan
         src/game.cpp
         src/item.cpp
         src/leaderboard.cpp
-        src/level.cpp
         src/level_manager.cpp
+        src/level.cpp
         src/map.cpp
         src/menu.cpp
         src/player.cpp

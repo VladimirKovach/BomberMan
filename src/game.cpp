@@ -53,7 +53,6 @@ bool Game::bomb_under_player() {
     return false;
 }
 
-
 void Game::handle_input() {
     Level& level = level_manager.get_current_level();
     Map& map = level.get_map();
@@ -83,7 +82,7 @@ void Game::handle_input() {
                 Bomb* bombs = level.get_bombs();
                 Position player_p = player.get_position();
 
-                if (level.get_bombs_count() < player.get_bomb_slots() && !bomb_under_player()) {
+                if (level.get_bomb_count() < player.get_bomb_slots() && !bomb_under_player()) {
                     int i = 0;
 
                     while (i < MAX_BOMBS && bombs[i].is_active()) {
@@ -91,7 +90,7 @@ void Game::handle_input() {
                     }
 
                     if (i < MAX_BOMBS) {
-                        bombs[i].place(player_p, player.get_bomb_range());
+                        bombs[i].place(map, player_p, player.get_bomb_range());
                     }
                 }
                 break;
@@ -129,17 +128,15 @@ void Game::handle_input() {
             player.move(map, RIGHT);
             break;
 
-        /*
+        // debugging
         case '+':
             player.increase_bomb_slots();
             break;
-        */
 
         default:
             break;
     }
 }
-
 
 void Game::handle_collisions() {
     Position player_p = player.get_position();
@@ -275,7 +272,6 @@ void Game::handle_collisions() {
         }
     }
 }
-
 
 void Game::run() {
     while (!game_over() && !win() && !quit) {

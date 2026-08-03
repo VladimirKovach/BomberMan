@@ -4,6 +4,7 @@
 #include "level_manager.hpp"
 #include "player.hpp"
 #include "utils.hpp"
+#include <ncurses.h>
 
 enum {
     COLOR_DEFAULT = -1,
@@ -22,34 +23,38 @@ enum {
     CP_EXPLOSION,
     CP_BLINK,
     CP_ITEM,
-    CP_LIFE,  // rombi rossi delle vite nell'HUD
-    CP_TITLE  // titolo bianco in alto
+    CP_LIFE,   // rombi rossi delle vite
+    CP_TITLE,  // titolo bianco in alto
 };
 
 class Renderer {
 protected:
-    Position map_start_p;
+    int map_start_y, map_start_x;
     int max_y, max_x;
+
+    WINDOW* map_window;
+    WINDOW* info_window;
 
     void init_colors();
 
     void display_title();
-    void display_lives(int lives);
     void display_effect(int buff_remaining);
-    void display_score(int score);
-    void display_time(int time);
     void display_colors_debug();
 
-    void draw_map(Map& map);
+    void draw_grid(Map& map);
     void draw_bombs(Bomb* bombs);
     void draw_items(Item* items);
-    void draw_player(Position player_p);
+    void draw_player(Player& player);
     void draw_dummy_enemies(DummyEnemy* dummy_enemies);
     void draw_smart_enemies(SmartEnemy* smart_enemies);
     void draw_explosions(Map& map);
 
+    void draw_map(Level& level, Player& player);
+    void draw_info(Level& level, Player& player, int score, int time);
+
 public:
     Renderer();
+    ~Renderer();
 
     void render(LevelManager& level_manager, Player& player, int score, int time);
 };

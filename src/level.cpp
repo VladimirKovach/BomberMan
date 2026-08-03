@@ -5,10 +5,14 @@
 #include "smart_enemy.hpp"
 #include "utils.hpp"
 
-Level::Level(int _difficulty) {
-    difficulty = _difficulty;
+Level::Level(int _number) {
+    number = _number;
     completed = false;
-    map = Map(_difficulty);
+    map = Map(number);
+}
+
+int Level::get_number() {
+    return number;
 }
 
 bool Level::is_completed() {
@@ -46,7 +50,7 @@ bool Level::spawn_item(Position p, ItemType type) {
     return false;  // nessuno slot disponibile
 }
 
-int Level::get_bombs_count() {
+int Level::get_bomb_count() {
     int count = 0;
     for (int i = 0; i < MAX_BOMBS; i++) {
         if (bombs[i].is_active()) {
@@ -107,12 +111,12 @@ void Level::update_enemies(Position player_p) {
 
 
 void Level::spawn_enemies() {
-    for (int i = 0; i < difficulty; i++) {
+    for (int i = 0; i < number; i++) {
         Position spawn_p = map.get_random_spawn();
         dummy_enemies[i] = DummyEnemy(spawn_p, 1);
     }
 
-    for (int i = 0; i < difficulty; i++) {
+    for (int i = 0; i < number; i++) {
         Position spawn_p = map.get_random_spawn();
         smart_enemies[i] = SmartEnemy(spawn_p, 2);
     }
