@@ -5,35 +5,36 @@
 #include "player.hpp"
 #include "utils.hpp"
 
-const int BOMB_TIMER_START = 3 * TICKS_PER_SECOND;
-const int EXPLOSION_TIMER_START = 2 * TICKS_PER_SECOND;
-const int BLINK_TIMER_START = TICKS_PER_SECOND / 2;
+const int BLINKING_TIMER_START = TICKS_PER_SECOND / 4;   // 0.25 secondi
+const int EXPLODING_TIMER_START = TICKS_PER_SECOND * 2;  // 2.00 secondi
+const int EXPLOSION_TIMER_START = TICKS_PER_SECOND / 2;  // 0.50 secondi
 
 class Bomb {
-protected:
-    Position p;
-    int range;
+private:
+    Position _p;
+    int _range;
 
-    bool active;
-    bool exploding;
-    bool blinking;
+    bool _active;
+    bool _blinking;
+    bool _exploding;
 
-    int bomb_timer;
-    int explosion_timer;
-    int blink_timer;
+    int _blinking_timer;
+    int _exploding_timer;
+    int _explosion_timer;
 
     void update_explosion(Map& map, Direction d, bool set);
 
 public:
-    Bomb(Position _p = {-1, -1}, int _range = 1);
+    Bomb(Position p = {-1, -1}, int range = 1);
 
     Position get_position();
+    int get_range();
 
     bool is_active();
-    bool is_exploding();
     bool is_blinking();
+    bool is_exploding();
 
-    void place(Map& map, Position _p, int _range);
+    void place(Map& map, Position p, int range);
 
     void explode(Map& map);
 

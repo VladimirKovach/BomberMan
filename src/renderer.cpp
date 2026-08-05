@@ -36,7 +36,7 @@ void Renderer::init_colors() {
     init_pair(CP_PLAYER, COLOR_CYAN, bg);
     init_pair(CP_ENEMY, COLOR_RED, bg);
     init_pair(CP_BOMB, COLOR_RED, bg);
-    init_pair(CP_EXPLOSION, COLOR_YELLOW, COLOR_RED);
+    init_pair(CP_EXPLOSION, COLOR_RED, COLOR_RED);
     init_pair(CP_BLINK, COLOR_WHITE, bg);
     init_pair(CP_ITEM, COLOR_MAGENTA, bg);
     init_pair(CP_LIFE, COLOR_RED, bg);
@@ -198,20 +198,20 @@ void Renderer::draw_player(Player& player) {
     mvwaddch(map_window, p.y, p.x, '@' | COLOR_PAIR(CP_PLAYER));
 }
 
-void Renderer::draw_dummy_enemies(DummyEnemy* dummy_enemies) {
-    for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
-        if (!dummy_enemies[i].is_dead()) {
-            Position p = dummy_enemies[i].get_position();
-            mvwaddch(map_window, p.y, p.x, '?' | COLOR_PAIR(CP_ENEMY));
+void Renderer::draw_roamers(Roamer* roamers) {
+    for (int i = 0; i < MAX_ROAMERS; i++) {
+        if (!roamers[i].is_dead()) {
+            Position p = roamers[i].get_position();
+            mvwaddch(map_window, p.y, p.x, 'R' | COLOR_PAIR(CP_ENEMY));
         }
     }
 }
 
-void Renderer::draw_smart_enemies(SmartEnemy* smart_enemies) {
-    for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
-        if (!smart_enemies[i].is_dead()) {
-            Position p = smart_enemies[i].get_position();
-            mvwaddch(map_window, p.y, p.x, '!' | COLOR_PAIR(CP_ENEMY));
+void Renderer::draw_walkers(Walker* walkers) {
+    for (int i = 0; i < MAX_WALKERS; i++) {
+        if (!walkers[i].is_dead()) {
+            Position p = walkers[i].get_position();
+            mvwaddch(map_window, p.y, p.x, 'W' | COLOR_PAIR(CP_ENEMY));
         }
     }
 }
@@ -220,7 +220,7 @@ void Renderer::draw_explosions(Map& map) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
             if (map.is_explosion({y, x})) {
-                mvwaddch(map_window, y, x, '*' | COLOR_PAIR(CP_EXPLOSION));
+                mvwaddch(map_window, y, x, ' ' | COLOR_PAIR(CP_EXPLOSION));
             }
         }
     }
@@ -233,8 +233,8 @@ void Renderer::draw_map(Level& level, Player& player) {
     draw_items(level.get_items());
     draw_bombs(level.get_bombs());
     draw_player(player);
-    draw_dummy_enemies(level.get_dummy_enemies());
-    draw_smart_enemies(level.get_smart_enemies());
+    draw_roamers(level.get_roamers());
+    draw_walkers(level.get_walkers());
     draw_explosions(level.get_map());
 
     wnoutrefresh(map_window);

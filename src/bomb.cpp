@@ -4,12 +4,12 @@
 #include "utils.hpp"
 
 void Bomb::update_explosion(Map& map, Direction d, bool set) {
-    Position target = p;
+    Position target = _p;
 
-    for (int i = 0; i < range; i++) {
+    for (int i = 0; i < _range; i++) {
         target = next_position(target, d);
 
-        if (map.get_cell(target) == UNBREAKABLE_WALL) {
+        if (map.out_of_bounds(target) || map.get_cell(target) == UNBREAKABLE_WALL) {
             return;
         }
 
@@ -22,82 +22,88 @@ void Bomb::update_explosion(Map& map, Direction d, bool set) {
     }
 }
 
-Bomb::Bomb(Position _p, int _range) {
-    p = _p;
-    range = _range;
+Bomb::Bomb(Position p, int range) {
+    _p = p;
+    _range = range;
 
-    active = false;
-    exploding = false;
-    blinking = false;
+    _active = false;
+    _blinking = false;
+    _exploding = false;
 
-    bomb_timer = BOMB_TIMER_START;
-    explosion_timer = EXPLOSION_TIMER_START;
-    blink_timer = BLINK_TIMER_START;
+    _blinking_timer = BLINKING_TIMER_START;
+    _exploding_timer = EXPLODING_TIMER_START;
+    _explosion_timer = EXPLOSION_TIMER_START;
 }
 
 Position Bomb::get_position() {
-    return p;
+    return _p;
+}
+
+int Bomb::get_range() {
+    return _range;
 }
 
 bool Bomb::is_active() {
-    return active;
-}
-
-bool Bomb::is_exploding() {
-    return exploding;
+    return _active;
 }
 
 bool Bomb::is_blinking() {
-    return blinking;
+    return _blinking;
 }
 
-void Bomb::place(Map& map, Position _p, int _range) {
-    map.set_cell(_p, BOMB);
-    p = _p;
-    range = _range;
+bool Bomb::is_exploding() {
+    return _exploding;
+}
 
-    active = true;
+void Bomb::place(Map& map, Position p, int range) {
+    _p = p;
+    _range = range;
+
+    _active = true;
+
+    map.set_cell(_p, BOMB);
 }
 
 void Bomb::explode(Map& map) {
-    exploding = true;
+    _exploding = true;
 
     // Esplosione al centro
-    map.set_explosion(p);
+    map.set_explosion(_p);
 
     // Esplosione nelle 4 direzioni (croce)
     update_explosion(map, UP, true);
     update_explosion(map, LEFT, true);
     update_explosion(map, DOWN, true);
     update_explosion(map, RIGHT, true);
+
+    map.set_cell(_p, EMPTY);
 }
 
 void Bomb::update(Map& map) {
-    if (!exploding) {
-        if (blink_timer > 0) {
-            blink_timer--;
+    if (!_exploding) {
+        if (_blinking_timer > 0) {
+            _blinking_timer--;
         }
-        if (bomb_timer > 0) {
-            bomb_timer--;
-        }
-
-        if (blink_timer == 0) {
-            blinking = !blinking;
-            blink_timer = BLINK_TIMER_START;
+        if (_exploding_timer > 0) {
+            _exploding_timer--;
         }
 
-        if (bomb_timer == 0) {
+        if (_blinking_timer == 0) {
+            _blinking = !_blinking;
+            _blinking_timer = BLINKING_TIMER_START;
+        }
+
+        if (_exploding_timer == 0) {
             explode(map);
-            map.set_cell(p, EMPTY);
         }
     }
     else {
-        if (explosion_timer > 0) {
-            explosion_timer--;
+        if (_explosion_timer > 0) {
+            _explosion_timer--;
         }
 
-        if (explosion_timer == 0) {
-            map.unset_explosion(p);
+        if (_explosion_timer == 0) {
+            map.unset_explosion(_p);
 
             update_explosion(map, UP, false);
             update_explosion(map, LEFT, false);
@@ -110,11 +116,11 @@ void Bomb::update(Map& map) {
 }
 
 void Bomb::reset() {
-    active = false;
-    exploding = false;
-    blinking = false;
+    _active = false;
+    _blinking = false;
+    _exploding = false;
 
-    bomb_timer = BOMB_TIMER_START;
-    explosion_timer = EXPLOSION_TIMER_START;
-    blink_timer = BLINK_TIMER_START;
+    _blinking_timer = BLINKING_TIMER_START;
+    _exploding_timer = EXPLODING_TIMER_START;
+    _explosion_timer = EXPLOSION_TIMER_START;
 }

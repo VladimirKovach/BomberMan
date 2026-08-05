@@ -143,8 +143,8 @@ void Game::handle_collisions() {
     Level& level = level_manager.get_current_level();
     Map& map = level.get_map();
     Bomb* bombs = level.get_bombs();
-    DummyEnemy* dummy_enemies = level.get_dummy_enemies();
-    SmartEnemy* smart_enemies = level.get_smart_enemies();
+    Roamer* roamers = level.get_roamers();
+    Walker* walkers = level.get_walkers();
     Item* items = level.get_items();
 
     // Collisioni giocatore-porte
@@ -196,20 +196,20 @@ void Game::handle_collisions() {
     }
 
     // Collisioni giocatore-nemici
-    for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
-        if (!dummy_enemies[i].is_dead()) {
-            Position dummy_enemy_p = dummy_enemies[i].get_position();
-            if (equal(player_p, dummy_enemy_p)) {
+    for (int i = 0; i < MAX_ROAMERS; i++) {
+        if (!roamers[i].is_dead()) {
+            Position roamer_p = roamers[i].get_position();
+            if (equal(player_p, roamer_p)) {
                 player_death(level);
                 return;
             }
         }
     }
 
-    for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
-        if (!smart_enemies[i].is_dead()) {
-            Position smart_enemy_p = smart_enemies[i].get_position();
-            if (equal(player_p, smart_enemy_p)) {
+    for (int i = 0; i < MAX_WALKERS; i++) {
+        if (!walkers[i].is_dead()) {
+            Position walker_p = walkers[i].get_position();
+            if (equal(player_p, walker_p)) {
                 player_death(level);
                 return;
             }
@@ -235,27 +235,27 @@ void Game::handle_collisions() {
     }
 
     // Collisioni nemici-esplosioni
-    for (int i = 0; i < MAX_DUMMY_ENEMIES; i++) {
-        if (!dummy_enemies[i].is_dead()) {
-            Position dummy_enemy_p = dummy_enemies[i].get_position();
-            if (map.is_explosion(dummy_enemy_p)) {
-                dummy_enemies[i].kill();
+    for (int i = 0; i < MAX_WALKERS; i++) {
+        if (!walkers[i].is_dead()) {
+            Position walker_p = walkers[i].get_position();
+            if (map.is_explosion(walker_p)) {
+                walkers[i].kill();
                 score += 3;
-                if (dummy_enemies[i].is_dead()) {
-                    try_drop_item(level, dummy_enemy_p, ENEMY_DROP_CHANCE);
+                if (walkers[i].is_dead()) {
+                    try_drop_item(level, walker_p, ENEMY_DROP_CHANCE);
                 }
             }
         }
     }
 
-    for (int i = 0; i < MAX_SMART_ENEMIES; i++) {
-        if (!smart_enemies[i].is_dead()) {
-            Position smart_enemy_p = smart_enemies[i].get_position();
-            if (map.is_explosion(smart_enemy_p)) {
-                smart_enemies[i].kill();
+    for (int i = 0; i < MAX_ROAMERS; i++) {
+        if (!roamers[i].is_dead()) {
+            Position roamer_p = roamers[i].get_position();
+            if (map.is_explosion(roamer_p)) {
+                roamers[i].kill();
                 score += 5;
-                if (smart_enemies[i].is_dead()) {
-                    try_drop_item(level, smart_enemy_p, ENEMY_DROP_CHANCE);
+                if (roamers[i].is_dead()) {
+                    try_drop_item(level, roamer_p, ENEMY_DROP_CHANCE);
                 }
             }
         }

@@ -11,6 +11,7 @@ enum Cell {
     ENTRANCE,
     EXIT,
     BOMB,
+    ITEM,
 };
 
 const int MAP_HEIGHT = 21;
@@ -47,6 +48,7 @@ public:
     bool is_wall(Position p);
     bool is_door(Position p);
     bool is_bomb(Position p);
+    bool is_item(Position p);
 
     // Gestione esplosioni
     bool is_explosion(Position p);

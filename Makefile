@@ -1,5 +1,5 @@
-bomberman: main.o bomb.o dummy_enemy.o game.o item.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o smart_enemy.o utils.o
-	g++ main.o bomb.o dummy_enemy.o game.o item.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o smart_enemy.o utils.o -lncurses -o bomberman
+bomberman: main.o bomb.o dummy_enemy.o game.o item.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o smart_enemy.o utils.o enemy.o roamer.o walker.o
+	g++ main.o bomb.o dummy_enemy.o game.o item.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o smart_enemy.o utils.o enemy.o roamer.o walker.o -lncurses -o bomberman
 main.o: src/main.cpp src/game.hpp src/menu.hpp
 	g++ -c src/main.cpp
 
@@ -41,6 +41,16 @@ smart_enemy.o: src/smart_enemy.cpp src/smart_enemy.hpp src/dummy_enemy.hpp src/m
 
 utils.o: src/utils.cpp src/utils.hpp
 	g++ -c src/utils.cpp
+
+
+enemy.o: src/enemy.cpp src/enemy.hpp
+	g++ -c src/enemy.cpp
+
+roamer.o: src/roamer.cpp src/roamer.hpp
+	g++ -c src/roamer.cpp
+
+walker.o: src/walker.cpp src/walker.hpp
+	g++ -c src/walker.cpp
 
 clean:
 	rm -f *.o

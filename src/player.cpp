@@ -90,6 +90,6 @@ void Player::update_buff() {
 void Player::reset() {
     p = start_p;
     bomb_slots = 1;
-    bomb_range = 1;  // morendo si perde anche il buff raggio
+    bomb_range = 1;
     buff_timer = 0;
 }
