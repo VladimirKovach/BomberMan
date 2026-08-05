@@ -2,32 +2,6 @@
 #include "utils.hpp"
 #include <cstdlib>
 
-/*
-void set_explosion(Position center, int range) {
-    explosion[center.y][center.x] = true;
-
-    for (int i = 1; i <= range; i++) {
-        Position target_up = {center.y - i, center.x};
-        Position target_left = {center.y, center.x - 1};
-        Position target_down = {center.y + 1, center.x};
-        Position target_right = {center.y, center.x + 1};
-    
-        if (!out_of_bounds(target_up) && get_cell(target_up) != UNBREAKABLE_WALL) {
-            explosion[target_up.y][target_up.x] = true;
-        }
-        if (!out_of_bounds(target_left) && get_cell(target_left) != UNBREAKABLE_WALL) {
-            explosion[target_left.y][target_left.x] = true;
-        }
-        if (!out_of_bounds(target_down) && get_cell(target_down) != UNBREAKABLE_WALL) {
-            explosion[target_down.y][target_down.x] = true;
-        }
-        if (!out_of_bounds(target_right) && get_cell(target_right) != UNBREAKABLE_WALL) {
-            explosion[target_right.y][target_right.x] = true;
-        }
-    }
-}
-*/
-
 void Map::get_spawns() {
     spawns_count = 0;
 
@@ -97,7 +71,7 @@ Map::Map(int difficulty) {
     // muri indistruttibili interni (pattern a scacchiera con buchi)
     for (int y = 1; y < MAP_HEIGHT - 1; y++) {
         for (int x = 1; x < MAP_WIDTH - 1; x++) {
-            if (y % 2 == 0 && x % 2 == 0) {
+            if (y % 2 == 0 && x % 2 == 0 && rand() % 2 == 0) {
                 grid[y][x] = UNBREAKABLE_WALL;
             }
         }
