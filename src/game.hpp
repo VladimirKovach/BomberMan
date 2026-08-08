@@ -20,7 +20,7 @@ protected:
     Player player;
     Renderer renderer;
 
-    bool game_over();
+    bool lose();
     bool win();
 
     void spawn_player(bool forward);
@@ -28,7 +28,6 @@ protected:
 
     void update_timer();
 
-    bool bomb_under_player();
     void handle_input();
     void handle_collisions();
 

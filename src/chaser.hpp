@@ -10,7 +10,7 @@ private:
 public:
     Chaser(Position p = {-1, -1}, int speed = 1);
 
-    void update(Map& map);
+    void update(Map& map, Position player_p);
 };
 
 #endif

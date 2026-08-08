@@ -10,27 +10,27 @@ const int MAX_BOMB_SLOTS = 3;
 
 class Player {
 protected:
-    Position p;
-    Position start_p;
+    Position _p;
+    Position _start_p;
 
-    int lives;
+    int _lives;
 
-    int bomb_slots;
-    int bomb_range;   // raggio corrente delle bombe (1 = base)
-    int buff_timer;   // tick rimanenti del buff raggio (0 = nessun buff)
+    int _bomb_slots;
+    int _bomb_range;   // raggio corrente delle bombe (1 = base)
+    int _buff_timer;   // tick rimanenti del buff raggio (0 = nessun buff)
 
 public:
-    Player(Position _p = {1, 1}, int _lives = 3);
+    Player(Position p = {1, 1}, int lives = 3);
 
     Position get_position();
-    void set_position(Position _p);
+    void set_position(Position p);
 
     int get_lives();
     void gain_life();
     void lose_life();
     bool is_dead();
 
-    bool can_move(Map& map, Position _p);
+    bool can_move_to(Map& map, Position p);
     void move(Map& map, Direction d);
 
     int get_bomb_slots();

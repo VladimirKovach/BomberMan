@@ -2,94 +2,95 @@
 #include "map.hpp"
 #include "utils.hpp"
 
-Player::Player(Position _p, int _lives) {
-    p = _p;
-    start_p = _p;
+Player::Player(Position p, int lives) {
+    _p = p;
+    _start_p = p;
 
-    lives = _lives;
+    _lives = lives;
 
-    bomb_slots = 1;
-    bomb_range = 1;
-    buff_timer = 0;  // nessun buff attivo all'inizio
+    _bomb_slots = 1;
+    _bomb_range = 1;
+    _buff_timer = 0;  // nessun buff attivo all'inizio
 }
 
 Position Player::get_position() {
-    return p;
+    return _p;
 }
 
-void Player::set_position(Position _p) {
-    p = _p;
-    start_p = _p;
+void Player::set_position(Position p) {
+    _p = p;
+    _start_p = p;
 }
 
 int Player::get_lives() {
-    return lives;
+    return _lives;
 }
 
 void Player::gain_life() {
-    if (lives < MAX_LIVES) {
-        lives++;
+    if (_lives < MAX_LIVES) {
+        _lives++;
     }
 }
 
 void Player::lose_life() {
-    if (lives > 0) {
-        lives--;
+    if (_lives > 0) {
+        _lives--;
     }
 }
 
 bool Player::is_dead() {
-    return lives == 0;
+    return _lives == 0;
 }
 
-bool Player::can_move(Map& map, Position _p) {
-    return !map.out_of_bounds(_p) && !map.is_wall(_p) && !map.is_bomb(_p);
+bool Player::can_move_to(Map& map, Position p) {
+    return !map.out_of_bounds(p) && !map.is_wall(p) && !map.is_bomb(p);
 }
 
 void Player::move(Map& map, Direction d) {
-    Position next = next_position(p, d);
-    if (can_move(map, next)) {
-        p = next;
+    Position next = next_position(_p, d);
+    if (can_move_to(map, next)) {
+        _p = next;
     }
 }
 
 int Player::get_bomb_slots() {
-    return bomb_slots;
+    return _bomb_slots;
 }
 
 void Player::increase_bomb_slots() {
-    if (bomb_slots < MAX_BOMB_SLOTS) {
-        bomb_slots++;
+    if (_bomb_slots < MAX_BOMB_SLOTS) {
+        _bomb_slots++;
     }
 }
 
 int Player::get_bomb_range() {
-    return bomb_range;
+    return _bomb_range;
 }
+
 int Player::get_buff_remaining() {
-    return buff_timer;
+    return _buff_timer;
 }
 
 void Player::apply_range_buff(int duration) {
     // Raccogliere un secondo item raggio non aumenta il bonus:
     // prolunga la durata di quello gia' attivo
-    bomb_range = 1 + RANGE_BONUS;
-    buff_timer += duration;
+    _bomb_range = 1 + RANGE_BONUS;
+    _buff_timer += duration;
 }
 
 void Player::update_buff() {
-    if (buff_timer > 0) {
-        buff_timer--;
+    if (_buff_timer > 0) {
+        _buff_timer--;
 
-        if (buff_timer == 0) {
-            bomb_range = 1;
+        if (_buff_timer == 0) {
+            _bomb_range = 1;
         }
     }
 }
 
 void Player::reset() {
-    p = start_p;
-    bomb_slots = 1;
-    bomb_range = 1;
-    buff_timer = 0;
+    _p = _start_p;
+    _bomb_slots = 1;
+    _bomb_range = 1;
+    _buff_timer = 0;
 }

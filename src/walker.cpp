@@ -2,21 +2,25 @@
 #include <cstdlib>
 
 Walker::Walker(Position p, int speed) : Enemy(p, speed) {
-    _d = (Direction) (rand() % DIRECTIONS_COUNT);
+    _direction = (Direction) (rand() % DIRECTIONS_COUNT);
 }
 
 void Walker::move(Map& map) {
-    if (can_move(map, _d)) {
-        _p = next_position(_p, _d);
+    Position next = next_position(_p, _direction);
+
+    if (can_move_to(map, next)) {
+        _p = next;
         return;
     }
 
     shuffle_directions();
 
     for (int i = 0; i < DIRECTIONS_COUNT; i++) {
-        if (can_move(map, _directions[i])) {
-            _d = _directions[i];
-            _p = next_position(_p, _d);
+        Position next = next_position(_p, _directions[i]);
+
+        if (can_move_to(map, next)) {
+            _p = next;
+            _direction = _directions[i];
             return;
         }
     }

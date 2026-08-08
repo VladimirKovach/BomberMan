@@ -29,12 +29,8 @@ Item* Level::get_items() {
     return items;
 }
 
-Roamer* Level::get_roamers() {
-    return roamers;
-}
-
-Walker* Level::get_walkers() {
-    return walkers;
+Enemy* Level::get_enemies() {
+    return enemies;
 }
 
 bool Level::spawn_item(Position p, ItemType type) {
@@ -63,14 +59,8 @@ int Level::get_bomb_count() {
 int Level::get_enemy_count() {
     int count = 0;
 
-    for (int i = 0; i < MAX_ROAMERS; i++) {
-        if (!roamers[i].is_dead()) {
-            count++;
-        }
-    }
-
-    for (int i = 0; i < MAX_WALKERS; i++) {
-        if (!walkers[i].is_dead()) {
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        if (!enemies[i].is_dead()) {
             count++;
         }
     }
@@ -86,18 +76,11 @@ void Level::update_bombs() {
     }
 }
 
-
 void Level::update_enemies(Position player_p) {
     if (!completed) {
-        for (int i = 0; i < MAX_ROAMERS; i++) {
-            if (!roamers[i].is_dead()) {
-                roamers[i].update(map);
-            }
-        }
-
-        for (int i = 0; i < MAX_WALKERS; i++) {
-            if (!walkers[i].is_dead()) {
-                walkers[i].update(map);
+        for (int i = 0; i < MAX_ENEMIES; i++) {
+            if (!enemies[i].is_dead()) {
+                enemies[i].update(map, player_p);
             }
         }
 
@@ -107,46 +90,72 @@ void Level::update_enemies(Position player_p) {
     }
 }
 
-
 void Level::spawn_enemies() {
     if (number == 1) {
         for (int i = 0; i < 3; i++) {
             Position p = map.get_random_spawn();
-            walkers[i] = Walker(p, 2);
+            enemies[i] = Enemy(p, 2, WALKER);
         }
     }
     else if (number == 2) {
         for (int i = 0; i < 3; i++) {
             Position p = map.get_random_spawn();
-            roamers[i] = Roamer(p, 1);
-        }
-    }
-    else {
-        for (int i = 0; i < number; i++) {
-            Position spawn_p = map.get_random_spawn();
-            walkers[i] = Walker(spawn_p, 1);
+            enemies[i] = Enemy(p, 2, WALKER);
         }
 
-        for (int i = 0; i < number; i++) {
-            Position spawn_p = map.get_random_spawn();
-            roamers[i] = Roamer(spawn_p, 2);
-        }
+        enemies[3] = Enemy(map.get_random_spawn(), 2, ROAMER);
     }
+    else if (number == 3) {
+        for (int i = 0; i < 3; i++) {
+            Position p = map.get_random_spawn();
+            enemies[i] = Enemy(p, 2, WALKER);
+        }
+
+        enemies[3] = Enemy(map.get_random_spawn(), 2, ROAMER);
+
+        enemies[4] = Enemy(map.get_random_spawn(), 2, CHASER);
+    }
+    else if (number == 4) {
+        for (int i = 0; i < 3; i++) {
+            Position p = map.get_random_spawn();
+            enemies[i] = Enemy(p, 2, WALKER);
+        }
+
+        enemies[3] = Enemy(map.get_random_spawn(), 2, ROAMER);
+        enemies[4] = Enemy(map.get_random_spawn(), 2, ROAMER);
+
+        enemies[5] = Enemy(map.get_random_spawn(), 2, CHASER);
+    }
+    else if (number == 5) {
+        for (int i = 0; i < 3; i++) {
+            Position p = map.get_random_spawn();
+            enemies[i] = Enemy(p, 2, WALKER);
+        }
+
+        enemies[3] = Enemy(map.get_random_spawn(), 2, ROAMER);
+        enemies[4] = Enemy(map.get_random_spawn(), 2, ROAMER);
+
+        enemies[5] = Enemy(map.get_random_spawn(), 2, CHASER);
+        enemies[6] = Enemy(map.get_random_spawn(), 2, CHASER);
+    }
+}
+
+void Level::update(Position player_p) {
+    update_bombs();
+    update_enemies(player_p);
 }
 
 void Level::reset() {
     completed = false;
 
+    map.reset();
+
     for (int i = 0; i < MAX_BOMBS; i++) {
         bombs[i].reset();
     }
 
-    for (int i = 0; i < MAX_WALKERS; i++) {
-        walkers[i].reset();
-    }
-
-    for (int i = 0; i < MAX_ROAMERS; i++) {
-        roamers[i].reset();
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        enemies[i].reset();
     }
 
     // Gli item a terra vanno rimossi: la griglia torna allo stato iniziale
@@ -154,6 +163,4 @@ void Level::reset() {
     for (int i = 0; i < MAX_ITEMS; i++) {
         items[i].reset();
     }
-
-    map.reset();
 }

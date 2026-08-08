@@ -45,8 +45,7 @@ protected:
     void draw_bombs(Bomb* bombs);
     void draw_items(Item* items);
     void draw_player(Player& player);
-    void draw_roamers(Roamer* roamers);
-    void draw_walkers(Walker* walkers);
+    void draw_enemies(Enemy* enemies);
     void draw_explosions(Map& map);
 
     void draw_map(Level& level, Player& player);

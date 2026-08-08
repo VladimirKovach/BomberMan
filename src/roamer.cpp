@@ -6,8 +6,9 @@ void Roamer::move(Map& map) {
     shuffle_directions();
 
     for (int i = 0; i < DIRECTIONS_COUNT; i++) {
-        if (can_move(map, _directions[i])) {
-            _p = next_position(_p, _directions[i]);
+        Position next = next_position(_p, _directions[i]);
+        if (can_move_to(map, next)) {
+            _p = next;
             return;
         }
     }

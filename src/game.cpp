@@ -16,12 +16,12 @@ void Game::spawn_player(bool forward) {
 
 Game::Game() {
     quit = false;
-    timer = 300 * TICKS_PER_SECOND;  // 300 secondi
+    timer = TICKS_PER_SECOND * 1000;  // 1000 secondi
     score = 0;
 }
 
-bool Game::game_over() {
-    return timer <= 0 || player.is_dead();
+bool Game::lose() {
+    return timer == 0 || player.is_dead();
 }
 
 bool Game::win() {
@@ -39,18 +39,6 @@ void Game::update_timer() {
     if (timer > 0) {
         timer--;
     }
-}
-
-bool Game::bomb_under_player() {
-    Bomb* bombs = level_manager.get_current_level().get_bombs();
-    for (int i = 0; i < MAX_BOMBS; i++) {
-        Position player_p = player.get_position();
-        Position bomb_p = bombs[i].get_position();
-        if (bombs[i].is_active() && equal(player_p, bomb_p)) {
-            return true;
-        }
-    }
-    return false;
 }
 
 void Game::handle_input() {
@@ -82,7 +70,7 @@ void Game::handle_input() {
                 Bomb* bombs = level.get_bombs();
                 Position player_p = player.get_position();
 
-                if (level.get_bomb_count() < player.get_bomb_slots() && !bomb_under_player()) {
+                if (level.get_bomb_count() < player.get_bomb_slots() && !map.is_bomb(player_p)) {
                     int i = 0;
 
                     while (i < MAX_BOMBS && bombs[i].is_active()) {
@@ -143,8 +131,7 @@ void Game::handle_collisions() {
     Level& level = level_manager.get_current_level();
     Map& map = level.get_map();
     Bomb* bombs = level.get_bombs();
-    Roamer* roamers = level.get_roamers();
-    Walker* walkers = level.get_walkers();
+    Enemy* enemies = level.get_enemies();
     Item* items = level.get_items();
 
     // Collisioni giocatore-porte
@@ -196,20 +183,10 @@ void Game::handle_collisions() {
     }
 
     // Collisioni giocatore-nemici
-    for (int i = 0; i < MAX_ROAMERS; i++) {
-        if (!roamers[i].is_dead()) {
-            Position roamer_p = roamers[i].get_position();
-            if (equal(player_p, roamer_p)) {
-                player_death(level);
-                return;
-            }
-        }
-    }
-
-    for (int i = 0; i < MAX_WALKERS; i++) {
-        if (!walkers[i].is_dead()) {
-            Position walker_p = walkers[i].get_position();
-            if (equal(player_p, walker_p)) {
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        if (!enemies[i].is_dead()) {
+            Position enemy_p = enemies[i].get_position();
+            if (equal(player_p, enemy_p)) {
                 player_death(level);
                 return;
             }
@@ -235,27 +212,15 @@ void Game::handle_collisions() {
     }
 
     // Collisioni nemici-esplosioni
-    for (int i = 0; i < MAX_WALKERS; i++) {
-        if (!walkers[i].is_dead()) {
-            Position walker_p = walkers[i].get_position();
-            if (map.is_explosion(walker_p)) {
-                walkers[i].kill();
-                score += 3;
-                if (walkers[i].is_dead()) {
-                    try_drop_item(level, walker_p, ENEMY_DROP_CHANCE);
-                }
-            }
-        }
-    }
-
-    for (int i = 0; i < MAX_ROAMERS; i++) {
-        if (!roamers[i].is_dead()) {
-            Position roamer_p = roamers[i].get_position();
-            if (map.is_explosion(roamer_p)) {
-                roamers[i].kill();
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        if (!enemies[i].is_dead()) {
+            Position enemy_p = enemies[i].get_position();
+            if (map.is_explosion(enemy_p)) {
+                enemies[i].kill();
                 score += 5;
-                if (roamers[i].is_dead()) {
-                    try_drop_item(level, roamer_p, ENEMY_DROP_CHANCE);
+
+                if (enemies[i].is_dead()) {
+                    try_drop_item(level, enemy_p, ENEMY_DROP_CHANCE);
                 }
             }
         }
@@ -265,6 +230,7 @@ void Game::handle_collisions() {
     for (int i = 0; i < MAX_BOMBS; i++) {
         if (bombs[i].is_active()) {
             Position bomb_p = bombs[i].get_position();
+
             // Reazione a catena
             if (!bombs[i].is_exploding() && map.is_explosion(bomb_p)) {
                 bombs[i].explode(map);
@@ -274,7 +240,7 @@ void Game::handle_collisions() {
 }
 
 void Game::run() {
-    while (!game_over() && !win() && !quit) {
+    while (!lose() && !win() && !quit) {
         Level& level = level_manager.get_current_level();
 
         handle_input();
@@ -283,8 +249,7 @@ void Game::run() {
         update_timer();
         player.update_buff();
         level_manager.update_doors();
-        level.update_bombs();
-        level.update_enemies(player.get_position());
+        level.update(player.get_position());
 
         renderer.render(level_manager, player, score, timer / TICKS_PER_SECOND);
 
@@ -296,7 +261,9 @@ void Game::try_drop_item(Level& level, Position p, int chance) {
     if (rand() % 100 < chance) {
         // Tipo casuale tra i quattro disponibili
         int r = rand() % 4;
+
         ItemType type = ITEM_RANGE;
+
         if (r == 1) {
             type = ITEM_LIFE;
         }
@@ -306,6 +273,7 @@ void Game::try_drop_item(Level& level, Position p, int chance) {
         else if (r == 3) {
             type = ITEM_SCORE;
         }
+
         level.spawn_item(p, type);
     }
 }

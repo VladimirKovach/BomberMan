@@ -50,7 +50,7 @@ Renderer::Renderer() {
     map_start_x = (max_x - MAP_WIDTH) / 2;
 
     map_window = newwin(MAP_HEIGHT, MAP_WIDTH, map_start_y, map_start_x);
-    info_window = newwin(MAP_HEIGHT, 20, map_start_y, map_start_x + MAP_WIDTH + 2);
+    info_window = newwin(MAP_HEIGHT, 15, map_start_y, map_start_x + MAP_WIDTH + 2);
 
     init_colors();
 }
@@ -198,20 +198,26 @@ void Renderer::draw_player(Player& player) {
     mvwaddch(map_window, p.y, p.x, '@' | COLOR_PAIR(CP_PLAYER));
 }
 
-void Renderer::draw_roamers(Roamer* roamers) {
-    for (int i = 0; i < MAX_ROAMERS; i++) {
-        if (!roamers[i].is_dead()) {
-            Position p = roamers[i].get_position();
-            mvwaddch(map_window, p.y, p.x, 'R' | COLOR_PAIR(CP_ENEMY));
-        }
-    }
-}
+void Renderer::draw_enemies(Enemy* enemies) {
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        if (!enemies[i].is_dead()) {
+            Position p = enemies[i].get_position();
+            EnemyType type = enemies[i].get_type();
 
-void Renderer::draw_walkers(Walker* walkers) {
-    for (int i = 0; i < MAX_WALKERS; i++) {
-        if (!walkers[i].is_dead()) {
-            Position p = walkers[i].get_position();
-            mvwaddch(map_window, p.y, p.x, 'W' | COLOR_PAIR(CP_ENEMY));
+            switch (type) {
+                case ROAMER:
+                    mvwaddch(map_window, p.y, p.x, '?' | COLOR_PAIR(CP_ENEMY));
+                    break;
+
+                case CHASER:
+                    mvwaddch(map_window, p.y, p.x, '!' | COLOR_PAIR(CP_ENEMY));
+                    break;
+
+                // WALKER
+                default:
+                    mvwaddch(map_window, p.y, p.x, 'X' | COLOR_PAIR(CP_ENEMY));
+                    break;
+            }
         }
     }
 }
@@ -233,8 +239,7 @@ void Renderer::draw_map(Level& level, Player& player) {
     draw_items(level.get_items());
     draw_bombs(level.get_bombs());
     draw_player(player);
-    draw_roamers(level.get_roamers());
-    draw_walkers(level.get_walkers());
+    draw_enemies(level.get_enemies());
     draw_explosions(level.get_map());
 
     wnoutrefresh(map_window);

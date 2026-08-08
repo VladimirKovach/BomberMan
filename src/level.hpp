@@ -2,18 +2,14 @@
 #define LEVEL_HPP
 
 #include "bomb.hpp"
+#include "enemy.hpp"
 #include "item.hpp"
 #include "map.hpp"
 #include "utils.hpp"
 
-#include "roamer.hpp"
-#include "walker.hpp"
-
 const int MAX_BOMBS = 3;
 const int MAX_ITEMS = 10;
-
-const int MAX_ROAMERS = 5;
-const int MAX_WALKERS = 5;
+const int MAX_ENEMIES = 10;
 
 class Level {
 protected:
@@ -24,9 +20,7 @@ protected:
 
     Bomb bombs[MAX_BOMBS];
     Item items[MAX_ITEMS];
-
-    Roamer roamers[MAX_ROAMERS];
-    Walker walkers[MAX_WALKERS];
+    Enemy enemies[MAX_ENEMIES];
 
 public:
     Level(int _number = 1);
@@ -37,8 +31,7 @@ public:
     Map& get_map();
     Bomb* get_bombs();
     Item* get_items();
-    Roamer* get_roamers();
-    Walker* get_walkers();
+    Enemy* get_enemies();
 
     // Posiziona un item del tipo dato sulla cella p, se c'e' uno slot libero.
     // Restituisce true se l'item e' stato posizionato.
@@ -51,6 +44,8 @@ public:
     void update_enemies(Position player_p);
 
     void spawn_enemies();
+
+    void update(Position player_p);
 
     void reset();
 };
