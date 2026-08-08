@@ -15,7 +15,7 @@ include_directories(${CURSES_INCLUDE_DIR})
 add_executable(BomberMan
         src/main.cpp
         src/bomb.cpp
-        src/dummy_enemy.cpp
+        src/enemy.cpp
         src/game.cpp
         src/item.cpp
         src/leaderboard.cpp
@@ -25,7 +25,6 @@ add_executable(BomberMan
         src/menu.cpp
         src/player.cpp
         src/renderer.cpp
-        src/smart_enemy.cpp
         src/utils.cpp
 )
 
