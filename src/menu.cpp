@@ -1,7 +1,7 @@
 #include "menu.hpp"
 #include "leaderboard.hpp"
 #include <ncurses.h>
-#include <cstdio>
+#include <cstdio>  // togliere
 
 // Dimensioni della finestra del menu.
 // Tenute piccole perche' il menu ha poche voci e deve stare comoda

@@ -15,6 +15,7 @@ include_directories(${CURSES_INCLUDE_DIR})
 add_executable(BomberMan
         src/main.cpp
         src/bomb.cpp
+        src/chaser.cpp
         src/enemy.cpp
         src/game.cpp
         src/item.cpp
@@ -25,7 +26,9 @@ add_executable(BomberMan
         src/menu.cpp
         src/player.cpp
         src/renderer.cpp
+        src/roamer.cpp
         src/utils.cpp
+        src/walker.cpp
 )
 
 target_link_libraries(BomberMan ${CURSES_LIBRARIES})

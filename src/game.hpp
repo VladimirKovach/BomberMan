@@ -2,9 +2,12 @@
 #define GAME_HPP
 
 #include "level_manager.hpp"
+#include "level.hpp"
 #include "player.hpp"
 #include "renderer.hpp"
 #include "utils.hpp"
+
+const int GAME_TIMER_START = TICKS_PER_SECOND * 600;  // 600 secondi = 10 minuti
 
 // Probabilita' (in percentuale) che un drop di item avvenga
 const int WALL_DROP_CHANCE = 25;   // alla rottura di un muro
@@ -12,7 +15,7 @@ const int ENEMY_DROP_CHANCE = 50;  // alla morte di un nemico
 
 class Game {
 protected:
-    bool quit;
+    bool running;
     int timer;  // tick rimanenti nella partita
     int score;
 
@@ -20,19 +23,28 @@ protected:
     Player player;
     Renderer renderer;
 
-    bool lose();
     bool win();
+    bool lose();
 
-    void spawn_player(bool forward);
-    void player_death(Level& level);
+    void handle_player_death(Level& level);
 
-    void update_timer();
+    // Prova a generare un item di tipo casuale in 'p' con probabilita' 'chance'
+    void try_drop_item(Level& level, Position p, int chance);
 
-    void handle_input();
+    void player_doors_collisions(Level& level);
+    void player_items_collisions(Level& level);
+    void player_enemies_collisions(Level& level);
+    void player_explosions_collisions(Level& level);
+    void walls_explosions_collisions(Level& level);
+    void enemies_explosions_collisions(Level& level);
+    void bombs_explosions_collisions(Level& level);
     void handle_collisions();
 
-    // Prova a generare un item di tipo casuale in p con probabilita' 'chance'
-    void try_drop_item(Level& level, Position p, int chance);
+    void place_bomb(Level& level, Map& map);
+
+    void handle_input();
+
+    void update();
 
 public:
     Game();

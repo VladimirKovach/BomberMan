@@ -1,6 +1,4 @@
 #include "level.hpp"
-#include "bomb.hpp"
-#include "map.hpp"
 #include "utils.hpp"
 
 Level::Level(int _number) {
@@ -29,8 +27,16 @@ Item* Level::get_items() {
     return items;
 }
 
-Enemy* Level::get_enemies() {
-    return enemies;
+Chaser* Level::get_chasers() {
+    return chasers;
+}
+
+Roamer* Level::get_roamers() {
+    return roamers;
+}
+
+Walker* Level::get_walkers() {
+    return walkers;
 }
 
 bool Level::spawn_item(Position p, ItemType type) {
@@ -41,7 +47,52 @@ bool Level::spawn_item(Position p, ItemType type) {
             return true;
         }
     }
+
     return false;  // nessuno slot disponibile
+}
+
+void Level::spawn_enemies() {
+    if (number == 1) {
+        for (int i = 0; i < 3; i++) {
+            walkers[i] = Walker(map.get_random_spawn(), 1);
+        }
+    }
+    else if (number == 2) {
+        for (int i = 0; i < 3; i++) {
+            walkers[i] = Walker(map.get_random_spawn(), 2);
+        }
+
+        roamers[0] = Roamer(map.get_random_spawn(), 1);
+    }
+    else if (number == 3) {
+        for (int i = 0; i < 3; i++) {
+            walkers[i] = Walker(map.get_random_spawn(), 2);
+        }
+
+        roamers[0] = Roamer(map.get_random_spawn(), 2);
+        roamers[1] = Roamer(map.get_random_spawn(), 2);
+    }
+    else if (number == 4) {
+        for (int i = 0; i < 3; i++) {
+            walkers[i] = Walker(map.get_random_spawn(), 2);
+        }
+
+        roamers[0] = Roamer(map.get_random_spawn(), 2);
+        roamers[1] = Roamer(map.get_random_spawn(), 2);
+
+        chasers[0] = Chaser(map.get_random_spawn(), 2);
+    }
+    else if (number == 5) {
+        for (int i = 0; i < 3; i++) {
+            walkers[i] = Walker(map.get_random_spawn(), 2);
+        }
+
+        roamers[0] = Roamer(map.get_random_spawn(), 2);
+        roamers[1] = Roamer(map.get_random_spawn(), 2);
+
+        chasers[0] = Chaser(map.get_random_spawn(), 2);
+        chasers[1] = Chaser(map.get_random_spawn(), 2);
+    }
 }
 
 int Level::get_bomb_count() {
@@ -59,8 +110,20 @@ int Level::get_bomb_count() {
 int Level::get_enemy_count() {
     int count = 0;
 
-    for (int i = 0; i < MAX_ENEMIES; i++) {
-        if (!enemies[i].is_dead()) {
+    for (int i = 0; i < MAX_CHASERS; i++) {
+        if (!chasers[i].is_dead()) {
+            count++;
+        }
+    }
+
+    for (int i = 0; i < MAX_ROAMERS; i++) {
+        if (!roamers[i].is_dead()) {
+            count++;
+        }
+    }
+
+    for (int i = 0; i < MAX_WALKERS; i++) {
+        if (!walkers[i].is_dead()) {
             count++;
         }
     }
@@ -77,72 +140,34 @@ void Level::update_bombs() {
 }
 
 void Level::update_enemies(Position player_p) {
-    if (!completed) {
-        for (int i = 0; i < MAX_ENEMIES; i++) {
-            if (!enemies[i].is_dead()) {
-                enemies[i].update(map, player_p);
-            }
-        }
-
-        if (get_enemy_count() == 0) {
-            completed = true;
+    for (int i = 0; i < MAX_CHASERS; i++) {
+        if (!chasers[i].is_dead()) {
+            chasers[i].update(map, player_p);
         }
     }
-}
 
-void Level::spawn_enemies() {
-    if (number == 1) {
-        for (int i = 0; i < 3; i++) {
-            Position p = map.get_random_spawn();
-            enemies[i] = Enemy(p, 2, WALKER);
+    for (int i = 0; i < MAX_ROAMERS; i++) {
+        if (!roamers[i].is_dead()) {
+            roamers[i].update(map);
         }
     }
-    else if (number == 2) {
-        for (int i = 0; i < 3; i++) {
-            Position p = map.get_random_spawn();
-            enemies[i] = Enemy(p, 2, WALKER);
+
+    for (int i = 0; i < MAX_WALKERS; i++) {
+        if (!walkers[i].is_dead()) {
+            walkers[i].update(map);
         }
-
-        enemies[3] = Enemy(map.get_random_spawn(), 2, ROAMER);
-    }
-    else if (number == 3) {
-        for (int i = 0; i < 3; i++) {
-            Position p = map.get_random_spawn();
-            enemies[i] = Enemy(p, 2, WALKER);
-        }
-
-        enemies[3] = Enemy(map.get_random_spawn(), 2, ROAMER);
-
-        enemies[4] = Enemy(map.get_random_spawn(), 2, CHASER);
-    }
-    else if (number == 4) {
-        for (int i = 0; i < 3; i++) {
-            Position p = map.get_random_spawn();
-            enemies[i] = Enemy(p, 2, WALKER);
-        }
-
-        enemies[3] = Enemy(map.get_random_spawn(), 2, ROAMER);
-        enemies[4] = Enemy(map.get_random_spawn(), 2, ROAMER);
-
-        enemies[5] = Enemy(map.get_random_spawn(), 2, CHASER);
-    }
-    else if (number == 5) {
-        for (int i = 0; i < 3; i++) {
-            Position p = map.get_random_spawn();
-            enemies[i] = Enemy(p, 2, WALKER);
-        }
-
-        enemies[3] = Enemy(map.get_random_spawn(), 2, ROAMER);
-        enemies[4] = Enemy(map.get_random_spawn(), 2, ROAMER);
-
-        enemies[5] = Enemy(map.get_random_spawn(), 2, CHASER);
-        enemies[6] = Enemy(map.get_random_spawn(), 2, CHASER);
     }
 }
 
 void Level::update(Position player_p) {
-    update_bombs();
-    update_enemies(player_p);
+    if (!completed) {
+        update_bombs();
+        update_enemies(player_p);
+    }
+
+    if (get_enemy_count() == 0) {
+        completed = true;
+    }
 }
 
 void Level::reset() {
@@ -154,13 +179,19 @@ void Level::reset() {
         bombs[i].reset();
     }
 
-    for (int i = 0; i < MAX_ENEMIES; i++) {
-        enemies[i].reset();
-    }
-
-    // Gli item a terra vanno rimossi: la griglia torna allo stato iniziale
-    // e i muri ripristinati potrebbero coprire item rimasti a terra
     for (int i = 0; i < MAX_ITEMS; i++) {
         items[i].reset();
+    }
+
+    for (int i = 0; i < MAX_CHASERS; i++) {
+        chasers[i].reset();
+    }
+
+    for (int i = 0; i < MAX_ROAMERS; i++) {
+        roamers[i].reset();
+    }
+
+    for (int i = 0; i < MAX_WALKERS; i++) {
+        walkers[i].reset();
     }
 }

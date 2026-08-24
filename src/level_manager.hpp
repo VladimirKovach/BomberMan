@@ -34,7 +34,6 @@ public:
     // Restituisce false se non c'e' un nodo adiacente nella direzione richiesta.
     bool remove_current_level(bool forward);
 
-    bool is_current_completed();
     bool all_levels_completed();
 
     void update_doors();

@@ -8,16 +8,17 @@
 enum ItemType {
     ITEM_RANGE,  // aumenta temporaneamente il raggio delle bombe
     ITEM_LIFE,   // aggiunge una vita (effetto istantaneo)
-    ITEM_TIME,   // aggiunge tempo al timer (effetto istantaneo)
     ITEM_SCORE,  // aggiunge punti al punteggio (effetto istantaneo)
+    ITEM_TIME,   // aggiunge tempo al timer (effetto istantaneo)
 };
 
 // Parametri degli effetti
 const int RANGE_BONUS = 1;                                  // raggio aggiuntivo durante il buff
 const int RANGE_DURATION_SHORT = 5 * TICKS_PER_SECOND;      // 5 s  = 100 tick
 const int RANGE_DURATION_LONG = 10 * TICKS_PER_SECOND;      // 10 s = 200 tick
+
+const int SCORE_BONUS = 5;                                  // punti
 const int TIME_BONUS = 30 * TICKS_PER_SECOND;               // 30 s = 600 tick
-const int SCORE_BONUS = 4;                                  // punti
 
 class Item {
 protected:

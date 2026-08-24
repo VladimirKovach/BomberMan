@@ -1,5 +1,8 @@
 #include "renderer.hpp"
+#include "bomb.hpp"
+#include "item.hpp"
 #include "level_manager.hpp"
+#include "level.hpp"
 #include "player.hpp"
 #include "utils.hpp"
 #include <cstdio>    // togliere 
@@ -36,10 +39,9 @@ void Renderer::init_colors() {
     init_pair(CP_PLAYER, COLOR_CYAN, bg);
     init_pair(CP_ENEMY, COLOR_RED, bg);
     init_pair(CP_BOMB, COLOR_RED, bg);
-    init_pair(CP_EXPLOSION, COLOR_RED, COLOR_RED);
     init_pair(CP_BLINK, COLOR_WHITE, bg);
+    init_pair(CP_EXPLOSION, COLOR_RED, COLOR_RED);
     init_pair(CP_ITEM, COLOR_MAGENTA, bg);
-    init_pair(CP_LIFE, COLOR_RED, bg);
     init_pair(CP_TITLE, COLOR_WHITE, bg);
 }
 
@@ -60,6 +62,7 @@ Renderer::~Renderer() {
     delwin(info_window);
 }
 
+/*
 // Titolo in stile "banner" da vecchio terminale
 const int TITLE_ROWS = 5;
 const char* TITLE_BANNER[TITLE_ROWS] = {
@@ -107,12 +110,11 @@ void Renderer::display_effect(int buff_remaining) {
     // 9 = length("Range 10s"), la stringa piu' lunga prevista
     printw("EFFETTO: %-9s", text);
 }
+*/
 
 void Renderer::display_colors_debug() {
-    // Info di debug sotto la griglia
     if (map_start_y + MAP_HEIGHT < max_y) {
-        move(map_start_y + MAP_HEIGHT, map_start_x);
-        printw("COLORS: %d", COLORS);
+        mvprintw(map_start_y + MAP_HEIGHT, map_start_x, "COLORS: %d", COLORS);
     }
 }
 
@@ -198,26 +200,29 @@ void Renderer::draw_player(Player& player) {
     mvwaddch(map_window, p.y, p.x, '@' | COLOR_PAIR(CP_PLAYER));
 }
 
-void Renderer::draw_enemies(Enemy* enemies) {
-    for (int i = 0; i < MAX_ENEMIES; i++) {
-        if (!enemies[i].is_dead()) {
-            Position p = enemies[i].get_position();
-            EnemyType type = enemies[i].get_type();
+void Renderer::draw_enemies(Level& level) {
+    Chaser* chasers = level.get_chasers();
+    Roamer* roamers = level.get_roamers();
+    Walker* walkers = level.get_walkers();
 
-            switch (type) {
-                case ROAMER:
-                    mvwaddch(map_window, p.y, p.x, '?' | COLOR_PAIR(CP_ENEMY));
-                    break;
+    for (int i = 0; i < MAX_CHASERS; i++) {
+        if (!chasers[i].is_dead()) {
+            Position p = chasers[i].get_position();
+            mvwaddch(map_window, p.y, p.x, '!' | COLOR_PAIR(CP_ENEMY));
+        }
+    }
 
-                case CHASER:
-                    mvwaddch(map_window, p.y, p.x, '!' | COLOR_PAIR(CP_ENEMY));
-                    break;
+    for (int i = 0; i < MAX_ROAMERS; i++) {
+        if (!roamers[i].is_dead()) {
+            Position p = roamers[i].get_position();
+            mvwaddch(map_window, p.y, p.x, '?' | COLOR_PAIR(CP_ENEMY));
+        }
+    }
 
-                // WALKER
-                default:
-                    mvwaddch(map_window, p.y, p.x, 'X' | COLOR_PAIR(CP_ENEMY));
-                    break;
-            }
+    for (int i = 0; i < MAX_WALKERS; i++) {
+        if (!walkers[i].is_dead()) {
+            Position p = walkers[i].get_position();
+            mvwaddch(map_window, p.y, p.x, 'X' | COLOR_PAIR(CP_ENEMY));
         }
     }
 }
@@ -239,7 +244,7 @@ void Renderer::draw_map(Level& level, Player& player) {
     draw_items(level.get_items());
     draw_bombs(level.get_bombs());
     draw_player(player);
-    draw_enemies(level.get_enemies());
+    draw_enemies(level);
     draw_explosions(level.get_map());
 
     wnoutrefresh(map_window);
@@ -247,7 +252,6 @@ void Renderer::draw_map(Level& level, Player& player) {
 
 void Renderer::draw_info(Level& level, Player& player, int score, int time) {
     werase(info_window);
-
     box(info_window, 0, 0);
 
     mvwprintw(info_window, 1, 1, "LEVEL: %d", level.get_number());
@@ -256,18 +260,11 @@ void Renderer::draw_info(Level& level, Player& player, int score, int time) {
     mvwprintw(info_window, 3, 1, "LIVES:");
     for (int i = 0; i < lives; i++) {
         waddch(info_window, ' ');
-        waddch(info_window, ACS_DIAMOND | COLOR_PAIR(CP_LIFE));
+        waddch(info_window, ACS_DIAMOND | COLOR_PAIR(CP_ITEM));
     }
 
-    int bombs = player.get_bomb_slots() - level.get_bomb_count();
-    mvwprintw(info_window, 5, 1, "BOMBS:");
-    for (int i = 0; i < bombs; i++) {
-        waddch(info_window, ' ');
-        waddch(info_window, '*');
-    }
-
-    mvwprintw(info_window, 7, 1, "SCORE: %d", score);
-    mvwprintw(info_window, 9, 1, "TIME: %d", time);
+    mvwprintw(info_window, 5, 1, "SCORE: %d", score);
+    mvwprintw(info_window, 7, 1, "TIME: %d", time);
 
     wnoutrefresh(info_window);
 }

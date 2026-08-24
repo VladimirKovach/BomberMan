@@ -1,7 +1,10 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
+#include "bomb.hpp"
+#include "item.hpp"
 #include "level_manager.hpp"
+#include "level.hpp"
 #include "player.hpp"
 #include "utils.hpp"
 #include <ncurses.h>
@@ -20,10 +23,9 @@ enum {
     CP_PLAYER,
     CP_ENEMY,
     CP_BOMB,
-    CP_EXPLOSION,
     CP_BLINK,
+    CP_EXPLOSION,
     CP_ITEM,
-    CP_LIFE,   // rombi rossi delle vite
     CP_TITLE,  // titolo bianco in alto
 };
 
@@ -37,15 +39,15 @@ protected:
 
     void init_colors();
 
-    void display_title();
-    void display_effect(int buff_remaining);
+    //void display_title();
+    //void display_effect(int buff_remaining);
     void display_colors_debug();
 
     void draw_grid(Map& map);
     void draw_bombs(Bomb* bombs);
     void draw_items(Item* items);
     void draw_player(Player& player);
-    void draw_enemies(Enemy* enemies);
+    void draw_enemies(Level& level);
     void draw_explosions(Map& map);
 
     void draw_map(Level& level, Player& player);

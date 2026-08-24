@@ -1,43 +1,257 @@
 #include "game.hpp"
 #include "level_manager.hpp"
+#include "level.hpp"
 #include "player.hpp"
 #include "renderer.hpp"
 #include "utils.hpp"
 #include <cstdlib>
 #include <ncurses.h>
 
-void Game::spawn_player(bool forward) {
-    Position spawn = {1, 1};  // vicino alla porta di entrata
-    if (!forward) {
-        spawn = {1, MAP_WIDTH - 2};  // vicino alla porta di uscita
-    }
-    player.set_position(spawn);
-}
-
 Game::Game() {
-    quit = false;
-    timer = TICKS_PER_SECOND * 1000;  // 1000 secondi
+    running = true;
+    timer = GAME_TIMER_START;
     score = 0;
-}
-
-bool Game::lose() {
-    return timer == 0 || player.is_dead();
 }
 
 bool Game::win() {
     return level_manager.all_levels_completed();
 }
 
+bool Game::lose() {
+    return timer == 0 || player.is_dead();
+}
+
 // Il livello riparte com'era: muri, nemici, item e punteggio insieme
-void Game::player_death(Level& level) {
+void Game::handle_player_death(Level& level) {
     player.lose_life();
     player.reset();
     level.reset();
 }
 
-void Game::update_timer() {
-    if (timer > 0) {
-        timer--;
+void Game::try_drop_item(Level& level, Position p, int chance) {
+    if (rand() % 100 < chance) {
+        // Tipo casuale tra i quattro disponibili
+        int r = rand() % 4;
+
+        ItemType type = ITEM_RANGE;
+
+        if (r == 1) {
+            type = ITEM_LIFE;
+        }
+        else if (r == 2) {
+            type = ITEM_SCORE;
+        }
+        else if (r == 3) {
+            type = ITEM_TIME;
+        }
+
+        level.spawn_item(p, type);
+    }
+}
+
+void Game::handle_collisions() {
+    Level& level = level_manager.get_current_level();
+
+    player_doors_collisions(level);
+    player_items_collisions(level);
+    player_enemies_collisions(level);
+    player_explosions_collisions(level);
+    walls_explosions_collisions(level);
+    enemies_explosions_collisions(level);
+    bombs_explosions_collisions(level);
+}
+
+void Game::player_doors_collisions(Level& level) {
+    Map& map = level.get_map();
+
+    Cell c = map.get_cell(player.get_position());
+
+    if (c == EXIT && level_manager.has_next_level()) {
+        if (level.is_completed()) {
+            level_manager.remove_current_level(true);
+        }
+        else {
+            level_manager.go_to_next_level();
+        }
+
+        player.set_position({1, 1});  // vicino alla porta a sinistra
+    }
+    else if (c == ENTRANCE && level_manager.has_prev_level()) {
+        if (level.is_completed()) {
+            level_manager.remove_current_level(false);
+        }
+        else {
+            level_manager.go_to_prev_level();
+        }
+
+        player.set_position({1, MAP_WIDTH - 2});  // vicino alla porta a destra
+    }
+}
+
+void Game::player_items_collisions(Level& level) {
+    Item* items = level.get_items();
+
+    for (int i = 0; i < MAX_ITEMS; i++) {
+        if (items[i].is_active() && equal(player.get_position(), items[i].get_position())) {
+            switch (items[i].get_type()) {
+                case ITEM_RANGE:
+                    player.apply_range_buff(items[i].get_duration());
+                    break;
+
+                case ITEM_LIFE:
+                    player.gain_life();
+                    break;
+
+                case ITEM_SCORE:
+                    score += SCORE_BONUS;
+                    break;
+
+                case ITEM_TIME:
+                    timer += TIME_BONUS;
+                    break;
+            }
+
+            items[i].collect();
+        }
+    }
+}
+
+void Game::player_enemies_collisions(Level& level) {
+    Map& map = level.get_map();
+    Chaser* chasers = level.get_chasers();
+    Roamer* roamers = level.get_roamers();
+    Walker* walkers = level.get_walkers();
+
+    Position player_p = player.get_position();
+
+    for (int i = 0; i < MAX_CHASERS; i++) {
+        if (!chasers[i].is_dead()) {
+            Position chaser_p = chasers[i].get_position();
+            if (equal(player_p, chaser_p)) {
+                handle_player_death(level);
+                return;
+            }
+        }
+    }
+
+    for (int i = 0; i < MAX_ROAMERS; i++) {
+        if (!roamers[i].is_dead()) {
+            Position roamer_p = roamers[i].get_position();
+            if (equal(player_p, roamer_p)) {
+                handle_player_death(level);
+                return;
+            }
+        }
+    }
+
+    for (int i = 0; i < MAX_WALKERS; i++) {
+        if (!walkers[i].is_dead()) {
+            Position walker_p = walkers[i].get_position();
+            if (equal(player_p, walker_p)) {
+                handle_player_death(level);
+                return;
+            }
+        }
+    }
+}
+
+void Game::player_explosions_collisions(Level& level) {
+    Map& map = level.get_map();
+
+    if (map.is_explosion(player.get_position())) {
+        handle_player_death(level);
+    }
+}
+
+void Game::walls_explosions_collisions(Level& level) {
+    Map& map = level.get_map();
+
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            Position p = {y, x};
+
+            if (map.is_explosion(p) && map.get_cell(p) == BREAKABLE_WALL) {
+                map.set_cell(p, EMPTY);
+                score++;
+                try_drop_item(level, p, WALL_DROP_CHANCE);
+            }
+        }
+    }
+}
+
+void Game::enemies_explosions_collisions(Level& level) {
+    Map& map = level.get_map();
+    Chaser* chasers = level.get_chasers();
+    Roamer* roamers = level.get_roamers();
+    Walker* walkers = level.get_walkers();
+
+    for (int i = 0; i < MAX_CHASERS; i++) {
+        if (!chasers[i].is_dead()) {
+            Position chaser_p = chasers[i].get_position();
+
+            if (map.is_explosion(chaser_p)) {
+                chasers[i].kill();
+                score += 10;
+                try_drop_item(level, chaser_p, ENEMY_DROP_CHANCE);
+            }
+        }
+    }
+
+    for (int i = 0; i < MAX_ROAMERS; i++) {
+        if (!roamers[i].is_dead()) {
+            Position roamer_p = roamers[i].get_position();
+
+            if (map.is_explosion(roamer_p)) {
+                roamers[i].kill();
+                score += 10;
+                try_drop_item(level, roamer_p, ENEMY_DROP_CHANCE);
+            }
+        }
+    }
+
+    for (int i = 0; i < MAX_WALKERS; i++) {
+        if (!walkers[i].is_dead()) {
+            Position walker_p = walkers[i].get_position();
+
+            if (map.is_explosion(walker_p)) {
+                walkers[i].kill();
+                score += 5;
+                try_drop_item(level, walker_p, ENEMY_DROP_CHANCE);
+            }
+        }
+    }
+}
+
+void Game::bombs_explosions_collisions(Level& level) {
+    Map& map = level.get_map();
+    Bomb* bombs = level.get_bombs();
+
+    for (int i = 0; i < MAX_BOMBS; i++) {
+        if (bombs[i].is_active()) {
+            Position bomb_p = bombs[i].get_position();
+
+            // Reazione a catena
+            if (!bombs[i].is_exploding() && map.is_explosion(bomb_p)) {
+                bombs[i].explode(map);
+            }
+        }
+    }
+}
+
+void Game::place_bomb(Level& level, Map& map) {
+    Bomb* bombs = level.get_bombs();
+    Position player_p = player.get_position();
+
+    if (level.get_bomb_count() < MAX_BOMBS && !map.is_bomb(player_p)) {
+        int i = 0;
+
+        while (i < MAX_BOMBS && bombs[i].is_active()) {
+            i++;
+        }
+
+        if (i < MAX_BOMBS) {
+            bombs[i].place(map, player_p, player.get_bomb_range());
+        }
     }
 }
 
@@ -62,32 +276,18 @@ void Game::handle_input() {
         switch (key) {
             case 'q':
             case 'Q':
-                quit = true;
+                running = false;
                 break;
 
             case ' ':
-            {
-                Bomb* bombs = level.get_bombs();
-                Position player_p = player.get_position();
-
-                if (level.get_bomb_count() < player.get_bomb_slots() && !map.is_bomb(player_p)) {
-                    int i = 0;
-
-                    while (i < MAX_BOMBS && bombs[i].is_active()) {
-                        i++;
-                    }
-
-                    if (i < MAX_BOMBS) {
-                        bombs[i].place(map, player_p, player.get_bomb_range());
-                    }
-                }
+                place_bomb(level, map);
                 break;
-            }
 
             default:
                 move_key = key;
                 break;
         }
+
         key = getch();
     }
 
@@ -116,166 +316,40 @@ void Game::handle_input() {
             player.move(map, RIGHT);
             break;
 
-        // debugging
-        case '+':
-            player.increase_bomb_slots();
-            break;
-
         default:
             break;
     }
 }
 
-void Game::handle_collisions() {
-    Position player_p = player.get_position();
+void Game::update() {
+    if (timer > 0) {
+        timer--;
+    }
+
+    player.update_buff();
+    level_manager.update_doors();
+
     Level& level = level_manager.get_current_level();
-    Map& map = level.get_map();
-    Bomb* bombs = level.get_bombs();
-    Enemy* enemies = level.get_enemies();
-    Item* items = level.get_items();
+    level.update(player.get_position());
 
-    // Collisioni giocatore-porte
-    Cell c = map.get_cell(player_p);
+    handle_collisions();
 
-    if (c == EXIT && level_manager.has_next_level()) {
-        if (level_manager.is_current_completed()) {
-            level_manager.remove_current_level(true);
-        }
-        else {
-            level_manager.go_to_next_level();
-        }
-
-        spawn_player(true);
-    }
-    else if (c == ENTRANCE && level_manager.has_prev_level()) {
-        if (level_manager.is_current_completed()) {
-            level_manager.remove_current_level(false);
-        }
-        else {
-            level_manager.go_to_prev_level();
-        }
-
-        spawn_player(false);
-    }
-
-    // Raccolta item (il giocatore ci cammina sopra)
-    for (int i = 0; i < MAX_ITEMS; i++) {
-        if (items[i].is_active() && equal(player_p, items[i].get_position())) {
-            switch (items[i].get_type()) {
-                case ITEM_RANGE:
-                    player.apply_range_buff(items[i].get_duration());
-                    break;
-
-                case ITEM_LIFE:
-                    player.gain_life();
-                    break;
-
-                case ITEM_TIME:
-                    timer += TIME_BONUS;
-                    break;
-
-                case ITEM_SCORE:
-                    score += SCORE_BONUS;
-                    break;
-            }
-            items[i].collect();
-        }
-    }
-
-    // Collisioni giocatore-nemici
-    for (int i = 0; i < MAX_ENEMIES; i++) {
-        if (!enemies[i].is_dead()) {
-            Position enemy_p = enemies[i].get_position();
-            if (equal(player_p, enemy_p)) {
-                player_death(level);
-                return;
-            }
-        }
-    }
-
-    // Collisioni giocatore-esplosioni
-    if (map.is_explosion(player_p)) {
-        player_death(level);
-        return;
-    }
-
-    // Collisioni muri-esplosioni
-    for (int y = 0; y < MAP_HEIGHT; y++) {
-        for (int x = 0; x < MAP_WIDTH; x++) {
-            Position p = {y, x};
-            if (map.is_explosion(p) && map.get_cell(p) == BREAKABLE_WALL) {
-                map.set_cell({y, x}, EMPTY);
-                score++;
-                try_drop_item(level, p, WALL_DROP_CHANCE);
-            }
-        }
-    }
-
-    // Collisioni nemici-esplosioni
-    for (int i = 0; i < MAX_ENEMIES; i++) {
-        if (!enemies[i].is_dead()) {
-            Position enemy_p = enemies[i].get_position();
-            if (map.is_explosion(enemy_p)) {
-                enemies[i].kill();
-                score += 5;
-
-                if (enemies[i].is_dead()) {
-                    try_drop_item(level, enemy_p, ENEMY_DROP_CHANCE);
-                }
-            }
-        }
-    }
-
-    // Collisioni bombe-esplosioni
-    for (int i = 0; i < MAX_BOMBS; i++) {
-        if (bombs[i].is_active()) {
-            Position bomb_p = bombs[i].get_position();
-
-            // Reazione a catena
-            if (!bombs[i].is_exploding() && map.is_explosion(bomb_p)) {
-                bombs[i].explode(map);
-            }
-        }
+    if (win() || lose()) {
+        running = false;
     }
 }
 
 void Game::run() {
-    while (!lose() && !win() && !quit) {
-        Level& level = level_manager.get_current_level();
-
+    while (running) {
         handle_input();
-        handle_collisions();
-
-        update_timer();
-        player.update_buff();
-        level_manager.update_doors();
-        level.update(player.get_position());
+        update();
 
         renderer.render(level_manager, player, score, timer / TICKS_PER_SECOND);
-
         napms(DELAY);
     }
-}
 
-void Game::try_drop_item(Level& level, Position p, int chance) {
-    if (rand() % 100 < chance) {
-        // Tipo casuale tra i quattro disponibili
-        int r = rand() % 4;
-
-        ItemType type = ITEM_RANGE;
-
-        if (r == 1) {
-            type = ITEM_LIFE;
-        }
-        else if (r == 2) {
-            type = ITEM_TIME;
-        }
-        else if (r == 3) {
-            type = ITEM_SCORE;
-        }
-
-        level.spawn_item(p, type);
-    }
+    // Il tempo rimanente diventa un bonus per il punteggio
+    score += timer / TICKS_PER_SECOND;
 }
 
 int Game::get_score() {

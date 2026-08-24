@@ -1,5 +1,5 @@
 #include "level_manager.hpp"
-#include <cstddef>
+#include <cstdlib>
 
 LevelManager::LevelManager() {
     head = NULL;
@@ -62,13 +62,6 @@ void LevelManager::go_to_prev_level() {
     if (current != NULL && current->prev != NULL) {
         current = current->prev;
     }
-}
-
-bool LevelManager::is_current_completed() {
-    if (current != NULL) {
-        return (current->level).is_completed();
-    }
-    return false;
 }
 
 bool LevelManager::all_levels_completed() {
