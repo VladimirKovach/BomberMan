@@ -37,6 +37,14 @@ void Enemy::shuffle_directions() {
     }
 }
 
+bool Enemy::can_move_to(Map& map, Position next) {
+    if (map.out_of_bounds(next)) {
+        return false;
+    }
+
+    return !map.is_wall(next) && !map.is_bomb(next) && !map.is_explosion(next);
+}
+
 Position Enemy::get_position() {
     return p;
 }
@@ -55,14 +63,6 @@ void Enemy::kill() {
 
 bool Enemy::is_dead() {
     return dead;
-}
-
-bool Enemy::can_move_to(Map& map, Position p) {
-    if (map.out_of_bounds(p)) {
-        return false;
-    }
-
-    return !map.is_wall(p) && !map.is_bomb(p) && !map.is_explosion(p);
 }
 
 void Enemy::reset() {

@@ -6,12 +6,11 @@
 enum Cell {
     NONE,
     EMPTY,
-    BREAKABLE_WALL,
-    UNBREAKABLE_WALL,
-    ENTRANCE,
-    EXIT,
+    WALL_SOLID,
+    WALL_DESTRUCTIBLE,
+    DOOR_PREV,
+    DOOR_NEXT,
     BOMB,
-    ITEM,
 };
 
 const int MAP_HEIGHT = 21;
@@ -27,41 +26,50 @@ protected:
 
     // Possibili posizioni in cui spawnare nemici
     Position spawns[MAX_SPAWNS];
-    int spawns_count;
+    int spawn_count;
 
-    void get_spawns();
+    void save_spawns();
     void shuffle_spawns();
+
     bool safe_zone(Position p);
 
-    void place_breakable_walls(int percentage);
+    void place_solid_walls();
+    void place_destructible_walls(int percentage);
+
+    void save_start_grid();
 
 public:
     Map(int difficulty = 1);
 
+    // Restituisce uno spawn valido e lo rimuove dalla lista dei possibili spawn
     Position get_random_spawn();
 
-    // Gestione celle
     Cell get_cell(Position p);
-    void set_cell(Position p, Cell c);
+    void set_cell(Position p, Cell c);  // togliere?
 
     bool out_of_bounds(Position p);
-    bool is_wall(Position p);
-    bool is_door(Position p);
-    bool is_bomb(Position p);
-    bool is_item(Position p);
 
-    // Gestione esplosioni
+    bool is_wall(Position p);
+    bool is_wall_solid(Position p);
+    bool is_wall_destructible(Position p);
+    void break_wall(Position p);
+
+    bool is_door(Position p);
+    bool is_door_prev(Position p);
+    bool is_door_next(Position p);
+
+    void open_door_prev();
+    void close_door_prev();
+    void open_door_next();
+    void close_door_next();
+
+    bool is_bomb(Position p);
+    void set_bomb(Position p);
+    void unset_bomb(Position p);
+
     bool is_explosion(Position p);
     void set_explosion(Position p);
     void unset_explosion(Position p);
-
-    // Porte tra livelli
-    // ENTRANCE: bordo superiore sinistro
-    // EXIT: bordo superiore destro
-    void open_entrance();
-    void close_entrance();
-    void open_exit();
-    void close_exit();
 
     void reset();
 };

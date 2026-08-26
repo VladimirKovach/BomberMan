@@ -13,8 +13,8 @@ protected:
 
     int lives;
 
-    int bomb_range;   // raggio corrente delle bombe (1 = base)
-    int buff_timer;   // tick rimanenti del buff raggio (0 = nessun buff)
+    int bomb_range;   // raggio corrente delle bombe (1 = raggio base)
+    int buff_timer;   // tick rimanenti del buff raggio (0 = no buff)
 
 public:
     Player(Position _p = {1, 1}, int _lives = 3);
@@ -27,19 +27,19 @@ public:
     void lose_life();
     bool is_dead();
 
-    bool can_move_to(Map& map, Position p);
+    bool can_move_to(Map& map, Position next);
     void move(Map& map, Direction d);
 
     int get_bomb_range();
 
-    // Attiva o prolunga il buff raggio per 'duration' tick
-    void apply_range_buff(int duration);
+    // Attiva (o prolunga) il buff raggio per 'duration' tick
+    void apply_buff(int duration);
 
-    // Scala il buff di un tick e lo disattiva alla scadenza (ogni frame)
+    // Scala il buff raggio di un tick e lo disattiva alla scadenza (ogni frame)
     void update_buff();
 
-    // Tick rimanenti del buff (0 se non attivo)
-    int get_buff_remaining();
+    // Tick rimanenti del buff raggio (0 se non attivo)
+    //int get_buff_remaining();
 
     void reset();
 };

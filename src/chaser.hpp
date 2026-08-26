@@ -14,7 +14,7 @@ private:
     void move(Map& map, Position player_p);
 
 public:
-    Chaser(Position _p = {-1, -1}, int _speed = 1);
+    Chaser(Position _p = {-1, -1}, int _speed = 2);
 
     void update(Map& map, Position player_p);
 };

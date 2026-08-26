@@ -37,6 +37,7 @@ public:
     bool is_completed();
 
     Map& get_map();
+
     Bomb* get_bombs();
     Item* get_items();
 
@@ -44,11 +45,10 @@ public:
     Roamer* get_roamers();
     Walker* get_walkers();
 
-    void place_bomb(Position player_p);
-
     // Posiziona un item del tipo dato sulla cella p, se c'e' uno slot libero.
     // Restituisce true se l'item e' stato posizionato.
     bool spawn_item(Position p, ItemType type);
+
     void spawn_enemies();
 
     int get_bomb_count();

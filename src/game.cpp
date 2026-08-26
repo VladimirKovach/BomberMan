@@ -21,7 +21,6 @@ bool Game::lose() {
     return timer == 0 || player.is_dead();
 }
 
-// Il livello riparte com'era: muri, nemici, item e punteggio insieme
 void Game::handle_player_death(Level& level) {
     player.lose_life();
     player.reset();
@@ -30,7 +29,6 @@ void Game::handle_player_death(Level& level) {
 
 void Game::try_drop_item(Level& level, Position p, int chance) {
     if (rand() % 100 < chance) {
-        // Tipo casuale tra i quattro disponibili
         int r = rand() % 4;
 
         ItemType type = ITEM_RANGE;
@@ -64,9 +62,9 @@ void Game::handle_collisions() {
 void Game::player_doors_collisions(Level& level) {
     Map& map = level.get_map();
 
-    Cell c = map.get_cell(player.get_position());
+    Position player_p = player.get_position();
 
-    if (c == EXIT && level_manager.has_next_level()) {
+    if (map.is_door_next(player_p) && level_manager.has_next_level()) {
         if (level.is_completed()) {
             level_manager.remove_current_level(true);
         }
@@ -74,9 +72,9 @@ void Game::player_doors_collisions(Level& level) {
             level_manager.go_to_next_level();
         }
 
-        player.set_position({1, 1});  // vicino alla porta a sinistra
+        player.set_position({1, 1});  // vicino alla porta in alto a sinistra
     }
-    else if (c == ENTRANCE && level_manager.has_prev_level()) {
+    else if (map.is_door_prev(player_p) && level_manager.has_prev_level()) {
         if (level.is_completed()) {
             level_manager.remove_current_level(false);
         }
@@ -95,7 +93,7 @@ void Game::player_items_collisions(Level& level) {
         if (items[i].is_active() && equal(player.get_position(), items[i].get_position())) {
             switch (items[i].get_type()) {
                 case ITEM_RANGE:
-                    player.apply_range_buff(items[i].get_duration());
+                    player.apply_buff(items[i].get_duration());
                     break;
 
                 case ITEM_LIFE:
@@ -170,8 +168,8 @@ void Game::walls_explosions_collisions(Level& level) {
         for (int x = 0; x < MAP_WIDTH; x++) {
             Position p = {y, x};
 
-            if (map.is_explosion(p) && map.get_cell(p) == BREAKABLE_WALL) {
-                map.set_cell(p, EMPTY);
+            if (map.is_explosion(p) && map.is_wall_destructible(p)) {
+                map.break_wall(p);
                 score++;
                 try_drop_item(level, p, WALL_DROP_CHANCE);
             }

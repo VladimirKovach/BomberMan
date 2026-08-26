@@ -7,7 +7,7 @@
 #include "renderer.hpp"
 #include "utils.hpp"
 
-const int GAME_TIMER_START = TICKS_PER_SECOND * 600;  // 600 secondi = 10 minuti
+const int GAME_TIMER_START = TICKS_PER_SECOND * 300;  // 300 secondi = 5 minuti
 
 // Probabilita' (in percentuale) che un drop di item avvenga
 const int WALL_DROP_CHANCE = 25;   // alla rottura di un muro

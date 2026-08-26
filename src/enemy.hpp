@@ -20,15 +20,13 @@ protected:
 
     void shuffle_directions();
 
-    bool can_move_to(Map& map, Position p);
+    bool can_move_to(Map& map, Position next);
 
 public:
     Enemy(Position _p = {-1, -1}, int _speed = 1);
 
     Position get_position();
     void set_position(Position _p);
-
-    void spawn(Position _p, int _speed);
 
     int get_speed();
 

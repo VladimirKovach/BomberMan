@@ -17,16 +17,15 @@ enum {
 enum {
     CP_NONE,
     CP_SCREEN,
-    CP_BREAKABLE_WALL,
-    CP_UNBREAKABLE_WALL,
+    CP_WALL_SOLID,
+    CP_WALL_DESTRUCTIBLE,
     CP_DOOR,
     CP_PLAYER,
     CP_ENEMY,
     CP_BOMB,
-    CP_BLINK,
     CP_EXPLOSION,
     CP_ITEM,
-    CP_TITLE,  // titolo bianco in alto
+    CP_TITLE,
 };
 
 class Renderer {

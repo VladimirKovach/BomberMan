@@ -2,15 +2,16 @@
 #include "utils.hpp"
 #include <cstdlib>
 
-void Map::get_spawns() {
-    spawns_count = 0;
+void Map::save_spawns() {
+    spawn_count = 0;
 
     for (int y = 1; y < MAP_HEIGHT - 1; y++) {
         for (int x = 1; x < MAP_WIDTH - 1; x++) {
-            Position p = {y, x};
-            if (!safe_zone(p) && grid[y][x] == EMPTY) {
-                spawns[spawns_count] = p;
-                spawns_count++;
+            Position spawn = {y, x};
+
+            if (!safe_zone(spawn) && grid[y][x] == EMPTY) {
+                spawns[spawn_count] = spawn;
+                spawn_count++;
             }
         }
     }
@@ -18,7 +19,7 @@ void Map::get_spawns() {
 
 // Fisher-Yates shuffle
 void Map::shuffle_spawns() {
-    for (int i = spawns_count - 1; i >= 0; i--) {
+    for (int i = spawn_count - 1; i >= 0; i--) {
         int j = rand() % (i + 1);
 
         if (j != i) {
@@ -34,18 +35,48 @@ bool Map::safe_zone(Position p) {
     return p.y >= 0 && p.y < MAP_HEIGHT / 2 && p.x >= 0 && p.x < MAP_WIDTH / 2;
 }
 
-void Map::place_breakable_walls(int percentage) {
+void Map::place_solid_walls() {
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        grid[y][0] = WALL_SOLID;              // bordo sinistro
+        grid[y][MAP_WIDTH - 1] = WALL_SOLID;  // bordo destro
+    }
+
+    for (int x = 0; x < MAP_WIDTH; x++) {
+        grid[0][x] = WALL_SOLID;               // bordo superiore
+        grid[MAP_HEIGHT - 1][x] = WALL_SOLID;  // bordo inferiore
+    }
+
+    // muri solidi interni (pattern a scacchiera con buchi)
     for (int y = 1; y < MAP_HEIGHT - 1; y++) {
         for (int x = 1; x < MAP_WIDTH - 1; x++) {
-            if (rand() % 100 < percentage) {
-                grid[y][x] = BREAKABLE_WALL;
+            if (y % 2 == 0 && x % 2 == 0 && rand() % 100 < 50) {
+                grid[y][x] = WALL_SOLID;
+            }
+        }
+    }
+}
+
+void Map::place_destructible_walls(int percentage) {
+    for (int y = 1; y < MAP_HEIGHT - 1; y++) {
+        for (int x = 1; x < MAP_WIDTH - 1; x++) {
+            if (grid[y][x] == EMPTY && rand() % 100 < percentage) {
+                grid[y][x] = WALL_DESTRUCTIBLE;
             }
         }
     }
 
+    // No muri sulla cella iniziale del giocatore e sulle due adiacenti
     grid[1][1] = EMPTY;
     grid[1][2] = EMPTY;
     grid[2][1] = EMPTY;
+}
+
+void Map::save_start_grid() {
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            start_grid[y][x] = grid[y][x];
+        }
+    }
 }
 
 Map::Map(int difficulty) {
@@ -56,51 +87,17 @@ Map::Map(int difficulty) {
         }
     }
 
-    // muri indistruttibili esterni (a destra e a sinistra)
-    for (int y = 0; y < MAP_HEIGHT; y++) {
-        grid[y][0] = UNBREAKABLE_WALL;
-        grid[y][MAP_WIDTH - 1] = UNBREAKABLE_WALL;
-    }
+    place_solid_walls();
+    place_destructible_walls(difficulty * 5);
+    save_start_grid();
 
-    // muri indistruttibili esterni (in alto e in basso)
-    for (int x = 0; x < MAP_WIDTH; x++) {
-        grid[0][x] = UNBREAKABLE_WALL;
-        grid[MAP_HEIGHT - 1][x] = UNBREAKABLE_WALL;
-    }
-
-    // muri indistruttibili interni (pattern a scacchiera con buchi)
-    for (int y = 1; y < MAP_HEIGHT - 1; y++) {
-        for (int x = 1; x < MAP_WIDTH - 1; x++) {
-            if (y % 2 == 0 && x % 2 == 0 && rand() % 2 == 0) {
-                grid[y][x] = UNBREAKABLE_WALL;
-            }
-        }
-    }
-
-    place_breakable_walls(difficulty * 5);
-
-    for (int y = 0; y < MAP_HEIGHT; y++) {
-        for (int x = 0; x < MAP_WIDTH; x++) {
-            start_grid[y][x] = grid[y][x];
-        }
-    }
-
-    get_spawns();
+    save_spawns();
     shuffle_spawns();
 }
 
-void Map::reset() {
-    for (int y = 0; y < MAP_HEIGHT; y++) {
-        for (int x = 0; x < MAP_WIDTH; x++) {
-            grid[y][x] = start_grid[y][x];
-            explosion[y][x] = false;
-        }
-    }
-}
-
 Position Map::get_random_spawn() {
-    Position spawn = spawns[spawns_count - 1];
-    spawns_count--;
+    Position spawn = spawns[spawn_count - 1];
+    spawn_count--;
     return spawn;
 }
 
@@ -127,8 +124,21 @@ bool Map::is_wall(Position p) {
         return false;
     }
 
-    Cell c = grid[p.y][p.x];
-    return c == BREAKABLE_WALL || c == UNBREAKABLE_WALL;
+    return grid[p.y][p.x] == WALL_SOLID || grid[p.y][p.x] == WALL_DESTRUCTIBLE;
+}
+
+bool Map::is_wall_solid(Position p){
+    return !out_of_bounds(p) && grid[p.y][p.x] == WALL_SOLID;
+}
+
+bool Map::is_wall_destructible(Position p) {
+    return !out_of_bounds(p) && grid[p.y][p.x] == WALL_DESTRUCTIBLE;
+}
+
+void Map::break_wall(Position p) {
+    if (is_wall_destructible(p)) {
+        grid[p.y][p.x] = EMPTY;
+    }
 }
 
 bool Map::is_door(Position p) {
@@ -136,16 +146,47 @@ bool Map::is_door(Position p) {
         return false;
     }
 
-    Cell c = grid[p.y][p.x];
-    return c == ENTRANCE || c == EXIT;
+    return grid[p.y][p.x] == DOOR_PREV || grid[p.y][p.x] == DOOR_NEXT;
+}
+
+bool Map::is_door_prev(Position p) {
+    return !out_of_bounds(p) && grid[p.y][p.x] == DOOR_PREV;
+}
+
+bool Map::is_door_next(Position p) {
+    return !out_of_bounds(p) && grid[p.y][p.x] == DOOR_NEXT;
+}
+
+void Map::open_door_prev() {
+    grid[1][0] = DOOR_PREV;
+}
+
+void Map::close_door_prev() {
+    grid[1][0] = WALL_SOLID;
+}
+
+void Map::open_door_next() {
+    grid[1][MAP_WIDTH - 1] = DOOR_NEXT;
+}
+
+void Map::close_door_next() {
+    grid[1][MAP_WIDTH - 1] = WALL_SOLID;
 }
 
 bool Map::is_bomb(Position p) {
     return !out_of_bounds(p) && grid[p.y][p.x] == BOMB;
 }
 
-bool Map::is_item(Position p) {
-    return !out_of_bounds(p) && grid[p.y][p.x] == ITEM;
+void Map::set_bomb(Position p) {
+    if (!out_of_bounds(p)) {
+        grid[p.y][p.x] = BOMB;
+    }
+}
+
+void Map::unset_bomb(Position p) {
+    if (is_bomb(p)) {
+        grid[p.y][p.x] = EMPTY;
+    }
 }
 
 bool Map::is_explosion(Position p) {
@@ -164,18 +205,11 @@ void Map::unset_explosion(Position p) {
     }
 }
 
-void Map::open_entrance() {
-    grid[1][0] = ENTRANCE;
-}
-
-void Map::close_entrance() {
-    grid[1][0] = UNBREAKABLE_WALL;
-}
-
-void Map::open_exit() {
-    grid[1][MAP_WIDTH - 1] = EXIT;
-}
-
-void Map::close_exit() {
-    grid[1][MAP_WIDTH - 1] = UNBREAKABLE_WALL;
+void Map::reset() {
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            grid[y][x] = start_grid[y][x];
+            explosion[y][x] = false;
+        }
+    }
 }

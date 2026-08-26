@@ -33,13 +33,12 @@ void Renderer::init_colors() {
 
     // COLOR_DEFAULT = -1 significa "usa lo sfondo nativo del terminale"
     init_pair(CP_SCREEN, bg, bg);
-    init_pair(CP_UNBREAKABLE_WALL, COLOR_WHITE, COLOR_WHITE);
-    init_pair(CP_BREAKABLE_WALL, grey, grey);
+    init_pair(CP_WALL_SOLID, COLOR_WHITE, COLOR_WHITE);
+    init_pair(CP_WALL_DESTRUCTIBLE, grey, grey);
     init_pair(CP_DOOR, COLOR_GREEN, bg);
     init_pair(CP_PLAYER, COLOR_CYAN, bg);
     init_pair(CP_ENEMY, COLOR_RED, bg);
     init_pair(CP_BOMB, COLOR_RED, bg);
-    init_pair(CP_BLINK, COLOR_WHITE, bg);
     init_pair(CP_EXPLOSION, COLOR_RED, COLOR_RED);
     init_pair(CP_ITEM, COLOR_MAGENTA, bg);
     init_pair(CP_TITLE, COLOR_WHITE, bg);
@@ -124,19 +123,19 @@ void Renderer::draw_grid(Map& map) {
             Cell c = map.get_cell({y, x});
 
             switch (c) {
-                case BREAKABLE_WALL:
-                    mvwaddch(map_window, y, x, ' ' | COLOR_PAIR(CP_BREAKABLE_WALL));
+                case WALL_SOLID:
+                    mvwaddch(map_window, y, x, ' ' | COLOR_PAIR(CP_WALL_SOLID));
                     break;
 
-                case UNBREAKABLE_WALL:
-                    mvwaddch(map_window, y, x, ' ' | COLOR_PAIR(CP_UNBREAKABLE_WALL));
+                case WALL_DESTRUCTIBLE:
+                    mvwaddch(map_window, y, x, ' ' | COLOR_PAIR(CP_WALL_DESTRUCTIBLE));
                     break;
 
-                case ENTRANCE:
+                case DOOR_PREV:
                     mvwaddch(map_window, y, x, '<' | COLOR_PAIR(CP_DOOR));
                     break;
 
-                case EXIT:
+                case DOOR_NEXT:
                     mvwaddch(map_window, y, x, '>' | COLOR_PAIR(CP_DOOR));
                     break;
 
@@ -152,14 +151,7 @@ void Renderer::draw_bombs(Bomb* bombs) {
     for (int i = 0; i < MAX_BOMBS; i++) {
         if (bombs[i].is_active()) {
             Position p = bombs[i].get_position();
-
-            if (bombs[i].is_blinking()) {
-                mvwaddch(map_window, p.y, p.x, 'O' | COLOR_PAIR(CP_BLINK));
-            }
-            else {
-                mvwaddch(map_window, p.y, p.x, 'O' | COLOR_PAIR(CP_BOMB));
-            }
-            
+            mvwaddch(map_window, p.y, p.x, 'O' | COLOR_PAIR(CP_BOMB));
         }
     }
 }

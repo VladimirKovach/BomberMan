@@ -80,17 +80,17 @@ void LevelManager::update_doors() {
         Map& map = (current->level).get_map();
 
         if (current->next != NULL) {
-            map.open_exit();
+            map.open_door_next();
         }
         else {
-            map.close_exit();
+            map.close_door_next();
         }
 
         if (current->prev != NULL) {
-            map.open_entrance();
+            map.open_door_prev();
         }
         else {
-            map.close_entrance();
+            map.close_door_prev();
         }
     }
 }

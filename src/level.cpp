@@ -53,29 +53,29 @@ bool Level::spawn_item(Position p, ItemType type) {
 
 void Level::spawn_enemies() {
     if (number == 1) {
-        for (int i = 0; i < 3; i++) {
-            walkers[i] = Walker(map.get_random_spawn(), 1);
-        }
+        walkers[0] = Walker(map.get_random_spawn(), 1);
+        walkers[1] = Walker(map.get_random_spawn(), 1);
+        walkers[2] = Walker(map.get_random_spawn(), 1);
     }
     else if (number == 2) {
-        for (int i = 0; i < 3; i++) {
-            walkers[i] = Walker(map.get_random_spawn(), 2);
-        }
+        walkers[0] = Walker(map.get_random_spawn(), 2);
+        walkers[1] = Walker(map.get_random_spawn(), 2);
+        walkers[2] = Walker(map.get_random_spawn(), 2);
 
         roamers[0] = Roamer(map.get_random_spawn(), 1);
     }
     else if (number == 3) {
-        for (int i = 0; i < 3; i++) {
-            walkers[i] = Walker(map.get_random_spawn(), 2);
-        }
+        walkers[0] = Walker(map.get_random_spawn(), 2);
+        walkers[1] = Walker(map.get_random_spawn(), 2);
+        walkers[2] = Walker(map.get_random_spawn(), 2);
 
         roamers[0] = Roamer(map.get_random_spawn(), 2);
         roamers[1] = Roamer(map.get_random_spawn(), 2);
     }
     else if (number == 4) {
-        for (int i = 0; i < 3; i++) {
-            walkers[i] = Walker(map.get_random_spawn(), 2);
-        }
+        walkers[0] = Walker(map.get_random_spawn(), 2);
+        walkers[1] = Walker(map.get_random_spawn(), 2);
+        walkers[2] = Walker(map.get_random_spawn(), 2);
 
         roamers[0] = Roamer(map.get_random_spawn(), 2);
         roamers[1] = Roamer(map.get_random_spawn(), 2);
@@ -83,9 +83,9 @@ void Level::spawn_enemies() {
         chasers[0] = Chaser(map.get_random_spawn(), 2);
     }
     else if (number == 5) {
-        for (int i = 0; i < 3; i++) {
-            walkers[i] = Walker(map.get_random_spawn(), 2);
-        }
+        walkers[0] = Walker(map.get_random_spawn(), 2);
+        walkers[1] = Walker(map.get_random_spawn(), 2);
+        walkers[2] = Walker(map.get_random_spawn(), 2);
 
         roamers[0] = Roamer(map.get_random_spawn(), 2);
         roamers[1] = Roamer(map.get_random_spawn(), 2);

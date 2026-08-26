@@ -4,7 +4,6 @@
 #include "map.hpp"
 #include "utils.hpp"
 
-const int BLINK_TIMER_START = TICKS_PER_SECOND / 4;      // 0.25 secondi
 const int EXPLODING_TIMER_START = TICKS_PER_SECOND * 2;  // 2.00 secondi
 const int EXPLOSION_TIMER_START = TICKS_PER_SECOND / 2;  // 0.50 secondi
 
@@ -14,14 +13,12 @@ protected:
     int range;
 
     bool active;
-    bool blink;
     bool exploding;
 
-    int blink_timer;
     int exploding_timer;
     int explosion_timer;
 
-    // spostare in map
+    // spostare in map?
     void update_explosion(Map& map, Direction d, bool set);
 
 public:
@@ -31,7 +28,6 @@ public:
     int get_range();
 
     bool is_active();
-    bool is_blinking();
     bool is_exploding();
 
     void place(Map& map, Position _p, int _range);
