@@ -11,6 +11,7 @@ enum Direction {
     DOWN,
     RIGHT,
 };
+const int DIRECTIONS_COUNT = 4;
 
 struct Position {
     int y;

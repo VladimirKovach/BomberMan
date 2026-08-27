@@ -30,9 +30,9 @@ void Map::shuffle_spawns() {
     }
 }
 
-// primo quadrante
+// SAFE ZONE - zona in cui non si possono spawnare i nemici
 bool Map::safe_zone(Position p) {
-    return p.y >= 0 && p.y < MAP_HEIGHT / 2 && p.x >= 0 && p.x < MAP_WIDTH / 2;
+    return p.y >= 0 && p.y < SAFE_ZONE_SIZE && p.x >= 0 && p.x < SAFE_ZONE_SIZE;
 }
 
 void Map::place_solid_walls() {
@@ -65,10 +65,13 @@ void Map::place_destructible_walls(int percentage) {
         }
     }
 
-    // No muri sulla cella iniziale del giocatore e sulle due adiacenti
+    // Cella iniziale del giocatore, celle adiacenti e almeno una via di fuga:
+    // con raggio 1 l'esplosione da (1,1) copre (1,2) e (2,1), quindi serve
+    // una casella libera fuori dalla croce per poter bombardare senza morire.
     grid[1][1] = EMPTY;
     grid[1][2] = EMPTY;
     grid[2][1] = EMPTY;
+    grid[1][3] = EMPTY;
 }
 
 void Map::save_start_grid() {
@@ -83,12 +86,12 @@ Map::Map(int difficulty) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
             grid[y][x] = EMPTY;
-            explosion[y][x] = false;
+            explosion[y][x] = 0;
         }
     }
 
     place_solid_walls();
-    place_destructible_walls(difficulty * 5);
+    place_destructible_walls(BASE_WALL_PERCENTAGE + difficulty * 5);
     save_start_grid();
 
     save_spawns();
@@ -107,12 +110,6 @@ Cell Map::get_cell(Position p) {
     }
 
     return grid[p.y][p.x];
-}
-
-void Map::set_cell(Position p, Cell c) {
-    if (!out_of_bounds(p)) {
-        grid[p.y][p.x] = c;
-    }
 }
 
 bool Map::out_of_bounds(Position p) {
@@ -190,18 +187,18 @@ void Map::unset_bomb(Position p) {
 }
 
 bool Map::is_explosion(Position p) {
-    return !out_of_bounds(p) && explosion[p.y][p.x];
+    return !out_of_bounds(p) && explosion[p.y][p.x] > 0;
 }
 
 void Map::set_explosion(Position p) {
     if (!out_of_bounds(p)) {
-        explosion[p.y][p.x] = true;
+        explosion[p.y][p.x]++;
     }
 }
 
 void Map::unset_explosion(Position p) {
     if (!out_of_bounds(p)) {
-        explosion[p.y][p.x] = false;
+        explosion[p.y][p.x]--;
     }
 }
 

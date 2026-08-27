@@ -5,19 +5,39 @@
 void Bomb::update_explosion(Map& map, Direction d, bool set) {
     Position target = p;
 
-    for (int i = 0; i < range; i++) {
-        target = next_position(target, d);
+    if (set) {
+        // Accensione: propago fino al raggio, fermandomi sul primo muro solido.
+        // Un muro distruttibile viene colpito ma assorbe l'esplosione, che
+        // quindi non prosegue oltre.
+        int reach = 0;
 
-        if (map.out_of_bounds(target) || map.is_wall_solid(target)) {
-            return;
-        }
+        for (int i = 0; i < range; i++) {
+            target = next_position(target, d);
 
-        if (set) {
+            if (map.out_of_bounds(target) || map.is_wall_solid(target)) {
+                break;
+            }
+
             map.set_explosion(target);
+            reach++;
+
+            if (map.is_wall_destructible(target)) {
+                break;
+            }
         }
-        else {
+
+        blast[d] = reach;
+    }
+    else {
+        // Spegnimento: uso il raggio memorizzato. Non posso ricalcolarlo,
+        // perche' i muri colpiti nel frattempo sono stati distrutti e la
+        // griglia non li mostra piu'.
+        for (int i = 0; i < blast[d]; i++) {
+            target = next_position(target, d);
             map.unset_explosion(target);
         }
+
+        blast[d] = 0;
     }
 }
 
@@ -25,6 +45,9 @@ Bomb::Bomb(Position _p, int _range) {
     p = _p;
     range = _range;
 
+    for (int i = 0; i < DIRECTIONS_COUNT; i++) {
+        blast[i] = 0;
+    }
     active = false;
     exploding = false;
 

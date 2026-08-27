@@ -13,8 +13,8 @@ void Leaderboard::save(const char* name, int score) {
     std::ofstream out;
     out.open(LEADERBOARD_FILE, std::ios::app);
 
-    // Se l'apertura fallisce ignoriamo
-    //todo Forse si potrebbe fare un try/catch, gestione di errori.
+    // Se l'apertura fallisce ignoriamo silenziosamente: il punteggio
+    // non viene salvato ma il gioco prosegue.
     if (!out.is_open()) return;
 
     // Scrive il nome carattere per carattere.
@@ -70,11 +70,7 @@ static ScoreEntry* insert_sorted(ScoreEntry* head, ScoreEntry* new_node) {
 // Strategia: leggi una riga alla volta (formato "nome;score"), splitta
 // sul ';', crea un nodo, inseriscilo in ordine nella lista. A fine
 // lettura la lista e' gia' ordinata - non serve un sort separato.
-//
-// Costo: O(n^2) nel caso peggiore per via dell'inserzione lineare. Con
-// poche decine di punteggi e' irrilevante. Se un giorno la classifica
-// diventasse enorme si potrebbe leggere tutto in un array e fare un sort
-// piu' veloce, ma sarebbe ottimizzazione prematura.
+
 ScoreEntry* Leaderboard::load() {
     std::ifstream in;
     in.open(LEADERBOARD_FILE);

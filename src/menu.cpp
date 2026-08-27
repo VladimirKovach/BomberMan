@@ -1,7 +1,6 @@
 #include "menu.hpp"
 #include "leaderboard.hpp"
 #include <ncurses.h>
-#include <cstdio>  // togliere
 
 // Dimensioni della finestra del menu.
 // Tenute piccole perche' il menu ha poche voci e deve stare comoda
@@ -20,6 +19,25 @@ Menu::Menu() {
     items[QUIT]        = "Esci";
 }
 
+
+// Numero di cifre decimali di un intero (0 -> 1).
+// Serve solo a calcolare la larghezza del testo da centrare a schermo:
+// la stampa vera e propria la fa mvprintw con "%d".
+// Sostituisce snprintf, che appartiene a <cstdio> (libreria non ammessa).
+static int digit_count(int n) {
+    if (n < 0) {
+        n = -n;
+    }
+
+    int digits = 1;
+
+    while (n >= 10) {
+        n /= 10;
+        digits++;
+    }
+
+    return digits;
+}
 
 // Disegna il menu da capo a ogni frame/pressione di tasto.
 // influisce poco la performance.
@@ -222,9 +240,15 @@ void Menu::prompt_save_score(int score) {
     while (title[title_len] != '\0') title_len++;
     mvprintw(LINES / 2 - 4, (COLS - title_len) / 2, "%s", title);
 
-    char score_str[32];
-    int score_len = snprintf(score_str, sizeof(score_str), "Punteggio: %d", score);
-    mvprintw(LINES / 2 - 2, (COLS - score_len) / 2, "%s", score_str);
+    // Lunghezza della riga "Punteggio: <n>" calcolata a mano, per centrarla.
+    // Non serve un buffer: mvprintw formatta direttamente sullo schermo.
+    const char* score_label = "Punteggio: ";
+    int score_len = 0;
+    while (score_label[score_len] != '\0') score_len++;
+    score_len += digit_count(score);
+    if (score < 0) score_len++;  // spazio per il segno meno
+
+    mvprintw(LINES / 2 - 2, (COLS - score_len) / 2, "%s%d", score_label, score);
 
     const char* prompt = "Inserisci il tuo nome: ";
     int prompt_len = 0;

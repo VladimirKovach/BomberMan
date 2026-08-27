@@ -4,8 +4,6 @@
 #include "map.hpp"
 #include "utils.hpp"
 
-const int DIRECTIONS_COUNT = 4;
-
 class Enemy {
 protected:
     Direction directions[DIRECTIONS_COUNT];

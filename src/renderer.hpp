@@ -9,6 +9,9 @@
 #include "utils.hpp"
 #include <ncurses.h>
 
+// Larghezza del pannello laterale con LEVEL / LIVES / SCORE / TIME
+const int INFO_WIDTH = 15;
+
 enum {
     COLOR_DEFAULT = -1,
     COLOR_GREY = 244,
@@ -38,9 +41,8 @@ protected:
 
     void init_colors();
 
-    //void display_title();
-    //void display_effect(int buff_remaining);
-    void display_colors_debug();
+    void display_title();
+    void display_effect(int buff_remaining);
 
     void draw_grid(Map& map);
     void draw_bombs(Bomb* bombs);

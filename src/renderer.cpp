@@ -5,12 +5,10 @@
 #include "level.hpp"
 #include "player.hpp"
 #include "utils.hpp"
-#include <cstdio>    // togliere 
 #include <ncurses.h>
 
 void Renderer::init_colors() {
     start_color();
-    use_default_colors();
 
     //  ----- ADATTAMENTO DELLA GRAFICA PER WINDOWS -----
 
@@ -51,7 +49,7 @@ Renderer::Renderer() {
     map_start_x = (max_x - MAP_WIDTH) / 2;
 
     map_window = newwin(MAP_HEIGHT, MAP_WIDTH, map_start_y, map_start_x);
-    info_window = newwin(MAP_HEIGHT, 15, map_start_y, map_start_x + MAP_WIDTH + 2);
+    info_window = newwin(MAP_HEIGHT, INFO_WIDTH, map_start_y, map_start_x + MAP_WIDTH + 2);
 
     init_colors();
 }
@@ -61,7 +59,8 @@ Renderer::~Renderer() {
     delwin(info_window);
 }
 
-/*
+
+
 // Titolo in stile "banner" da vecchio terminale
 const int TITLE_ROWS = 5;
 const char* TITLE_BANNER[TITLE_ROWS] = {
@@ -73,26 +72,26 @@ const char* TITLE_BANNER[TITLE_ROWS] = {
 };
 
 void Renderer::display_title() {
-    int banner_w = 61;  // larghezza delle righe di TITLE_BANNER
-    int top = map_start_y - 2 - TITLE_ROWS;  // sopra la riga HUD, con una riga vuota
+    const char* title = "B O M B E R M A N";
+
+    // Lunghezza calcolata con un loop manuale (niente strlen)
+    int len = 0;
+    while (title[len] != '\0') len++;
+
+    // Il titolo sta due righe sopra la mappa, cioe' sopra la riga EFFETTO.
+    // Se il terminale e' troppo basso non c'e' spazio: non disegniamo nulla.
+    int row = map_start_y - 3;
+    if (row < 0) {
+        return;
+    }
+
+    int left = (max_x - len) / 2;
+    if (left < 0) {
+        left = 0;
+    }
 
     attron(COLOR_PAIR(CP_TITLE) | A_BOLD);
-    if (top >= 0 && max_x >= banner_w) {
-        // Centrato rispetto alla griglia (che a sua volta e' centrata)
-        int left = map_start_x + (MAP_WIDTH - banner_w) / 2;
-        if (left < 0) {
-            left = 0;
-        }
-        for (int i = 0; i < TITLE_ROWS; i++) {
-            mvprintw(top + i, left, "%s", TITLE_BANNER[i]);
-        }
-    }
-    else if (map_start_y - 3 >= 0) {
-        // Terminale piccolo: titolo compatto
-        const char* small_title = "B O M B E R M A N";
-        int left = (max_x - 17) / 2;
-        mvprintw(map_start_y - 3, left, "%s", small_title);
-    }
+    mvprintw(row, left, "%s", title);
     attroff(COLOR_PAIR(CP_TITLE) | A_BOLD);
 }
 
@@ -100,22 +99,18 @@ void Renderer::display_effect(int buff_remaining) {
     move(map_start_y - 1, map_start_x);
 
     char text[32] = "None";
+
+    // Il padding a larghezza fissa serve a cancellare il testo del frame
+    // precedente ("Range 10s" è la stringa piu lunga prevista: 9 caratteri).
     if (buff_remaining > 0) {
         int seconds = (buff_remaining + TICKS_PER_SECOND - 1) / TICKS_PER_SECOND;
-        snprintf(text, sizeof(text), "Range %ds", seconds);
+        printw("EFFETTO: Range %-3d", seconds);
     }
-
-    // %-9s: padding a destra per cancellare il testo del frame precedente.
-    // 9 = length("Range 10s"), la stringa piu' lunga prevista
-    printw("EFFETTO: %-9s", text);
-}
-*/
-
-void Renderer::display_colors_debug() {
-    if (map_start_y + MAP_HEIGHT < max_y) {
-        mvprintw(map_start_y + MAP_HEIGHT, map_start_x, "COLORS: %d", COLORS);
+    else {
+        printw("EFFETTO: %-9s", "None");
     }
 }
+
 
 void Renderer::draw_grid(Map& map) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
@@ -264,9 +259,10 @@ void Renderer::draw_info(Level& level, Player& player, int score, int time) {
 void Renderer::render(LevelManager& level_manager, Player& player, int score, int time) {
     Level& level = level_manager.get_current_level();
 
-    //display_title();
-    //display_effect(player.get_buff_remaining());
-    //display_colors_debug();
+    display_title();
+    display_effect(player.get_buff_remaining());
+
+    wnoutrefresh(stdscr); // <-- stdscr per primo: fa da sfondo
 
     draw_map(level, player);
     draw_info(level, player, score, time);

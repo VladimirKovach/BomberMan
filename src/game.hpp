@@ -31,7 +31,10 @@ protected:
     // Prova a generare un item di tipo casuale in 'p' con probabilita' 'chance'
     void try_drop_item(Level& level, Position p, int chance);
 
-    void player_doors_collisions(Level& level);
+    // Ritorna true se il livello corrente e' cambiato (o e' stato rimosso):
+    // in quel caso il Level& del chiamante non e' piu' valido e le altre
+    // collisioni vanno saltate fino al frame successivo.
+    bool player_doors_collisions(Level& level);
     void player_items_collisions(Level& level);
     void player_enemies_collisions(Level& level);
     void player_explosions_collisions(Level& level);

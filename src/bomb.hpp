@@ -11,6 +11,8 @@ class Bomb {
 protected:
     Position p;
     int range;
+    // Memorizza quante celle ha effettivamente raggiunto l'esplosione in ciascuna direzione.
+    int blast[DIRECTIONS_COUNT]; // 4 interi: UP, LEFT, DOWN, RIGHT
 
     bool active;
     bool exploding;

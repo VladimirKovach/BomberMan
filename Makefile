@@ -1,7 +1,7 @@
 bomberman: main.o bomb.o chaser.o enemy.o game.o item.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o roamer.o utils.o walker.o
 	g++ main.o bomb.o chaser.o enemy.o game.o item.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o roamer.o utils.o walker.o -lncurses -o bomberman
 
-main.o: src/main.cpp src/game.hpp src/menu.hpp
+main.o: src/main.cpp src/game.hpp src/map.hpp src/menu.hpp src/renderer.hpp
 	g++ -c src/main.cpp
 
 bomb.o: src/bomb.cpp src/bomb.hpp src/map.hpp src/utils.hpp

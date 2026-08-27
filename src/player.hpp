@@ -39,7 +39,7 @@ public:
     void update_buff();
 
     // Tick rimanenti del buff raggio (0 se non attivo)
-    //int get_buff_remaining();
+    int get_buff_remaining();
 
     void reset();
 };

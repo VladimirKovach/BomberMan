@@ -48,6 +48,11 @@ void Game::try_drop_item(Level& level, Position p, int chance) {
 }
 
 void Game::handle_collisions() {
+
+    if (player_doors_collisions(level_manager.get_current_level())) {
+        return;
+    }
+
     Level& level = level_manager.get_current_level();
 
     player_doors_collisions(level);
@@ -59,7 +64,7 @@ void Game::handle_collisions() {
     bombs_explosions_collisions(level);
 }
 
-void Game::player_doors_collisions(Level& level) {
+bool Game::player_doors_collisions(Level& level) {
     Map& map = level.get_map();
 
     Position player_p = player.get_position();
@@ -72,9 +77,11 @@ void Game::player_doors_collisions(Level& level) {
             level_manager.go_to_next_level();
         }
 
-        player.set_position({1, 1});  // vicino alla porta in alto a sinistra
+        player.set_position({1, 1});
+        return true;
     }
-    else if (map.is_door_prev(player_p) && level_manager.has_prev_level()) {
+
+    if (map.is_door_prev(player_p) && level_manager.has_prev_level()) {
         if (level.is_completed()) {
             level_manager.remove_current_level(false);
         }
@@ -82,8 +89,11 @@ void Game::player_doors_collisions(Level& level) {
             level_manager.go_to_prev_level();
         }
 
-        player.set_position({1, MAP_WIDTH - 2});  // vicino alla porta a destra
+        player.set_position({1, MAP_WIDTH - 2});
+        return true;
     }
+
+    return false;
 }
 
 void Game::player_items_collisions(Level& level) {
@@ -115,7 +125,6 @@ void Game::player_items_collisions(Level& level) {
 }
 
 void Game::player_enemies_collisions(Level& level) {
-    Map& map = level.get_map();
     Chaser* chasers = level.get_chasers();
     Roamer* roamers = level.get_roamers();
     Walker* walkers = level.get_walkers();
