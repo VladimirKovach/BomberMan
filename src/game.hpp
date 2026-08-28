@@ -18,6 +18,9 @@ protected:
     bool running;
     int timer;  // tick rimanenti nella partita
     int score;
+    int level_score;  // Punteggio al momento dell'ingresso nel livello corrente.
+    // Alla morte del giocatore il punteggio torna a questo valore, cosi' i punti fatti nel
+    // tentativo fallito non restano acquisiti (il livello viene resettato).
 
     LevelManager level_manager;
     Player player;

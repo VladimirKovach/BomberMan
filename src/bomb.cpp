@@ -2,52 +2,91 @@
 #include "map.hpp"
 #include "utils.hpp"
 
-void Bomb::update_explosion(Map& map, Direction d, bool set) {
-    Position target = p;
+void Bomb::ignite(Map& map) {
+    bool visited[MAP_HEIGHT][MAP_WIDTH];
 
-    if (set) {
-        // Accensione: propago fino al raggio, fermandomi sul primo muro solido.
-        // Un muro distruttibile viene colpito ma assorbe l'esplosione, che
-        // quindi non prosegue oltre.
-        int reach = 0;
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            visited[y][x] = false;
+        }
+    }
 
-        for (int i = 0; i < range; i++) {
-            target = next_position(target, d);
+    Position queue[MAX_EXPLOSION_CELLS];
+    int distance[MAX_EXPLOSION_CELLS];
+    int head = 0;
+    int tail = 0;
 
-            if (map.out_of_bounds(target) || map.is_wall_solid(target)) {
-                break;
-            }
+    const Direction dirs[DIRECTIONS_COUNT] = {UP, LEFT, DOWN, RIGHT};
 
-            map.set_explosion(target);
-            reach++;
+    lit_count = 0;
 
-            if (map.is_wall_destructible(target)) {
-                break;
-            }
+    // La visita parte dalla cella della bomba, a distanza 0.
+    queue[tail] = p;
+    distance[tail] = 0;
+    tail++;
+    visited[p.y][p.x] = true;
+
+    while (head < tail) {
+        Position current = queue[head];
+        int d = distance[head];
+        head++;
+
+        // Accendo la cella e la registro, per poterla spegnere dopo.
+        map.set_explosion(current);
+        lit_cells[lit_count] = current;
+        lit_count++;
+
+        // Un muro distruttibile viene colpito, ma assorbe l'esplosione:
+        // le celle oltre non si accendono.
+        if (map.is_wall_destructible(current)) {
+            continue;
         }
 
-        blast[d] = reach;
-    }
-    else {
-        // Spegnimento: uso il raggio memorizzato. Non posso ricalcolarlo,
-        // perche' i muri colpiti nel frattempo sono stati distrutti e la
-        // griglia non li mostra piu'.
-        for (int i = 0; i < blast[d]; i++) {
-            target = next_position(target, d);
-            map.unset_explosion(target);
+        // Raggiunta la distanza massima: non espando oltre.
+        if (d == range) {
+            continue;
         }
 
-        blast[d] = 0;
+        for (int i = 0; i < DIRECTIONS_COUNT; i++) {
+            Position next = next_position(current, dirs[i]);
+
+            // L'ordine dei controlli conta: out_of_bounds va verificato
+            // prima di leggere visited[next.y][next.x].
+            if (map.out_of_bounds(next)) {
+                continue;
+            }
+            if (visited[next.y][next.x]) {
+                continue;
+            }
+            if (map.is_wall_solid(next)) {
+                continue;
+            }
+            if (tail >= MAX_EXPLOSION_CELLS) {
+                continue;
+            }
+
+            visited[next.y][next.x] = true;
+            queue[tail] = next;
+            distance[tail] = d + 1;
+            tail++;
+        }
     }
+}
+
+void Bomb::extinguish(Map& map) {
+    for (int i = 0; i < lit_count; i++) {
+        map.unset_explosion(lit_cells[i]);
+    }
+
+    lit_count = 0;
 }
 
 Bomb::Bomb(Position _p, int _range) {
     p = _p;
     range = _range;
 
-    for (int i = 0; i < DIRECTIONS_COUNT; i++) {
-        blast[i] = 0;
-    }
+    lit_count = 0;
+
     active = false;
     exploding = false;
 
@@ -80,16 +119,15 @@ void Bomb::place(Map& map, Position _p, int _range) {
 }
 
 void Bomb::explode(Map& map) {
+    // Guardia contro una doppia accensione.
+    // ignite() azzera lit_count, quindi le celle della prima accensione non verrebbero mai spente.
+    if (exploding) {
+        return;
+    }
+
     exploding = true;
 
-    // Esplosione al centro
-    map.set_explosion(p);
-
-    // Esplosione nelle 4 direzioni (croce)
-    update_explosion(map, UP, true);
-    update_explosion(map, LEFT, true);
-    update_explosion(map, DOWN, true);
-    update_explosion(map, RIGHT, true);
+    ignite(map);
 
     map.unset_bomb(p);
 }
@@ -110,13 +148,7 @@ void Bomb::update(Map& map) {
         }
 
         if (explosion_timer == 0) {
-            map.unset_explosion(p);
-
-            update_explosion(map, UP, false);
-            update_explosion(map, LEFT, false);
-            update_explosion(map, DOWN, false);
-            update_explosion(map, RIGHT, false);
-
+            extinguish(map);
             reset();
         }
     }
@@ -125,6 +157,7 @@ void Bomb::update(Map& map) {
 void Bomb::reset() {
     active = false;
     exploding = false;
+    lit_count = 0;
 
     exploding_timer = EXPLODING_TIMER_START;
     explosion_timer = EXPLOSION_TIMER_START;

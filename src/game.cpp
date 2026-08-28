@@ -11,6 +11,7 @@ Game::Game() {
     running = true;
     timer = GAME_TIMER_START;
     score = 0;
+    level_score = 0;
 }
 
 bool Game::win() {
@@ -25,6 +26,7 @@ void Game::handle_player_death(Level& level) {
     player.lose_life();
     player.reset();
     level.reset();
+    score = level_score;
 }
 
 void Game::try_drop_item(Level& level, Position p, int chance) {
@@ -78,6 +80,7 @@ bool Game::player_doors_collisions(Level& level) {
         }
 
         player.set_position({1, 1});
+        level_score = score; // Il valore va preso all'ingresso nel livello, non all'uscita
         return true;
     }
 
@@ -90,6 +93,7 @@ bool Game::player_doors_collisions(Level& level) {
         }
 
         player.set_position({1, MAP_WIDTH - 2});
+        level_score = score;
         return true;
     }
 
