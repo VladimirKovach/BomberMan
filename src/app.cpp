@@ -2,6 +2,7 @@
 #include "game.hpp"
 #include "menu.hpp"
 #include <ncurses.h>
+#include <iostream>
 
 App::App() {
     running = true;
@@ -14,11 +15,33 @@ App::App() {
     nodelay(stdscr, true);
 }
 
-App::~App() {
-    endwin();
+// Verifica che il terminale sia abbastanza grande.
+// Un programma ncurses non puo' ridimensionare la finestra che lo ospita:
+// l'unica cosa corretta da fare e' avvisare l'utente e uscire.
+bool App::terminal_too_small() {
+    int h, w;
+    getmaxyx(stdscr, h, w);
+
+    if (h >= MIN_LINES && w >= MIN_COLS) {
+        return false;
+    }
+    else {
+        endwin();
+
+        std::cout << "Terminale troppo piccolo." << '\n';
+        std::cout << "Dimensione minima: " << MIN_LINES << " x " << MIN_COLS << " (righe x colonne)\n";
+        std::cout << "Dimensione attuale: " << h << " x " << w << '\n';
+        std::cout << "Ingrandisci la finestra e riavvia il gioco." << '\n';
+
+        return true;
+    }
 }
 
 void App::run() {
+    if (terminal_too_small()) {
+        return;
+    }
+
     // Main Loop: il menu compare ogni volta che finisce una partita
     while (running) {
         MenuChoice choice = menu.show();
@@ -47,4 +70,6 @@ void App::run() {
                 break;
         }
     }
+
+    endwin();
 }
