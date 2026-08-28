@@ -61,7 +61,7 @@ bool Game::handle_level_change(Level& level) {
             level_manager.go_to_next_level();
         }
 
-        player.set_position({1, 1});
+        player.set_spawn({1, 1});
         level_score = score;
 
         return true;
@@ -75,7 +75,7 @@ bool Game::handle_level_change(Level& level) {
             level_manager.go_to_prev_level();
         }
 
-        player.set_position({1, MAP_WIDTH - 2});
+        player.set_spawn({1, MAP_WIDTH - 2});
         level_score = score;
 
         return true;

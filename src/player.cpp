@@ -21,6 +21,11 @@ void Player::set_position(Position _p) {
     p = _p;
 }
 
+void Player::set_spawn(Position _p) {
+    p = _p;
+    start_p = _p;
+}
+
 int Player::get_lives() {
     return lives;
 }

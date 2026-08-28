@@ -18,7 +18,7 @@ const int MAP_WIDTH = 41;
 const int MAX_SPAWNS = MAP_HEIGHT * MAP_WIDTH;
 
 // Lato del quadrato in cui non si possono spawnare nemici
-const int SAFE_ZONE_SIDE = 5;
+const int SAFE_ZONE_SIZE = 5;
 
 // Percentuale base di muri distruttibili; a questa si somma 5 per livello.
 const int BASE_WALL_PERCENTAGE = 5;

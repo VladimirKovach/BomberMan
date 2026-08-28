@@ -32,7 +32,21 @@ void Map::shuffle_spawns() {
 
 // SAFE ZONE - zona in cui non si possono spawnare nemici
 bool Map::safe_zone(Position p) {
-    return p.y >= 0 && p.y < SAFE_ZONE_SIDE && p.x >= 0 && p.x < SAFE_ZONE_SIDE;
+    if (p.y < 0 || p.y >= SAFE_ZONE_SIZE) {
+        return false;
+    }
+
+    // Angolo sinistro: spawn iniziale e rientro dalla porta 'next'.
+    if (p.x >= 0 && p.x < SAFE_ZONE_SIZE) {
+        return true;
+    }
+
+    // Angolo destro: rientro dalla porta 'prev'.
+    if (p.x >= MAP_WIDTH - SAFE_ZONE_SIZE && p.x < MAP_WIDTH) {
+        return true;
+    }
+
+    return false;
 }
 
 void Map::place_solid_walls() {
@@ -65,10 +79,17 @@ void Map::place_destructible_walls(int percentage) {
         }
     }
 
-    // No muri sulla cella iniziale del giocatore e sulle due adiacenti
+    // -- I due punti di ingresso al livello devono essere sempre agibili --
+    // Angolo sinistro (spawn iniziale e rientro dalla porta 'next')
     grid[1][1] = EMPTY;
     grid[1][2] = EMPTY;
     grid[2][1] = EMPTY;
+    grid[1][3] = EMPTY;
+    // Angolo destro (rientro dalla porta 'prev')
+    grid[1][MAP_WIDTH - 2] = EMPTY;
+    grid[1][MAP_WIDTH - 3] = EMPTY;
+    grid[2][MAP_WIDTH - 2] = EMPTY;
+    grid[1][MAP_WIDTH - 4] = EMPTY;
 }
 
 void Map::save_start_grid() {

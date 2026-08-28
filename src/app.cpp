@@ -2,7 +2,6 @@
 #include "game.hpp"
 #include "menu.hpp"
 #include <ncurses.h>
-#include <iostream>
 
 App::App() {
     running = true;
@@ -25,16 +24,18 @@ bool App::terminal_too_small() {
     if (h >= MIN_LINES && w >= MIN_COLS) {
         return false;
     }
-    else {
-        endwin();
 
-        std::cout << "Terminale troppo piccolo." << '\n';
-        std::cout << "Dimensione minima: " << MIN_LINES << " x " << MIN_COLS << " (righe x colonne)\n";
-        std::cout << "Dimensione attuale: " << h << " x " << w << '\n';
-        std::cout << "Ingrandisci la finestra e riavvia il gioco." << '\n';
+    mvprintw(0, 0, "Terminale troppo piccolo.");
+    mvprintw(1, 0, "Dimensione minima: %d x %d (righe x colonne).", MIN_LINES, MIN_COLS);
+    mvprintw(2, 0, "Dimensione attuale: %d x %d.", h, w);
+    mvprintw(4, 0, "Ingrandisci la finestra e riavvia il gioco.");
+    mvprintw(5, 0, "Premi un tasto per uscire...");
 
-        return true;
-    }
+    nodelay(stdscr, FALSE);   // il costruttore ha messo nodelay(TRUE):
+    refresh();                // senza questo getch() non aspetterebbe
+    getch();
+
+    return true;
 }
 
 void App::run() {

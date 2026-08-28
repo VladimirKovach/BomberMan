@@ -21,6 +21,8 @@ public:
 
     Position get_position();
     void set_position(Position _p);
+    void set_spawn(Position _p); // va usata all'ingresso in un livello
+    // cosi' alla morte si riparte dalla porta da cui si è entrati.
 
     int get_lives();
     void gain_life();
