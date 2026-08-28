@@ -30,9 +30,9 @@ void Map::shuffle_spawns() {
     }
 }
 
-// SAFE ZONE - zona in cui non si possono spawnare i nemici
+// SAFE ZONE - zona in cui non si possono spawnare nemici
 bool Map::safe_zone(Position p) {
-    return p.y >= 0 && p.y < SAFE_ZONE_SIZE && p.x >= 0 && p.x < SAFE_ZONE_SIZE;
+    return p.y >= 0 && p.y < SAFE_ZONE_SIDE && p.x >= 0 && p.x < SAFE_ZONE_SIDE;
 }
 
 void Map::place_solid_walls() {
@@ -46,7 +46,7 @@ void Map::place_solid_walls() {
         grid[MAP_HEIGHT - 1][x] = WALL_SOLID;  // bordo inferiore
     }
 
-    // muri solidi interni (pattern a scacchiera con buchi)
+    // Muri solidi interni (pattern a scacchiera con buchi)
     for (int y = 1; y < MAP_HEIGHT - 1; y++) {
         for (int x = 1; x < MAP_WIDTH - 1; x++) {
             if (y % 2 == 0 && x % 2 == 0 && rand() % 100 < 50) {
@@ -65,13 +65,10 @@ void Map::place_destructible_walls(int percentage) {
         }
     }
 
-    // Cella iniziale del giocatore, celle adiacenti e almeno una via di fuga:
-    // con raggio 1 l'esplosione da (1,1) copre (1,2) e (2,1), quindi serve
-    // una casella libera fuori dalla croce per poter bombardare senza morire.
+    // No muri sulla cella iniziale del giocatore e sulle due adiacenti
     grid[1][1] = EMPTY;
     grid[1][2] = EMPTY;
     grid[2][1] = EMPTY;
-    grid[1][3] = EMPTY;
 }
 
 void Map::save_start_grid() {
@@ -91,7 +88,7 @@ Map::Map(int difficulty) {
     }
 
     place_solid_walls();
-    place_destructible_walls(BASE_WALL_PERCENTAGE + difficulty * 5);
+    place_destructible_walls(BASE_WALL_PERCENTAGE + (difficulty * 5));
     save_start_grid();
 
     save_spawns();

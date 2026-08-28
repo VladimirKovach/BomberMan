@@ -9,7 +9,7 @@ const int MENU_WIN_HEIGHT = 11;
 const int MENU_WIN_WIDTH = 40;
 
 // Titolo mostrato in cima alla finestra del menu
-const char* MENU_TITLE = "SUPER BOMBERMAN";
+const char* MENU_TITLE = "BOMBERMAN";
 
 
 Menu::Menu() {

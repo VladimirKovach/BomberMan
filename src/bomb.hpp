@@ -5,6 +5,7 @@
 #include "utils.hpp"
 #include "item.hpp"
 
+const int BLINK_TIMER_START = TICKS_PER_SECOND / 4;      // 0.25 secondi
 const int EXPLODING_TIMER_START = TICKS_PER_SECOND * 2;  // 2.00 secondi
 const int EXPLOSION_TIMER_START = TICKS_PER_SECOND / 2;  // 0.50 secondi
 
@@ -42,9 +43,12 @@ protected:
     Position lit_cells[MAX_EXPLOSION_CELLS]; // numero effettivo
     int lit_count;
 
-    bool active;
+
+    bool active;  // e' stata piazzata e non e' ancora esplosa o sta esplodendo
+    bool blink;
     bool exploding;
 
+    int blink_timer;  // tick rimanenti al cambio di stato (lampeggio / non lampeggio)
     int exploding_timer;
     int explosion_timer;
 
@@ -62,6 +66,7 @@ public:
     int get_range();
 
     bool is_active();
+    bool is_blinking();
     bool is_exploding();
 
     void place(Map& map, Position _p, int _range);

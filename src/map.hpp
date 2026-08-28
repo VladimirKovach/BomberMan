@@ -17,9 +17,8 @@ const int MAP_HEIGHT = 21;
 const int MAP_WIDTH = 41;
 const int MAX_SPAWNS = MAP_HEIGHT * MAP_WIDTH;
 
-// Lato del quadrato attorno allo spawn del giocatore in cui i nemici
-// non possono nascere.
-const int SAFE_ZONE_SIZE = 5;
+// Lato del quadrato in cui non si possono spawnare nemici
+const int SAFE_ZONE_SIDE = 5;
 
 // Percentuale base di muri distruttibili; a questa si somma 5 per livello.
 const int BASE_WALL_PERCENTAGE = 5;
@@ -29,6 +28,7 @@ protected:
     Cell grid[MAP_HEIGHT][MAP_WIDTH];
     Cell start_grid[MAP_HEIGHT][MAP_WIDTH];
 
+    // Numero di esplosioni per cella (sovrapposte se piu' di una)
     int explosion[MAP_HEIGHT][MAP_WIDTH];
 
     // Possibili posizioni in cui spawnare nemici

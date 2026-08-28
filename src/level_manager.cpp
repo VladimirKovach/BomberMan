@@ -14,8 +14,6 @@ LevelManager::LevelManager() {
         node->next = NULL;
         node->prev = prev_node;
 
-        (node->level).spawn_enemies();
-
         if (prev_node != NULL) {
             prev_node->next = node;
         }

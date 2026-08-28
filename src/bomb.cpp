@@ -88,8 +88,10 @@ Bomb::Bomb(Position _p, int _range) {
     lit_count = 0;
 
     active = false;
+    blink = false;
     exploding = false;
 
+    blink_timer = BLINK_TIMER_START;
     exploding_timer = EXPLODING_TIMER_START;
     explosion_timer = EXPLOSION_TIMER_START;
 }
@@ -104,6 +106,10 @@ int Bomb::get_range() {
 
 bool Bomb::is_active() {
     return active;
+}
+
+bool Bomb::is_blinking() {
+    return blink;
 }
 
 bool Bomb::is_exploding() {
@@ -134,8 +140,17 @@ void Bomb::explode(Map& map) {
 
 void Bomb::update(Map& map) {
     if (!exploding) {
+        if (blink_timer > 0) {
+            blink_timer--;
+        }
+
         if (exploding_timer > 0) {
             exploding_timer--;
+        }
+
+        if (blink_timer == 0) {
+            blink = !blink;
+            blink_timer = BLINK_TIMER_START;
         }
 
         if (exploding_timer == 0) {
@@ -156,9 +171,11 @@ void Bomb::update(Map& map) {
 
 void Bomb::reset() {
     active = false;
+    blink = false;
     exploding = false;
     lit_count = 0;
 
+    blink_timer = BLINK_TIMER_START;
     exploding_timer = EXPLODING_TIMER_START;
     explosion_timer = EXPLOSION_TIMER_START;
 }
