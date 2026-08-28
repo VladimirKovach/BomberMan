@@ -4,6 +4,7 @@
 #include "map.hpp"
 #include "utils.hpp"
 
+const int BLINK_TIMER_START = TICKS_PER_SECOND / 4;      // 0.25 secondi
 const int EXPLODING_TIMER_START = TICKS_PER_SECOND * 2;  // 2.00 secondi
 const int EXPLOSION_TIMER_START = TICKS_PER_SECOND / 2;  // 0.50 secondi
 
@@ -11,17 +12,20 @@ class Bomb {
 protected:
     Position p;
     int range;
-    // Memorizza quante celle ha effettivamente raggiunto l'esplosione in ciascuna direzione.
-    int blast[DIRECTIONS_COUNT]; // 4 interi: UP, LEFT, DOWN, RIGHT
 
-    bool active;
+    // Raggio effettivo dell'esplosione in ogni direzione
+    int explosion_range[DIRECTIONS_COUNT];
+
+    bool active;  // e' stata piazzata e non e' ancora esplosa o sta esplodendo
+    bool blink;
     bool exploding;
 
+    int blink_timer;  // tick rimanenti al cambio di stato (lampeggio / non lampeggio)
     int exploding_timer;
     int explosion_timer;
 
-    // spostare in map?
-    void update_explosion(Map& map, Direction d, bool set);
+    void start_explosion(Map& map, Direction d);
+    void stop_explosion(Map& map, Direction d);
 
 public:
     Bomb(Position _p = {-1, -1}, int _range = 1);
@@ -30,6 +34,7 @@ public:
     int get_range();
 
     bool is_active();
+    bool is_blinking();
     bool is_exploding();
 
     void place(Map& map, Position _p, int _range);

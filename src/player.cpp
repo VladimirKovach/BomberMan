@@ -57,12 +57,6 @@ int Player::get_bomb_range() {
     return bomb_range;
 }
 
-
-int Player::get_buff_remaining() {
-    return buff_timer;
-}
-
-
 // Raccogliere un secondo item raggio non aumenta il bonus:
 // prolunga la durata di quello gia' attivo
 void Player::apply_buff(int duration) {
@@ -78,6 +72,10 @@ void Player::update_buff() {
             bomb_range = 1;
         }
     }
+}
+
+int Player::get_buff_remaining() {
+    return buff_timer;
 }
 
 void Player::reset() {

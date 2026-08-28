@@ -1,8 +1,11 @@
-bomberman: main.o bomb.o chaser.o enemy.o game.o item.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o roamer.o utils.o walker.o
-	g++ main.o bomb.o chaser.o enemy.o game.o item.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o roamer.o utils.o walker.o -lncurses -o bomberman
+bomberman: main.o app.o bomb.o chaser.o enemy.o game.o item.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o roamer.o utils.o walker.o
+	g++ main.o app.o bomb.o chaser.o enemy.o game.o item.o leaderboard.o level_manager.o level.o map.o menu.o player.o renderer.o roamer.o utils.o walker.o -lncurses -o bomberman
 
-main.o: src/main.cpp src/game.hpp src/map.hpp src/menu.hpp src/renderer.hpp
+main.o: src/main.cpp src/app.hpp
 	g++ -c src/main.cpp
+
+app.o: src/app.cpp src/app.hpp src/game.hpp src/menu.hpp
+	g++ -c src/app.cpp
 
 bomb.o: src/bomb.cpp src/bomb.hpp src/map.hpp src/utils.hpp
 	g++ -c src/bomb.cpp
@@ -50,5 +53,4 @@ walker.o: src/walker.cpp src/walker.hpp src/map.hpp src/utils.hpp
 	g++ -c src/walker.cpp
 
 clean:
-	rm -f *.o
-	rm -f bomberman
+	rm -f bomberman *.o

@@ -9,8 +9,8 @@
 #include "utils.hpp"
 #include <ncurses.h>
 
-// Larghezza del pannello laterale con LEVEL / LIVES / SCORE / TIME
-const int INFO_WIDTH = 15;
+// Larghezza del pannello laterale con LEVEL / LIVES / EFFECT / SCORE / TIME
+const int INFO_WIDTH = 20;
 
 enum {
     COLOR_DEFAULT = -1,
@@ -26,6 +26,7 @@ enum {
     CP_PLAYER,
     CP_ENEMY,
     CP_BOMB,
+    CP_BOMB_BLINK,
     CP_EXPLOSION,
     CP_ITEM,
     CP_TITLE,
@@ -42,7 +43,6 @@ protected:
     void init_colors();
 
     void display_title();
-    void display_effect(int buff_remaining);
 
     void draw_grid(Map& map);
     void draw_bombs(Bomb* bombs);
@@ -50,6 +50,9 @@ protected:
     void draw_player(Player& player);
     void draw_enemies(Level& level);
     void draw_explosions(Map& map);
+
+    void display_lives(int lives);
+    void display_effect(int buff_remaining);
 
     void draw_map(Level& level, Player& player);
     void draw_info(Level& level, Player& player, int score, int time);

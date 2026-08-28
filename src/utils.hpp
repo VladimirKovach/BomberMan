@@ -5,13 +5,14 @@ const int DELAY = 50;  // millisecondi
 
 const int TICKS_PER_SECOND = 1000 / DELAY;
 
+const int DIRECTIONS_COUNT = 4;
+
 enum Direction {
     UP,
     LEFT,
     DOWN,
     RIGHT,
 };
-const int DIRECTIONS_COUNT = 4;
 
 struct Position {
     int y;
