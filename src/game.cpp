@@ -11,6 +11,7 @@ Game::Game() {
     running = true;
     timer = GAME_TIMER_START;
     score = 0;
+    level_score = 0;
 }
 
 bool Game::win() {
@@ -43,6 +44,7 @@ void Game::handle_collisions() {
         player.lose_life();
         player.reset();
         level.reset();
+        score = level_score;
     }
 }
 
@@ -60,6 +62,7 @@ bool Game::handle_level_change(Level& level) {
         }
 
         player.set_position({1, 1});
+        level_score = score;
 
         return true;
     }
@@ -73,6 +76,7 @@ bool Game::handle_level_change(Level& level) {
         }
 
         player.set_position({1, MAP_WIDTH - 2});
+        level_score = score;
 
         return true;
     }
