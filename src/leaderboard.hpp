@@ -28,7 +28,7 @@ public:
     static void save(const char* name, int score);
 
     // Legge tutti i punteggi dal file e ritorna una lista concatenata ORDINATA in modo decrescente per punteggio.
-    // Se il file non esiste o è vuoto, ritorna nullptr.
+    // Se il file non esiste o è vuoto, ritorna NULL.
     // ATTENZIONE: il chiamante deve liberare la memoria chiamando free_list() quando ha finito di usare la lista.
     static ScoreEntry* load();
 

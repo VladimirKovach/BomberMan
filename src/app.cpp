@@ -10,8 +10,8 @@ App::App() {
     cbreak();
     noecho();
     curs_set(0);
-    keypad(stdscr, true);
-    nodelay(stdscr, true);
+    keypad(stdscr, TRUE);
+    nodelay(stdscr, TRUE);
 }
 
 // Verifica che il terminale sia abbastanza grande.
@@ -31,9 +31,13 @@ bool App::terminal_too_small() {
     mvprintw(4, 0, "Ingrandisci la finestra e riavvia il gioco.");
     mvprintw(5, 0, "Premi un tasto per uscire...");
 
-    nodelay(stdscr, FALSE);   // il costruttore ha messo nodelay(TRUE):
-    refresh();                // senza questo getch() non aspetterebbe
+    refresh();
+
+    // il costruttore ha messo nodelay(TRUE): senza questo getch() non aspetterebbe
+    nodelay(stdscr, FALSE);
     getch();
+
+    endwin();
 
     return true;
 }

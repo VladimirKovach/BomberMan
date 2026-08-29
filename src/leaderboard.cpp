@@ -1,4 +1,5 @@
 #include "leaderboard.hpp"
+#include <cstdlib>
 #include <fstream>
 
 // Formato di ogni riga: "<nome>;<score>\n"
@@ -46,7 +47,7 @@ void Leaderboard::save(const char* name, int score) {
 static ScoreEntry* insert_sorted(ScoreEntry* head, ScoreEntry* new_node) {
     // Caso 1: lista vuota, oppure il nuovo punteggio supera la testa
     // -> il nuovo nodo diventa la nuova testa.
-    if (head == nullptr || new_node->score > head->score) {
+    if (head == NULL || new_node->score > head->score) {
         new_node->next = head;
         return new_node;
     }
@@ -55,7 +56,7 @@ static ScoreEntry* insert_sorted(ScoreEntry* head, ScoreEntry* new_node) {
     // 'curr' avanza finche' il prossimo nodo ha ancora score >= new->score.
     // Quando il prossimo ha score minore (o non c'e' piu'), inseriamo qui.
     ScoreEntry* curr = head;
-    while (curr->next != nullptr && curr->next->score >= new_node->score) {
+    while (curr->next != NULL && curr->next->score >= new_node->score) {
         curr = curr->next;
     }
 
@@ -76,9 +77,9 @@ ScoreEntry* Leaderboard::load() {
     in.open(LEADERBOARD_FILE);
 
     // Se il file non esiste (mai stata salvata una partita) ritorna lista vuota.
-    if (!in.is_open()) return nullptr;
+    if (!in.is_open()) return NULL;
 
-    ScoreEntry* head = nullptr;
+    ScoreEntry* head = NULL;
 
     // Buffer per leggere una riga intera dal file.
     // Una riga ben formata e' al massimo: nome (MAX_NAME_LEN-1) + ';' + numero
@@ -106,7 +107,7 @@ ScoreEntry* Leaderboard::load() {
         // Alloca il nuovo nodo solo dopo aver verificato che la riga
         // e' parsabile - cosi' non rischiamo new/delete inutili.
         ScoreEntry* node = new ScoreEntry;
-        node->next = nullptr;
+        node->next = NULL;
 
         // Copia il nome (dall'inizio della riga fino al ';' escluso) nel
         // buffer del nodo, troncando a MAX_NAME_LEN-1 caratteri per lasciare
@@ -139,7 +140,7 @@ ScoreEntry* Leaderboard::load() {
 
 // Libera una lista di ScoreEntry nodo per nodo.
 void Leaderboard::free_list(ScoreEntry* head) {
-    while (head != nullptr) {
+    while (head != NULL) {
         ScoreEntry* next = head->next;
         delete head;
         head = next;

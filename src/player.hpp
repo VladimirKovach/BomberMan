@@ -13,16 +13,18 @@ protected:
 
     int lives;
 
-    int bomb_range;   // raggio corrente delle bombe (1 = raggio base)
-    int buff_timer;   // tick rimanenti del buff raggio (0 = no buff)
+    int bomb_range;   // raggio corrente delle bombe (1 se base)
+    int buff_timer;   // tick rimanenti del buff raggio (0 se non attivo)
 
 public:
     Player(Position _p = {1, 1}, int _lives = 3);
 
     Position get_position();
     void set_position(Position _p);
-    void set_spawn(Position _p); // va usata all'ingresso in un livello
+
+    // Va usata all'ingresso in un livello,
     // cosi' alla morte si riparte dalla porta da cui si è entrati.
+    void set_spawn(Position _p);
 
     int get_lives();
     void gain_life();

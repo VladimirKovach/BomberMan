@@ -36,12 +36,12 @@ bool Map::safe_zone(Position p) {
         return false;
     }
 
-    // Angolo sinistro: spawn iniziale e rientro dalla porta 'next'.
+    // Angolo sinistro: spawn iniziale e rientro da DOOR_PREV
     if (p.x >= 0 && p.x < SAFE_ZONE_SIZE) {
         return true;
     }
 
-    // Angolo destro: rientro dalla porta 'prev'.
+    // Angolo destro: rientro da DOOR_NEXT
     if (p.x >= MAP_WIDTH - SAFE_ZONE_SIZE && p.x < MAP_WIDTH) {
         return true;
     }
@@ -79,12 +79,14 @@ void Map::place_destructible_walls(int percentage) {
         }
     }
 
-    // -- I due punti di ingresso al livello devono essere sempre agibili --
+    // I due punti di ingresso al livello devono essere sempre agibili
+
     // Angolo sinistro (spawn iniziale e rientro dalla porta 'next')
     grid[1][1] = EMPTY;
     grid[1][2] = EMPTY;
     grid[2][1] = EMPTY;
     grid[1][3] = EMPTY;
+
     // Angolo destro (rientro dalla porta 'prev')
     grid[1][MAP_WIDTH - 2] = EMPTY;
     grid[1][MAP_WIDTH - 3] = EMPTY;
@@ -117,17 +119,23 @@ Map::Map(int difficulty) {
 }
 
 Position Map::get_random_spawn() {
-    Position spawn = spawns[spawn_count - 1];
-    spawn_count--;
-    return spawn;
+    if (spawn_count - 1 < 0) {
+        return {-1, -1};
+    }
+    else {
+        Position spawn = spawns[spawn_count - 1];
+        spawn_count--;
+        return spawn;
+    }
 }
 
 Cell Map::get_cell(Position p) {
     if (out_of_bounds(p)) {
         return NONE;
     }
-
-    return grid[p.y][p.x];
+    else {
+        return grid[p.y][p.x];
+    }
 }
 
 bool Map::out_of_bounds(Position p) {
@@ -135,11 +143,7 @@ bool Map::out_of_bounds(Position p) {
 }
 
 bool Map::is_wall(Position p) {
-    if (out_of_bounds(p)) {
-        return false;
-    }
-
-    return grid[p.y][p.x] == WALL_SOLID || grid[p.y][p.x] == WALL_DESTRUCTIBLE;
+    return !out_of_bounds(p) && grid[p.y][p.x] == WALL_SOLID || grid[p.y][p.x] == WALL_DESTRUCTIBLE;
 }
 
 bool Map::is_wall_solid(Position p){
@@ -157,11 +161,7 @@ void Map::break_wall(Position p) {
 }
 
 bool Map::is_door(Position p) {
-    if (out_of_bounds(p)) {
-        return false;
-    }
-
-    return grid[p.y][p.x] == DOOR_PREV || grid[p.y][p.x] == DOOR_NEXT;
+    return !out_of_bounds(p) && grid[p.y][p.x] == DOOR_PREV || grid[p.y][p.x] == DOOR_NEXT;
 }
 
 bool Map::is_door_prev(Position p) {
@@ -224,7 +224,7 @@ void Map::reset() {
     for (int y = 0; y < MAP_HEIGHT; y++) {
         for (int x = 0; x < MAP_WIDTH; x++) {
             grid[y][x] = start_grid[y][x];
-            explosion[y][x] = false;
+            explosion[y][x] = 0;
         }
     }
 }

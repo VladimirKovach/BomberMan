@@ -1,5 +1,6 @@
 #include "menu.hpp"
 #include "leaderboard.hpp"
+#include <cstdlib>
 #include <ncurses.h>
 
 // Dimensioni della finestra del menu.
@@ -198,7 +199,7 @@ void Menu::show_leaderboard() {
     clear();
     mvprintw(1, (COLS - title_len) / 2, "%s", title);
 
-    if (head == nullptr) {
+    if (head == NULL) {
         const char* empty = "Nessun punteggio salvato.";
         int empty_len = 0;
         while (empty[empty_len] != '\0') empty_len++;
@@ -210,7 +211,7 @@ void Menu::show_leaderboard() {
         int row = 4;
         int col = (COLS - 30) / 2;
 
-        while (curr != nullptr && rank <= n) {
+        while (curr != NULL && rank <= n) {
             mvprintw(row, col, "%2d. %-15s %6d", rank, curr->name, curr->score);
             curr = curr->next;
             rank++;

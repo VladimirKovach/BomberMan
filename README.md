@@ -2,7 +2,7 @@
 
 Un gioco Bomberman scritto in C++ usando la libreria ncurses.
 
-## Installazione
+## Dipendenze
 
 Installa ncurses:
 
