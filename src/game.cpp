@@ -3,7 +3,7 @@
 #include "level.hpp"
 #include "player.hpp"
 #include "renderer.hpp"
-#include "utils.hpp"
+#include "position.hpp"
 #include <cstdlib>
 #include <ncurses.h>
 

@@ -3,16 +3,16 @@
 
 #include "enemy.hpp"
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
 
 class Walker : public Enemy {
-private:
+protected:
     Direction direction;
 
     void move(Map& map);
 
 public:
-    Walker(Position _p = {-1, -1}, int _speed = 1);
+    Walker(Position _p = POSITION_NONE, int _speed = 1);
 
     void update(Map& map);
 };

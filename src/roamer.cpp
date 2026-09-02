@@ -1,6 +1,7 @@
 #include "roamer.hpp"
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
+#include "time.hpp"
 
 Roamer::Roamer(Position _p, int _speed) : Enemy(_p, _speed) {}
 

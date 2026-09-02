@@ -4,7 +4,7 @@
 #include "level_manager.hpp"
 #include "level.hpp"
 #include "player.hpp"
-#include "utils.hpp"
+#include "position.hpp"
 #include <ncurses.h>
 
 void Renderer::init_colors() {

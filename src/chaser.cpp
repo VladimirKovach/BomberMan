@@ -1,6 +1,7 @@
 #include "chaser.hpp"
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
+#include "time.hpp"
 #include <cstdlib>
 
 // distanza di Manhattan

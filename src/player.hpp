@@ -2,7 +2,7 @@
 #define PLAYER_HPP
 
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
 
 const int MAX_LIVES = 3;
 
@@ -13,8 +13,8 @@ protected:
 
     int lives;
 
-    int bomb_range;   // raggio corrente delle bombe (1 se base)
-    int buff_timer;   // tick rimanenti del buff raggio (0 se non attivo)
+    int bomb_range;  // raggio corrente delle bombe (1 se base)
+    int buff_timer;  // tick rimanenti del buff raggio (0 se non attivo)
 
 public:
     Player(Position _p = {1, 1}, int _lives = 3);

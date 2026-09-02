@@ -2,7 +2,8 @@
 #define ITEM_HPP
 
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
+#include "time.hpp"
 
 // Tipi di item raccoglibili dal giocatore
 enum ItemType {
@@ -28,7 +29,7 @@ protected:
     bool active;    // true se l'item e' ancora a terra (non raccolto)
 
 public:
-    Item(Position _p = {-1, -1}, ItemType _type = ITEM_RANGE);
+    Item(Position _p = POSITION_NONE, ItemType _type = ITEM_RANGE);
 
     Position get_position();
     ItemType get_type();

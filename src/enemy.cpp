@@ -1,6 +1,7 @@
 #include "enemy.hpp"
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
+#include "time.hpp"
 #include <cstdlib>
 
 Enemy::Enemy(Position _p, int _speed) {
@@ -12,7 +13,7 @@ Enemy::Enemy(Position _p, int _speed) {
     p = _p;
     start_p = _p;
 
-    if (_speed != 0) {
+    if (_speed > 0) {
         speed = _speed;
     }
     else {
@@ -21,7 +22,7 @@ Enemy::Enemy(Position _p, int _speed) {
 
     move_timer = TICKS_PER_SECOND / speed;
 
-    dead = equal(p, {-1, -1});
+    dead = equal(p, POSITION_NONE);
 }
 
 // Fisher-Yates shuffle
@@ -49,10 +50,6 @@ Position Enemy::get_position() {
     return p;
 }
 
-void Enemy::set_position(Position _p) {
-    p = _p;
-}
-
 int Enemy::get_speed() {
     return speed;
 }
@@ -68,5 +65,5 @@ bool Enemy::is_dead() {
 void Enemy::reset() {
     p = start_p;
     move_timer = TICKS_PER_SECOND / speed;
-    dead = equal(p, {-1, -1});
+    dead = equal(p, POSITION_NONE);
 }

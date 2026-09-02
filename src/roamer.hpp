@@ -3,14 +3,14 @@
 
 #include "enemy.hpp"
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
 
 class Roamer : public Enemy {
-private:
+protected:
     void move(Map& map);
 
 public:
-    Roamer(Position _p = {-1, -1}, int _speed = 1);
+    Roamer(Position _p = POSITION_NONE, int _speed = 1);
 
     void update(Map& map);
 };

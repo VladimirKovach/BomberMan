@@ -1,7 +1,7 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 
-#include "utils.hpp"
+#include "position.hpp"
 
 enum Cell {
     NONE,
@@ -28,7 +28,7 @@ protected:
     Cell grid[MAP_HEIGHT][MAP_WIDTH];
     Cell start_grid[MAP_HEIGHT][MAP_WIDTH];
 
-    // Numero di esplosioni per cella (sovrapposte se piu' di una)
+    // Numero di esplosioni presenti in ogni cella (sovrapposte se piu' di una)
     int explosion[MAP_HEIGHT][MAP_WIDTH];
 
     // Possibili posizioni in cui spawnare nemici

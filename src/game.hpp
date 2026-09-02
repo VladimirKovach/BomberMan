@@ -5,7 +5,8 @@
 #include "level.hpp"
 #include "player.hpp"
 #include "renderer.hpp"
-#include "utils.hpp"
+#include "position.hpp"
+#include "time.hpp"
 
 const int GAME_TIMER_START = TICKS_PER_SECOND * 1000;  // 1000 secondi
 

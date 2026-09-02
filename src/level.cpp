@@ -1,5 +1,5 @@
 #include "level.hpp"
-#include "utils.hpp"
+#include "position.hpp"
 #include <cstdlib>
 
 void Level::try_drop_item(Position p, int chance) {

@@ -5,8 +5,8 @@
 #include "chaser.hpp"
 #include "item.hpp"
 #include "map.hpp"
+#include "position.hpp"
 #include "roamer.hpp"
-#include "utils.hpp"
 #include "walker.hpp"
 
 const int MAX_BOMBS = 3;

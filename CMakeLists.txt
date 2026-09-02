@@ -26,9 +26,9 @@ add_executable(BomberMan
         src/map.cpp
         src/menu.cpp
         src/player.cpp
+        src/position.cpp
         src/renderer.cpp
         src/roamer.cpp
-        src/utils.cpp
         src/walker.cpp
 )
 

@@ -1,6 +1,6 @@
 #include "bomb.hpp"
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
 
 // Propaga l'esplosione fino al raggio
 // I muri solidi bloccano l'esplosione
@@ -36,9 +36,9 @@ void Bomb::stop_explosion(Map& map, Direction d) {
     }
 }
 
-Bomb::Bomb(Position _p, int _range) {
-    p = _p;
-    range = _range;
+Bomb::Bomb() {
+    p = POSITION_NONE;
+    range = 1;
 
     for (int i = 0; i < DIRECTIONS_COUNT; i++) {
         explosion_range[i] = 0;
@@ -76,6 +76,11 @@ bool Bomb::is_exploding() {
 void Bomb::place(Map& map, Position _p, int _range) {
     p = _p;
     range = _range;
+
+    if (range <= 0) {
+        range = 1;
+    }
+
     active = true;
 
     map.set_bomb(p);

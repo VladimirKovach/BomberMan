@@ -1,11 +1,5 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
-
-const int DELAY = 50;  // millisecondi
-
-const int TICKS_PER_SECOND = 1000 / DELAY;
-
-const int DIRECTIONS_COUNT = 4;
+#ifndef POSITION_HPP
+#define POSITION_HPP
 
 enum Direction {
     UP,
@@ -14,10 +8,14 @@ enum Direction {
     RIGHT,
 };
 
+const int DIRECTIONS_COUNT = 4;
+
 struct Position {
     int y;
     int x;
 };
+
+const Position POSITION_NONE = {-1, -1};  // posizione non valida, fuori dalla mappa
 
 bool equal(Position a, Position b);
 

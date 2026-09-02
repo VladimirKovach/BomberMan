@@ -1,6 +1,7 @@
 #include "walker.hpp"
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
+#include "time.hpp"
 #include <cstdlib>
 
 Walker::Walker(Position _p, int _speed) : Enemy(_p, _speed) {

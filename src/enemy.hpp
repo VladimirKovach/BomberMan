@@ -2,7 +2,7 @@
 #define ENEMY_HPP
 
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
 
 class Enemy {
 protected:
@@ -21,11 +21,9 @@ protected:
     bool can_move_to(Map& map, Position next);
 
 public:
-    Enemy(Position _p = {-1, -1}, int _speed = 1);
+    Enemy(Position _p = POSITION_NONE, int _speed = 1);
 
     Position get_position();
-    void set_position(Position _p);
-
     int get_speed();
 
     void kill();

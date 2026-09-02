@@ -2,7 +2,8 @@
 #define BOMB_HPP
 
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
+#include "time.hpp"
 
 const int BLINK_TIMER_START = TICKS_PER_SECOND / 4;      // 0.25 secondi
 const int EXPLODING_TIMER_START = TICKS_PER_SECOND * 2;  // 2.00 secondi
@@ -28,7 +29,7 @@ protected:
     void stop_explosion(Map& map, Direction d);
 
 public:
-    Bomb(Position _p = {-1, -1}, int _range = 1);
+    Bomb();
 
     Position get_position();
     int get_range();

@@ -4,7 +4,7 @@
 
 // Spazio minimo richiesto
 // MIN_COLS: mappa + spazio (2) + info
-// MIN_LINES: mappa (titolo non indispesabile)
+// MIN_LINES: mappa (titolo non indispensabile)
 const int MIN_COLS = MAP_WIDTH + 2 + INFO_WIDTH;
 const int MIN_LINES = MAP_HEIGHT;
 

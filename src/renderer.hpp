@@ -6,7 +6,7 @@
 #include "level_manager.hpp"
 #include "level.hpp"
 #include "player.hpp"
-#include "utils.hpp"
+#include "position.hpp"
 #include <ncurses.h>
 
 // Larghezza del pannello laterale con LEVEL / LIVES / EFFECT / SCORE / TIME

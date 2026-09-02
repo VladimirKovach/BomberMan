@@ -1,7 +1,7 @@
 #include "player.hpp"
 #include "item.hpp"
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
 
 Player::Player(Position _p, int _lives) {
     p = _p;

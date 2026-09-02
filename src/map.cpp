@@ -1,5 +1,5 @@
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
 #include <cstdlib>
 
 void Map::save_spawns() {
@@ -120,7 +120,7 @@ Map::Map(int difficulty) {
 
 Position Map::get_random_spawn() {
     if (spawn_count - 1 < 0) {
-        return {-1, -1};
+        return POSITION_NONE;
     }
     else {
         Position spawn = spawns[spawn_count - 1];

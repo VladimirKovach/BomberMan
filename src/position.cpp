@@ -1,4 +1,4 @@
-#include "utils.hpp"
+#include "position.hpp"
 
 bool equal(Position a, Position b) {
     return a.y == b.y && a.x == b.x;

@@ -3,10 +3,10 @@
 
 #include "enemy.hpp"
 #include "map.hpp"
-#include "utils.hpp"
+#include "position.hpp"
 
 class Chaser : public Enemy {
-private:
+protected:
     int distance(Position a, Position b);
 
     void sort_directions(Position player_p);
@@ -14,7 +14,7 @@ private:
     void move(Map& map, Position player_p);
 
 public:
-    Chaser(Position _p = {-1, -1}, int _speed = 2);
+    Chaser(Position _p = POSITION_NONE, int _speed = 2);
 
     void update(Map& map, Position player_p);
 };
