@@ -143,7 +143,7 @@ bool Map::out_of_bounds(Position p) {
 }
 
 bool Map::is_wall(Position p) {
-    return !out_of_bounds(p) && grid[p.y][p.x] == WALL_SOLID || grid[p.y][p.x] == WALL_DESTRUCTIBLE;
+    return (!out_of_bounds(p) && grid[p.y][p.x] == WALL_SOLID) || (grid[p.y][p.x] == WALL_DESTRUCTIBLE);
 }
 
 bool Map::is_wall_solid(Position p){

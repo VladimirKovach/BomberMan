@@ -54,7 +54,7 @@ void App::run() {
         switch (choice) {
             case NEW_GAME:
             {
-                // Game viene costruito qui dentro, a fine partita il distruttore fa pulizia automaticamente.
+                // Game viene costruito qui dentro. La pulizia viene fatta da Game::run() prima di uscire
                 // La prossima volta costruisce un Game nuovo di zecca, senza bisogno di un reset esplicito.
                 Game game;
                 game.run();

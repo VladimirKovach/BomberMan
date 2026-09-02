@@ -37,6 +37,10 @@ public:
     bool all_levels_completed();
 
     void update_doors();
+
+    // Libera tutti i nodi della lista dei livelli.
+    // pulizia esplicita: la chiama Game::run() quando la partita finisce.
+    void free_levels();
 };
 
 #endif

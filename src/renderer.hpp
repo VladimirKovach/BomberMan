@@ -59,7 +59,10 @@ protected:
 
 public:
     Renderer();
-    ~Renderer();
+
+    // Libera le due finestre ncurses allocate dal costruttore.
+    // la chiama Game::run() a fine partita.
+    void free_windows();
 
     void render(LevelManager& level_manager, Player& player, int score, int time);
 };

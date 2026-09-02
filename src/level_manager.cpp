@@ -93,6 +93,17 @@ void LevelManager::update_doors() {
     }
 }
 
+void LevelManager::free_levels() {
+    Node* node = head;
+    while (node != NULL) {
+        Node* next = node->next;
+        delete node;
+        node = next;
+    }
+    head = NULL;
+    current = NULL;
+}
+
 
 bool LevelManager::remove_current_level(bool forward) {
     if (current == NULL) {

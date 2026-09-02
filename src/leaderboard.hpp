@@ -19,21 +19,27 @@ struct ScoreEntry {
 };
 
 // Gestisce salvatura e il caricamento dei punteggi.
-// è un raggruppamento logico di funzioni che lavorano sul file di punteggi, sono tutti public.
+// è un raggruppamento logico di funzioni che lavorano sul file di punteggi.
 class Leaderboard {
+protected:
+    // Inserisce un nodo in una lista gia' ordinata per punteggio decrescente.
+    // Ritorna la nuova testa (puo' cambiare se il nodo va in cima).
+    // E' un metodo protected: usato solo internamente da load().
+    ScoreEntry* insert_sorted(ScoreEntry* head, ScoreEntry* new_node);
+
 public:
     // Appende nome;punteggio in fondo al file.
     // Il file resta NON ordinato; l'ordinamento avviene a lettura (la funzione 'load').
     // Usiamo ';' come il separatore
-    static void save(const char* name, int score);
+    void save(const char* name, int score);
 
     // Legge tutti i punteggi dal file e ritorna una lista concatenata ORDINATA in modo decrescente per punteggio.
     // Se il file non esiste o è vuoto, ritorna NULL.
     // ATTENZIONE: il chiamante deve liberare la memoria chiamando free_list() quando ha finito di usare la lista.
-    static ScoreEntry* load();
+    ScoreEntry* load();
 
     // Libera la memoria allocata da load(), serve per prevenire la memory leak.
-    static void free_list(ScoreEntry* head);
+    void free_list(ScoreEntry* head);
 };
 
 #endif

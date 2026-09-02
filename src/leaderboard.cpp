@@ -32,19 +32,9 @@ void Leaderboard::save(const char* name, int score) {
     out.close();
 }
 
-
-// Funzione di supporto privata (sta solo in questo .cpp, non nell'header):
-// inserisce un nuovo nodo in una lista ORDINATA per punteggio decrescente.
-// Ritorna la nuova testa della lista (che puo' cambiare se il nuovo nodo
-// va in cima).
-//
 // Algoritmo: scorri finchè trovi un nodo con score minore del nuovo, e
 // inserisci prima di lui. Caso speciale: lista vuota o inserimento in testa.
-//
-// E' "static" in C++ a file scope per limitarne la visibilita' a questo
-// file - cosi' non inquina lo spazio dei nomi globali. (Equivalente a
-// metterla in un namespace anonimo.)
-static ScoreEntry* insert_sorted(ScoreEntry* head, ScoreEntry* new_node) {
+ScoreEntry* Leaderboard::insert_sorted(ScoreEntry* head, ScoreEntry* new_node) {
     // Caso 1: lista vuota, oppure il nuovo punteggio supera la testa
     // -> il nuovo nodo diventa la nuova testa.
     if (head == NULL || new_node->score > head->score) {

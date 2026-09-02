@@ -1,6 +1,8 @@
 #ifndef MENU_HPP
 #define MENU_HPP
 
+#include <ncurses.h>
+
 // Le scelte che il menu puo' ritornare al main.
 // Ogni variante del menu corrisponde a un valore di questo enum.
 enum MenuChoice {
@@ -19,9 +21,15 @@ protected:
     // Etichette mostrate a schermo, una per ogni voce
     const char* items[MENU_ITEM_COUNT];
 
-    // Disegna il menu completo: cornice, titolo, voci
-    // Viene richiamato ogni volta che l'utente preme un tasto.
-    void draw();
+    // Disegna il menu completo: cornice, titolo, voci.
+    // La finestra NON viene creata qui: la riceve dal chiamante (show()),
+    // che la crea una volta sola. Ricrearla a ogni frame causava sfarfallio.
+    void draw(WINDOW* win);
+
+    // Numero di cifre decimali di un intero (0 -> 1).
+    // Serve solo a calcolare la larghezza del testo da centrare a schermo.
+    // Sostituisce snprintf, che appartiene a <cstdio> (libreria non ammessa).
+    int digit_count(int n);
 
     // Helper privato: legge una stringa da tastiera in modo "bloccante".
     // Scrive il risultato in `buffer` (terminato da '\0'). max_len include

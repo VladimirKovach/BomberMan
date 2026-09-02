@@ -210,6 +210,13 @@ void Game::run() {
     if (win()) {
         score += timer / TICKS_PER_SECOND;
     }
+
+    // Pulizia esplicita
+    // libera i nodi della lista dei livelli e le finestre ncurses.
+    // Va fatta qui perchè è l'ultimo punto in cui la partita è ancora viva:
+    // subito dopo, App distrugge l'oggetto Game.
+    level_manager.free_levels();
+    renderer.free_windows();
 }
 
 int Game::get_score() {

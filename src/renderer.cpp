@@ -55,11 +55,6 @@ Renderer::Renderer() {
     init_colors();
 }
 
-Renderer::~Renderer() {
-    delwin(map_window);
-    delwin(info_window);
-}
-
 void Renderer::display_title() {
     const char* title = "B O M B E R M A N";
 
@@ -259,4 +254,9 @@ void Renderer::render(LevelManager& level_manager, Player& player, int score, in
     draw_info(level, player, score, time);
 
     doupdate();
+}
+
+void Renderer::free_windows() {
+    delwin(map_window);
+    delwin(info_window);
 }

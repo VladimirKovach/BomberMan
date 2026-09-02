@@ -25,7 +25,8 @@ Menu::Menu() {
 // Serve solo a calcolare la larghezza del testo da centrare a schermo:
 // la stampa vera e propria la fa mvprintw con "%d".
 // Sostituisce snprintf, che appartiene a <cstdio> (libreria non ammessa).
-static int digit_count(int n) {
+
+int Menu::digit_count(int n) {
     if (n < 0) {
         n = -n;
     }
@@ -40,20 +41,13 @@ static int digit_count(int n) {
     return digits;
 }
 
-// Disegna il menu da capo a ogni frame/pressione di tasto.
-// influisce poco la performance.
-void Menu::draw() {
-    // Pulisce tutto lo schermo prima di disegnare.
-    clear();
-
-    // Posizione della finestra: centrata nel terminale.
-    // LINES e COLS sono variabili globali di ncurses che danno la dimensione dello schermo in righe e colonne.
-    int start_y = (LINES - MENU_WIN_HEIGHT) / 2;
-    int start_x = (COLS - MENU_WIN_WIDTH) / 2;
-
-    // newwin crea una sotto-finestra ncurses. Ritorna un WINDOW* che useremo
-    // per disegnare al suo interno con le funzioni mv*w* (move-window-...).
-    WINDOW* win = newwin(MENU_WIN_HEIGHT, MENU_WIN_WIDTH, start_y, start_x);
+// Disegna il contenuto del menu dentro una finestra gia esistente.
+// werase() svuota SOLO il buffer di questa finestra: ncurses confronta poi
+// il buffer con ciò che è gia sul terminale e invia solo le differenze.
+// clear() invece imponeva la cancellazione fisica dell'intero schermo a ogni
+// tasto, ed è quello che causava lo sfarfallio.
+void Menu::draw(WINDOW* win) {
+    werase(win);
 
     // box disegna una cornice attorno alla finestra usando i caratteri di
     // bordo di default (gli zeri dicono "usa i default": ACS_VLINE per i
@@ -98,16 +92,13 @@ void Menu::draw() {
         }
     }
 
-    // refresh() fa apparire le modifiche su stdscr (lo schermo principale).
-    // wrefresh(win) fa apparire le modifiche sulla nostra sotto-finestra.
-    // prima stdscr (lo "sfondo"), poi la finestra sopra di esso.
-    refresh();
-    wrefresh(win);
-
-    // delwin libera la memoria allocata da newwin.
-    // Lo facciamo qui (non a fine show()) perche' la finestra viene ricreata
-    // a ogni chiamata di draw().
-    delwin(win);
+    // wnoutrefresh copia il buffer della finestra nel buffer "virtuale" dello
+    // schermo, SENZA scrivere sul terminale. doupdate() poi manda al terminale
+    // un solo aggiornamento con le differenze.
+    // Prima si facevano due scritture fisiche (refresh + wrefresh) e fra le due
+    // il terminale mostrava lo schermo vuoto: era il "lampo" nero.
+    wnoutrefresh(win);
+    doupdate();
 }
 
 
@@ -194,7 +185,8 @@ void Menu::show_leaderboard() {
     }
     if (n <= 0) n = 10;
 
-    ScoreEntry* head = Leaderboard::load();
+    Leaderboard board;
+    ScoreEntry* head = board.load();
 
     clear();
     mvprintw(1, (COLS - title_len) / 2, "%s", title);
@@ -219,7 +211,7 @@ void Menu::show_leaderboard() {
         }
     }
 
-    Leaderboard::free_list(head);
+    board.free_list(head);
 
     const char* back = "Premi un tasto per tornare al menu...";
     int back_len = 0;
@@ -265,7 +257,8 @@ void Menu::prompt_save_score(int score) {
         name[4] = 'i'; name[5] = 'm'; name[6] = 'o'; name[7] = '\0';
     }
 
-    Leaderboard::save(name, score);
+    Leaderboard board;
+    board.save(name, score);
 }
 
 MenuChoice Menu::show() {
@@ -275,12 +268,32 @@ MenuChoice Menu::show() {
     keypad(stdscr, TRUE);
     curs_set(0);
 
+    // Pulizia dello sfondo UNA VOLTA SOLA, prima del ciclo.
+    // Da qui in poi stdscr non viene piu' toccato: cosi' wgetch() non lo
+    // ridisegna implicitamente sopra la finestra del menu.
+    clear();
+    refresh();
+
+    // La finestra viene creata una volta sola e riusata a ogni frame.
+    int start_y = (LINES - MENU_WIN_HEIGHT) / 2;
+    int start_x = (COLS - MENU_WIN_WIDTH) / 2;
+    WINDOW* win = newwin(MENU_WIN_HEIGHT, MENU_WIN_WIDTH, start_y, start_x);
+
+    // keypad sulla finestra: serve perche' leggiamo l'input con wgetch(win)
+    // e non con getch() (= wgetch(stdscr)).
+    keypad(win, TRUE);
+
     bool chosen = false;
-    MenuChoice result = QUIT;  // valore di default
+    bool need_redraw = true;    // ridisegna solo se qualcosa e' cambiato
+    MenuChoice result = QUIT;   // valore di default
 
     while (!chosen) {
-        draw();
-        int key = getch();
+        if (need_redraw) {
+            draw(win);
+            need_redraw = false;
+        }
+
+        int key = wgetch(win);
 
         switch (key) {
             case KEY_UP:
@@ -292,12 +305,14 @@ MenuChoice Menu::show() {
                 // Aggiungendo N prima del modulo lo fixiamo.
                 // è una proprietà matematica: Sommare N al dividendo non cambia il risultato del modulo.
                 selected = (selected - 1 + MENU_ITEM_COUNT) % MENU_ITEM_COUNT;
+                need_redraw = true;
                 break;
 
             case KEY_DOWN:
             case 's':
             case 'S':
                 selected = (selected + 1) % MENU_ITEM_COUNT;
+                need_redraw = true;
                 break;
 
             case '\n':
@@ -322,6 +337,8 @@ MenuChoice Menu::show() {
         }
     }
 
+    // delwin libera la memoria della finestra, ora che il menu si chiude.
+    delwin(win);
     nodelay(stdscr, TRUE);
 
     return result;
