@@ -27,17 +27,6 @@ LevelManager::LevelManager() {
     current = head;
 }
 
-LevelManager::~LevelManager() {
-    Node* node = head;
-    while (node != NULL) {
-        Node* next = node->next;
-        delete node;
-        node = next;
-    }
-    head = NULL;
-    current = NULL;
-}
-
 Level& LevelManager::get_current_level() {
     return current->level;
 }

@@ -3,6 +3,9 @@ project(BomberMan)
 
 set(CMAKE_CXX_STANDARD 17)
 
+# Warning estesi
+add_compile_options(-Wall -Wextra)
+
 find_package(Curses)
 
 if(NOT CURSES_FOUND AND WIN32)

@@ -143,7 +143,7 @@ bool Map::out_of_bounds(Position p) {
 }
 
 bool Map::is_wall(Position p) {
-    return (!out_of_bounds(p) && grid[p.y][p.x] == WALL_SOLID) || (grid[p.y][p.x] == WALL_DESTRUCTIBLE);
+    return !out_of_bounds(p) && (grid[p.y][p.x] == WALL_SOLID || grid[p.y][p.x] == WALL_DESTRUCTIBLE);
 }
 
 bool Map::is_wall_solid(Position p){
@@ -161,7 +161,7 @@ void Map::break_wall(Position p) {
 }
 
 bool Map::is_door(Position p) {
-    return !out_of_bounds(p) && grid[p.y][p.x] == DOOR_PREV || grid[p.y][p.x] == DOOR_NEXT;
+    return !out_of_bounds(p) && (grid[p.y][p.x] == DOOR_PREV || grid[p.y][p.x] == DOOR_NEXT);
 }
 
 bool Map::is_door_prev(Position p) {

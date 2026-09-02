@@ -248,7 +248,11 @@ void Renderer::render(LevelManager& level_manager, Player& player, int score, in
     Level& level = level_manager.get_current_level();
 
     display_title();
-    display_effect(player.get_buff_remaining());
+
+    // stdscr fa da sfondo: va messo nel virtual screen PRIMA delle sottofinestre,
+    // altrimenti il titolo non arriva mai al terminale (doupdate legge solo cio'
+    // che le wnoutrefresh hanno depositato) e getch() lo ridisegna per conto suo.
+    wnoutrefresh(stdscr);
 
     draw_map(level, player);
     draw_info(level, player, score, time);

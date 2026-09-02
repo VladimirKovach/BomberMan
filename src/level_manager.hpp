@@ -18,7 +18,6 @@ protected:
 
 public:
     LevelManager();
-    ~LevelManager();
 
     Level& get_current_level();
 
