@@ -85,29 +85,27 @@ bool Game::handle_level_change(Level& level) {
 }
 
 void Game::handle_item_collection(Level& level) {
-    Item* items = level.get_items();
+    ItemType type;
+    int duration;
 
-    for (int i = 0; i < MAX_ITEMS; i++) {
-        if (items[i].is_active() && equal(player.get_position(), items[i].get_position())) {
-            switch (items[i].get_type()) {
-                case ITEM_RANGE:
-                    player.apply_buff(items[i].get_duration());
-                    break;
+    // while e non if: due item possono trovarsi sulla stessa cella
+    while (level.collect_item_at(player.get_position(), type, duration)) {
+        switch (type) {
+            case ITEM_RANGE:
+                player.apply_buff(duration);
+                break;
 
-                case ITEM_LIFE:
-                    player.gain_life();
-                    break;
+            case ITEM_LIFE:
+                player.gain_life();
+                break;
 
-                case ITEM_SCORE:
-                    score += SCORE_BONUS;
-                    break;
+            case ITEM_SCORE:
+                score += SCORE_BONUS;
+                break;
 
-                case ITEM_TIME:
-                    timer += TIME_BONUS;
-                    break;
-            }
-
-            items[i].collect();
+            case ITEM_TIME:
+                timer += TIME_BONUS;
+                break;
         }
     }
 }

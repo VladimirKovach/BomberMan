@@ -150,24 +150,66 @@ Map& Level::get_map() {
     return map;
 }
 
-Bomb* Level::get_bombs() {
-    return bombs;
+bool Level::has_enemy(Position p, EnemyType& type) {
+    for (int i = 0; i < MAX_CHASERS; i++) {
+        if (!chasers[i].is_dead() && equal(chasers[i].get_position(), p)) {
+            type = ENEMY_CHASER;
+            return true;
+        }
+    }
+
+    for (int i = 0; i < MAX_ROAMERS; i++) {
+        if (!roamers[i].is_dead() && equal(roamers[i].get_position(), p)) {
+            type = ENEMY_ROAMER;
+            return true;
+        }
+    }
+
+    for (int i = 0; i < MAX_WALKERS; i++) {
+        if (!walkers[i].is_dead() && equal(walkers[i].get_position(), p)) {
+            type = ENEMY_WALKER;
+            return true;
+        }
+    }
+
+    return false;
 }
 
-Item* Level::get_items() {
-    return items;
+bool Level::has_bomb(Position p, bool& blinking) {
+    for (int i = 0; i < MAX_BOMBS; i++) {
+        if (bombs[i].is_active() && equal(bombs[i].get_position(), p)) {
+            blinking = bombs[i].is_blinking();
+            return true;
+        }
+    }
+
+    return false;
 }
 
-Chaser* Level::get_chasers() {
-    return chasers;
+bool Level::has_item(Position p, ItemType& type) {
+    for (int i = 0; i < MAX_ITEMS; i++) {
+        if (items[i].is_active() && equal(items[i].get_position(), p)) {
+            type = items[i].get_type();
+            return true;
+        }
+    }
+
+    return false;
 }
 
-Roamer* Level::get_roamers() {
-    return roamers;
-}
+bool Level::collect_item_at(Position p, ItemType& type, int& duration) {
+    for (int i = 0; i < MAX_ITEMS; i++) {
+        if (items[i].is_active() && equal(items[i].get_position(), p)) {
+            type = items[i].get_type();
+            duration = items[i].get_duration();
 
-Walker* Level::get_walkers() {
-    return walkers;
+            items[i].collect();
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void Level::place_bomb(Position p, int range) {
@@ -193,26 +235,10 @@ bool Level::spawn_item(Position p, ItemType type) {
     return false;  // nessuno slot disponibile
 }
 
+// type qui non serve a nulla, ma la firma lo richiede
 bool Level::player_enemies_collisions(Position player_p) {
-    for (int i = 0; i < MAX_CHASERS; i++) {
-        if (!chasers[i].is_dead() && equal(player_p, chasers[i].get_position())) {
-            return true;
-        }
-    }
-
-    for (int i = 0; i < MAX_ROAMERS; i++) {
-        if (!roamers[i].is_dead() && equal(player_p, roamers[i].get_position())) {
-            return true;
-        }
-    }
-
-    for (int i = 0; i < MAX_WALKERS; i++) {
-        if (!walkers[i].is_dead() && equal(player_p, walkers[i].get_position())) {
-            return true;
-        }
-    }
-
-    return false;
+    EnemyType type;
+    return has_enemy(player_p, type);
 }
 
 bool Level::player_explosions_collisions(Position player_p) {

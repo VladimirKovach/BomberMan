@@ -79,122 +79,93 @@ void Renderer::display_title() {
     attroff(COLOR_PAIR(CP_TITLE) | A_BOLD);
 }
 
-void Renderer::draw_grid(Map& map) {
-    for (int y = 0; y < MAP_HEIGHT; y++) {
-        for (int x = 0; x < MAP_WIDTH; x++) {
-            Cell c = map.get_cell({y, x});
+void Renderer::draw_cell(Level& level, Player& player, Position p) {
+    Map& map = level.get_map();
 
-            switch (c) {
-                case WALL_SOLID:
-                    mvwaddch(map_window, y, x, ' ' | COLOR_PAIR(CP_WALL_SOLID));
-                    break;
+    EnemyType enemy_type;
+    ItemType item_type;
+    bool blinking;
 
-                case WALL_DESTRUCTIBLE:
-                    mvwaddch(map_window, y, x, ' ' | COLOR_PAIR(CP_WALL_DESTRUCTIBLE));
-                    break;
+    // chtype (non char): i simboli ACS_* sono definiti da ncurses
+    // e non entrano in un singolo byte
+    chtype glyph;
 
-                case DOOR_PREV:
-                    mvwaddch(map_window, y, x, '<' | COLOR_PAIR(CP_DOOR));
-                    break;
+    // Ordine di priorità: vince la prima condizione vera, quindi ciò che
+    // sta "sopra" copre ciò che sta sotto.
+    if (map.is_explosion(p)) {
+        // Il | non è un "oppure", è una fusione di campi.
+        glyph = '*' | COLOR_PAIR(CP_EXPLOSION);
+    }
+    else if (level.has_enemy(p, enemy_type)) {
+        switch (enemy_type) {
+            case ENEMY_CHASER:
+                glyph = '!' | COLOR_PAIR(CP_ENEMY);
+                break;
 
-                case DOOR_NEXT:
-                    mvwaddch(map_window, y, x, '>' | COLOR_PAIR(CP_DOOR));
-                    break;
+            case ENEMY_ROAMER:
+                glyph = '?' | COLOR_PAIR(CP_ENEMY);
+                break;
 
-                default:
-                    mvwaddch(map_window, y, x, ' ' | COLOR_PAIR(CP_SCREEN));
-                    break;
-            }
+            default:  // ENEMY_WALKER
+                glyph = 'X' | COLOR_PAIR(CP_ENEMY);
+                break;
         }
     }
-}
-
-void Renderer::draw_bombs(Bomb* bombs) {
-    for (int i = 0; i < MAX_BOMBS; i++) {
-        if (bombs[i].is_active()) {
-            Position p = bombs[i].get_position();
-
-            if (bombs[i].is_blinking()) {
-                mvwaddch(map_window, p.y, p.x, 'O' | COLOR_PAIR(CP_BOMB_BLINK));
-            }
-            else {
-                mvwaddch(map_window, p.y, p.x, 'O' | COLOR_PAIR(CP_BOMB));
-            }
+    else if (equal(player.get_position(), p)) {
+        glyph = '@' | COLOR_PAIR(CP_PLAYER);
+    }
+    else if (level.has_bomb(p, blinking)) {
+        if (blinking) {
+            glyph = 'O' | COLOR_PAIR(CP_BOMB_BLINK);
+        }
+        else {
+            glyph = 'O' | COLOR_PAIR(CP_BOMB);
         }
     }
-}
+    else if (level.has_item(p, item_type)) {
+        switch (item_type) {
+            case ITEM_LIFE:
+                glyph = ACS_DIAMOND | COLOR_PAIR(CP_ITEM);
+                break;
 
-void Renderer::draw_items(Item* items) {
-    for (int i = 0; i < MAX_ITEMS; i++) {
-        if (items[i].is_active()) {
-            Position p = items[i].get_position();
+            case ITEM_SCORE:
+                glyph = ACS_STERLING | COLOR_PAIR(CP_ITEM);
+                break;
 
-            // chtype (non char): i simboli ACS_* sono definiti da ncurses
-            // e non entrano in un singolo byte
-            chtype glyph = 'R';
+            case ITEM_TIME:
+                glyph = 'T' | COLOR_PAIR(CP_ITEM);
+                break;
 
-            switch (items[i].get_type()) {
-                case ITEM_LIFE:
-                    glyph = ACS_DIAMOND;
-                    break;
-
-                case ITEM_SCORE:
-                    glyph = ACS_STERLING;
-                    break;
-
-                case ITEM_TIME:
-                    glyph = 'T';
-                    break;
-
-                default:  // ITEM_RANGE
-                    break;
-            }
-
-            mvwaddch(map_window, p.y, p.x, glyph | COLOR_PAIR(CP_ITEM));
+            default:  // ITEM_RANGE
+                glyph = 'R' | COLOR_PAIR(CP_ITEM);
+                break;
         }
     }
-}
+    else {
+        switch (map.get_cell(p)) {
+            case WALL_SOLID:
+                glyph = ' ' | COLOR_PAIR(CP_WALL_SOLID);
+                break;
 
-void Renderer::draw_player(Player& player) {
-    Position p = player.get_position();
-    mvwaddch(map_window, p.y, p.x, '@' | COLOR_PAIR(CP_PLAYER));
-}
+            case WALL_DESTRUCTIBLE:
+                glyph = ' ' | COLOR_PAIR(CP_WALL_DESTRUCTIBLE);
+                break;
 
-void Renderer::draw_enemies(Level& level) {
-    Chaser* chasers = level.get_chasers();
-    Roamer* roamers = level.get_roamers();
-    Walker* walkers = level.get_walkers();
+            case DOOR_PREV:
+                glyph = '<' | COLOR_PAIR(CP_DOOR);
+                break;
 
-    for (int i = 0; i < MAX_CHASERS; i++) {
-        if (!chasers[i].is_dead()) {
-            Position p = chasers[i].get_position();
-            mvwaddch(map_window, p.y, p.x, '!' | COLOR_PAIR(CP_ENEMY));
+            case DOOR_NEXT:
+                glyph = '>' | COLOR_PAIR(CP_DOOR);
+                break;
+
+            default:
+                glyph = ' ' | COLOR_PAIR(CP_SCREEN);
+                break;
         }
     }
 
-    for (int i = 0; i < MAX_ROAMERS; i++) {
-        if (!roamers[i].is_dead()) {
-            Position p = roamers[i].get_position();
-            mvwaddch(map_window, p.y, p.x, '?' | COLOR_PAIR(CP_ENEMY));
-        }
-    }
-
-    for (int i = 0; i < MAX_WALKERS; i++) {
-        if (!walkers[i].is_dead()) {
-            Position p = walkers[i].get_position();
-            mvwaddch(map_window, p.y, p.x, 'X' | COLOR_PAIR(CP_ENEMY));
-        }
-    }
-}
-
-void Renderer::draw_explosions(Map& map) {
-    for (int y = 0; y < MAP_HEIGHT; y++) {
-        for (int x = 0; x < MAP_WIDTH; x++) {
-            if (map.is_explosion({y, x})) {
-                mvwaddch(map_window, y, x, '*' | COLOR_PAIR(CP_EXPLOSION));
-            }
-        }
-    }
+    mvwaddch(map_window, p.y, p.x, glyph);
 }
 
 void Renderer::display_lives(int lives) {
@@ -219,12 +190,11 @@ void Renderer::display_effect(int buff_remaining) {
 void Renderer::draw_map(Level& level, Player& player) {
     werase(map_window);
 
-    draw_grid(level.get_map());
-    draw_items(level.get_items());
-    draw_bombs(level.get_bombs());
-    draw_player(player);
-    draw_enemies(level);
-    draw_explosions(level.get_map());
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            draw_cell(level, player, {y, x});
+        }
+    }
 
     wnoutrefresh(map_window);
 }
@@ -250,7 +220,7 @@ void Renderer::render(LevelManager& level_manager, Player& player, int score, in
     display_title();
 
     // stdscr fa da sfondo: va messo nel virtual screen PRIMA delle sottofinestre,
-    // altrimenti il titolo non arriva mai al terminale (doupdate legge solo cio'
+    // altrimenti il titolo non arriva mai al terminale (doupdate legge solo ciò
     // che le wnoutrefresh hanno depositato) e getch() lo ridisegna per conto suo.
     wnoutrefresh(stdscr);
 

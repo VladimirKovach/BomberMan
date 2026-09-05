@@ -1,8 +1,7 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
-#include "bomb.hpp"
-#include "item.hpp"
+#include "enemy.hpp"
 #include "level_manager.hpp"
 #include "level.hpp"
 #include "player.hpp"
@@ -44,12 +43,9 @@ protected:
 
     void display_title();
 
-    void draw_grid(Map& map);
-    void draw_bombs(Bomb* bombs);
-    void draw_items(Item* items);
-    void draw_player(Player& player);
-    void draw_enemies(Level& level);
-    void draw_explosions(Map& map);
+    // Disegna il singolo carattere della cella 'p', scegliendolo in base a
+    // ciò che il livello dichiara di avere in quella posizione
+    void draw_cell(Level& level, Player& player, Position p);
 
     void display_lives(int lives);
     void display_effect(int buff_remaining);

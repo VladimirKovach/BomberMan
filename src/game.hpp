@@ -29,8 +29,8 @@ protected:
     bool win();
     bool lose();
 
-    // Ritorna true se il livello corrente e' cambiato (o e' stato rimosso):
-    // in quel caso il Level& del chiamante non e' piu' valido e le altre
+    // Ritorna true se il livello corrente è cambiato (o è stato rimosso):
+    // in quel caso il Level& del chiamante non è piu' valido e le altre
     // collisioni vanno saltate fino al frame successivo.
     bool handle_level_change(Level& level);
 

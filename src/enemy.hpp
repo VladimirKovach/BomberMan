@@ -4,6 +4,13 @@
 #include "map.hpp"
 #include "position.hpp"
 
+// Tipi di nemico, usati per interrogare il livello sul contenuto di una cella
+enum EnemyType {
+    ENEMY_CHASER,
+    ENEMY_ROAMER,
+    ENEMY_WALKER,
+};
+
 class Enemy {
 protected:
     Direction directions[DIRECTIONS_COUNT];

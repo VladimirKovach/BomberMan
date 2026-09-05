@@ -53,12 +53,16 @@ public:
 
     Map& get_map();
 
-    Bomb* get_bombs();
-    Item* get_items();
+    // Interrogazioni sul contenuto di una cella: restituiscono true se in 'p'
+    // c'è l'oggetto cercato e riempiono i parametri di uscita.
+    // Se restituiscono false i parametri di uscita non vengono toccati.
+    bool has_enemy(Position p, EnemyType& type);
+    bool has_bomb(Position p, bool& blinking);
+    bool has_item(Position p, ItemType& type);
 
-    Chaser* get_chasers();
-    Roamer* get_roamers();
-    Walker* get_walkers();
+    // Raccoglie l'item presente in 'p', se c'e', e lo disattiva.
+    // Restituisce true e riempie 'type' e 'duration'.
+    bool collect_item_at(Position p, ItemType& type, int& duration);
 
     void place_bomb(Position p, int range);
 
