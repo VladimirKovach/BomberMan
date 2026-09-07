@@ -12,11 +12,9 @@ Enemy::Enemy(Position _p, int _speed) {
 
     p = _p;
     start_p = _p;
+    speed = _speed;
 
-    if (_speed > 0) {
-        speed = _speed;
-    }
-    else {
+    if (speed <= 0) {
         speed = 1;
     }
 
@@ -39,19 +37,11 @@ void Enemy::shuffle_directions() {
 }
 
 bool Enemy::can_move_to(Map& map, Position next) {
-    if (map.out_of_bounds(next)) {
-        return false;
-    }
-
-    return !map.is_wall(next) && !map.is_bomb(next) && !map.is_explosion(next);
+    return !map.out_of_bounds(next) && !map.is_wall(next) && !map.is_bomb(next) && !map.is_explosion(next);
 }
 
 Position Enemy::get_position() {
     return p;
-}
-
-int Enemy::get_speed() {
-    return speed;
 }
 
 void Enemy::kill() {

@@ -1,7 +1,5 @@
 #include "renderer.hpp"
-#include "bomb.hpp"
 #include "item.hpp"
-#include "level_manager.hpp"
 #include "level.hpp"
 #include "player.hpp"
 #include "position.hpp"
@@ -12,25 +10,22 @@ void Renderer::init_colors() {
 
     //  ----- ADATTAMENTO DELLA GRAFICA PER WINDOWS -----
 
-    // su pdcurses (Windows) use_default_colors fallisce e ogni init_pair che
-    // usa -1 viene ignorato, lasciando i caratteri bianco su nero
+    // COLOR_DEFAULT (-1) rappresenta il colore dello sfondo del terminale
+    // Su pdcurses (Windows) use_default_colors() fallisce e ogni init_pair() che usa -1 viene ignorato,
+    // lasciando i caratteri bianco su nero
     short bg = COLOR_DEFAULT;
     if (use_default_colors() == ERR) {
         bg = COLOR_BLACK;
     }
 
-    // fallback per terminali senza 256 colori, per esempio pdcurses (Windows)
-    // GREY (244) non esiste, quindi init_pair fallisce, rendendo invisibili i
-    // muri distruttibili.
+    // Fallback per terminali senza 256 colori, per esempio pdcurses (Windows)
+    // COLOR_GREY (244) non esiste, quindi init_pair() fallisce, rendendo invisibili i muri distruttibili
     short grey = COLOR_GREY;
     if (COLORS < 256) {
         grey = COLOR_YELLOW;
     }
 
-    //  -------------------------------------------------
-
-    // COLOR_DEFAULT = -1 significa "usa lo sfondo nativo del terminale"
-    init_pair(CP_SCREEN, bg, bg);
+    init_pair(CP_EMPTY, bg, bg);
     init_pair(CP_WALL_SOLID, COLOR_WHITE, COLOR_WHITE);
     init_pair(CP_WALL_DESTRUCTIBLE, grey, grey);
     init_pair(CP_DOOR, COLOR_GREEN, bg);
@@ -84,88 +79,87 @@ void Renderer::draw_cell(Level& level, Player& player, Position p) {
 
     EnemyType enemy_type;
     ItemType item_type;
-    bool blinking;
+    bool blink;
 
-    // chtype (non char): i simboli ACS_* sono definiti da ncurses
-    // e non entrano in un singolo byte
-    chtype glyph;
+    // chtype (non char): i simboli ACS_* sono definiti da ncurses e non entrano in un singolo byte
+    chtype cell;
 
-    // Ordine di priorità: vince la prima condizione vera, quindi ciò che
-    // sta "sopra" copre ciò che sta sotto.
+    // Ordine di priorità: vince la prima condizione vera, quindi ciò che sta sopra copre ciò che sta sotto
     if (map.is_explosion(p)) {
-        // Il | non è un "oppure", è una fusione di campi.
-        glyph = '*' | COLOR_PAIR(CP_EXPLOSION);
+        cell = '*' | COLOR_PAIR(CP_EXPLOSION);
     }
     else if (level.has_enemy(p, enemy_type)) {
         switch (enemy_type) {
             case ENEMY_CHASER:
-                glyph = '!' | COLOR_PAIR(CP_ENEMY);
+                cell = '!' | COLOR_PAIR(CP_ENEMY);
                 break;
 
             case ENEMY_ROAMER:
-                glyph = '?' | COLOR_PAIR(CP_ENEMY);
+                cell = '?' | COLOR_PAIR(CP_ENEMY);
                 break;
 
-            default:  // ENEMY_WALKER
-                glyph = 'X' | COLOR_PAIR(CP_ENEMY);
+            // ENEMY_WALKER
+            default:
+                cell = 'X' | COLOR_PAIR(CP_ENEMY);
                 break;
         }
     }
-    else if (equal(player.get_position(), p)) {
-        glyph = '@' | COLOR_PAIR(CP_PLAYER);
+    else if (!player.is_dead() && equal(player.get_position(), p)) {
+        cell = '@' | COLOR_PAIR(CP_PLAYER);
     }
-    else if (level.has_bomb(p, blinking)) {
-        if (blinking) {
-            glyph = 'O' | COLOR_PAIR(CP_BOMB_BLINK);
+    else if (level.has_bomb(p, blink)) {
+        if (blink) {
+            cell = 'O' | COLOR_PAIR(CP_BOMB_BLINK);
         }
         else {
-            glyph = 'O' | COLOR_PAIR(CP_BOMB);
+            cell = 'O' | COLOR_PAIR(CP_BOMB);
         }
     }
     else if (level.has_item(p, item_type)) {
         switch (item_type) {
             case ITEM_LIFE:
-                glyph = ACS_DIAMOND | COLOR_PAIR(CP_ITEM);
+                cell = ACS_DIAMOND | COLOR_PAIR(CP_ITEM);
                 break;
 
             case ITEM_SCORE:
-                glyph = ACS_STERLING | COLOR_PAIR(CP_ITEM);
+                cell = ACS_STERLING | COLOR_PAIR(CP_ITEM);
                 break;
 
             case ITEM_TIME:
-                glyph = 'T' | COLOR_PAIR(CP_ITEM);
+                cell = 'T' | COLOR_PAIR(CP_ITEM);
                 break;
 
-            default:  // ITEM_RANGE
-                glyph = 'R' | COLOR_PAIR(CP_ITEM);
+            // ITEM_RANGE
+            default:
+                cell = 'R' | COLOR_PAIR(CP_ITEM);
                 break;
         }
     }
     else {
         switch (map.get_cell(p)) {
             case WALL_SOLID:
-                glyph = ' ' | COLOR_PAIR(CP_WALL_SOLID);
+                cell = ' ' | COLOR_PAIR(CP_WALL_SOLID);
                 break;
 
             case WALL_DESTRUCTIBLE:
-                glyph = ' ' | COLOR_PAIR(CP_WALL_DESTRUCTIBLE);
+                cell = ' ' | COLOR_PAIR(CP_WALL_DESTRUCTIBLE);
                 break;
 
             case DOOR_PREV:
-                glyph = '<' | COLOR_PAIR(CP_DOOR);
+                cell = '<' | COLOR_PAIR(CP_DOOR);
                 break;
 
             case DOOR_NEXT:
-                glyph = '>' | COLOR_PAIR(CP_DOOR);
+                cell = '>' | COLOR_PAIR(CP_DOOR);
                 break;
 
             default:
-                glyph = ' ' | COLOR_PAIR(CP_SCREEN);
+                cell = ' ' | COLOR_PAIR(CP_EMPTY);
                 break;
         }
     }
 
-    mvwaddch(map_window, p.y, p.x, glyph);
+    mvwaddch(map_window, p.y, p.x, cell);
 }
 
 void Renderer::display_lives(int lives) {
@@ -179,7 +173,7 @@ void Renderer::display_lives(int lives) {
 
 void Renderer::display_effect(int buff_remaining) {
     if (buff_remaining > 0) {
-        int seconds = (buff_remaining + TICKS_PER_SECOND - 1) / TICKS_PER_SECOND;
+        int seconds = (buff_remaining + TICKS_PER_SECOND - 1) / TICKS_PER_SECOND;  // ???
         mvwprintw(info_window, 5, 1, "EFFECT: RANGE %d S", seconds);
     }
     else {
@@ -214,9 +208,7 @@ void Renderer::draw_info(Level& level, Player& player, int score, int time) {
     wnoutrefresh(info_window);
 }
 
-void Renderer::render(LevelManager& level_manager, Player& player, int score, int time) {
-    Level& level = level_manager.get_current_level();
-
+void Renderer::render(Level& level, Player& player, int score, int time) {
     display_title();
 
     // stdscr fa da sfondo: va messo nel virtual screen PRIMA delle sottofinestre,

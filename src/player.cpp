@@ -6,8 +6,11 @@
 Player::Player(Position _p, int _lives) {
     p = _p;
     start_p = _p;
-
     lives = _lives;
+
+    if (lives <= 0) {
+        lives = 1;
+    }
 
     bomb_range = 1;
     buff_timer = 0;
@@ -17,11 +20,7 @@ Position Player::get_position() {
     return p;
 }
 
-void Player::set_position(Position _p) {
-    p = _p;
-}
-
-void Player::set_spawn(Position _p) {
+void Player::spawn(Position _p) {
     p = _p;
     start_p = _p;
 }

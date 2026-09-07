@@ -34,36 +34,34 @@ int Level::get_bomb_count() {
     return count;
 }
 
-int Level::get_enemy_count() {
-    int count = 0;
-
-    for (int i = 0; i < MAX_CHASERS; i++) {
-        if (!chasers[i].is_dead()) {
-            count++;
-        }
-    }
-
-    for (int i = 0; i < MAX_ROAMERS; i++) {
-        if (!roamers[i].is_dead()) {
-            count++;
-        }
-    }
-
-    for (int i = 0; i < MAX_WALKERS; i++) {
-        if (!walkers[i].is_dead()) {
-            count++;
-        }
-    }
-
-    return count;
-}
-
 void Level::update_bombs() {
     for (int i = 0; i < MAX_BOMBS; i++) {
         if (bombs[i].is_active()) {
             bombs[i].update(map);
         }
     }
+}
+
+bool Level::all_enemies_dead() {
+    for (int i = 0; i < MAX_CHASERS; i++) {
+        if (!chasers[i].is_dead()) {
+            return false;
+        }
+    }
+
+    for (int i = 0; i < MAX_ROAMERS; i++) {
+        if (!roamers[i].is_dead()) {
+            return false;
+        }
+    }
+
+    for (int i = 0; i < MAX_WALKERS; i++) {
+        if (!walkers[i].is_dead()) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void Level::update_enemies(Position player_p) {
@@ -87,52 +85,56 @@ void Level::update_enemies(Position player_p) {
 }
 
 void Level::spawn_enemies() {
-    if (number == 1) {
-        walkers[0] = Walker(map.get_random_spawn(), 1);
-        walkers[1] = Walker(map.get_random_spawn(), 1);
-        walkers[2] = Walker(map.get_random_spawn(), 1);
-    }
-    else if (number == 2) {
-        walkers[0] = Walker(map.get_random_spawn(), 2);
-        walkers[1] = Walker(map.get_random_spawn(), 2);
-        walkers[2] = Walker(map.get_random_spawn(), 2);
+    switch (number) {
+        case 1:
+            walkers[0] = Walker(map.get_random_spawn(), 1);
+            walkers[1] = Walker(map.get_random_spawn(), 1);
+            walkers[2] = Walker(map.get_random_spawn(), 1);
+            break;
 
-        roamers[0] = Roamer(map.get_random_spawn(), 1);
-    }
-    else if (number == 3) {
-        walkers[0] = Walker(map.get_random_spawn(), 2);
-        walkers[1] = Walker(map.get_random_spawn(), 2);
-        walkers[2] = Walker(map.get_random_spawn(), 2);
+        case 2:
+            walkers[0] = Walker(map.get_random_spawn(), 2);
+            walkers[1] = Walker(map.get_random_spawn(), 2);
+            walkers[2] = Walker(map.get_random_spawn(), 2);
+            roamers[0] = Roamer(map.get_random_spawn(), 1);
+            break;
 
-        roamers[0] = Roamer(map.get_random_spawn(), 2);
-        roamers[1] = Roamer(map.get_random_spawn(), 2);
-    }
-    else if (number == 4) {
-        walkers[0] = Walker(map.get_random_spawn(), 2);
-        walkers[1] = Walker(map.get_random_spawn(), 2);
-        walkers[2] = Walker(map.get_random_spawn(), 2);
+        case 3:
+            walkers[0] = Walker(map.get_random_spawn(), 2);
+            walkers[1] = Walker(map.get_random_spawn(), 2);
+            walkers[2] = Walker(map.get_random_spawn(), 2);
+            roamers[0] = Roamer(map.get_random_spawn(), 2);
+            roamers[1] = Roamer(map.get_random_spawn(), 2);
+            break;
 
-        roamers[0] = Roamer(map.get_random_spawn(), 2);
-        roamers[1] = Roamer(map.get_random_spawn(), 2);
+        case 4:
+            walkers[0] = Walker(map.get_random_spawn(), 2);
+            walkers[1] = Walker(map.get_random_spawn(), 2);
+            walkers[2] = Walker(map.get_random_spawn(), 2);
+            roamers[0] = Roamer(map.get_random_spawn(), 2);
+            roamers[1] = Roamer(map.get_random_spawn(), 2);
+            chasers[0] = Chaser(map.get_random_spawn(), 2);
+            break;
 
-        chasers[0] = Chaser(map.get_random_spawn(), 2);
-    }
-    else if (number == 5) {
-        walkers[0] = Walker(map.get_random_spawn(), 2);
-        walkers[1] = Walker(map.get_random_spawn(), 2);
-        walkers[2] = Walker(map.get_random_spawn(), 2);
+        case 5:
+            walkers[0] = Walker(map.get_random_spawn(), 2);
+            walkers[1] = Walker(map.get_random_spawn(), 2);
+            walkers[2] = Walker(map.get_random_spawn(), 2);
+            roamers[0] = Roamer(map.get_random_spawn(), 2);
+            roamers[1] = Roamer(map.get_random_spawn(), 2);
+            chasers[0] = Chaser(map.get_random_spawn(), 2);
+            chasers[1] = Chaser(map.get_random_spawn(), 2);
+            break;
 
-        roamers[0] = Roamer(map.get_random_spawn(), 2);
-        roamers[1] = Roamer(map.get_random_spawn(), 2);
-
-        chasers[0] = Chaser(map.get_random_spawn(), 2);
-        chasers[1] = Chaser(map.get_random_spawn(), 2);
+        default:
+            break;
     }
 }
 
 Level::Level(int _number) {
     number = _number;
     completed = false;
+
     map = Map(number);
 
     spawn_enemies();
@@ -175,10 +177,10 @@ bool Level::has_enemy(Position p, EnemyType& type) {
     return false;
 }
 
-bool Level::has_bomb(Position p, bool& blinking) {
+bool Level::has_bomb(Position p, bool& blink) {
     for (int i = 0; i < MAX_BOMBS; i++) {
         if (bombs[i].is_active() && equal(bombs[i].get_position(), p)) {
-            blinking = bombs[i].is_blinking();
+            blink = bombs[i].is_blinking();
             return true;
         }
     }
@@ -341,7 +343,7 @@ void Level::update(Position player_p) {
         update_enemies(player_p);
     }
 
-    if (get_enemy_count() == 0) {
+    if (all_enemies_dead()) {
         completed = true;
     }
 }

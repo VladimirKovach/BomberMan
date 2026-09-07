@@ -9,6 +9,13 @@
 #include "roamer.hpp"
 #include "walker.hpp"
 
+// Tipi di nemico, usati per interrogare il livello sul contenuto di una cella
+enum EnemyType {
+    ENEMY_CHASER,
+    ENEMY_ROAMER,
+    ENEMY_WALKER
+};
+
 const int MAX_BOMBS = 3;
 const int MAX_ITEMS = 10;
 
@@ -38,11 +45,10 @@ protected:
     void try_drop_item(Position p, int chance);
 
     int get_bomb_count();
-    int get_enemy_count();
-
     void update_bombs();
-    void update_enemies(Position player_p);
 
+    bool all_enemies_dead();
+    void update_enemies(Position player_p);
     void spawn_enemies();
 
 public:
@@ -53,15 +59,15 @@ public:
 
     Map& get_map();
 
-    // Interrogazioni sul contenuto di una cella: restituiscono true se in 'p'
-    // c'è l'oggetto cercato e riempiono i parametri di uscita.
+    // Interrogazioni sul contenuto di una cella:
+    // restituiscono true se in 'p' c'è l'oggetto cercato e riempiono i parametri di uscita.
     // Se restituiscono false i parametri di uscita non vengono toccati.
     bool has_enemy(Position p, EnemyType& type);
-    bool has_bomb(Position p, bool& blinking);
+    bool has_bomb(Position p, bool& blink);
     bool has_item(Position p, ItemType& type);
 
-    // Raccoglie l'item presente in 'p', se c'e', e lo disattiva.
-    // Restituisce true e riempie 'type' e 'duration'.
+    // Raccoglie e disattiva l'item presente in 'p', se c'e'.
+    // Restituisce true e riempie 'type' e 'duration' se l'item e' stato collezionato.
     bool collect_item_at(Position p, ItemType& type, int& duration);
 
     void place_bomb(Position p, int range);

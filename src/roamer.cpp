@@ -1,4 +1,5 @@
 #include "roamer.hpp"
+#include "enemy.hpp"
 #include "map.hpp"
 #include "position.hpp"
 #include "time.hpp"
@@ -21,10 +22,10 @@ void Roamer::move(Map& map) {
 void Roamer::update(Map& map) {
     if (move_timer > 0) {
         move_timer--;
-    }
 
-    if (move_timer == 0) {
-        move(map);
-        move_timer = TICKS_PER_SECOND / speed;
+        if (move_timer == 0) {
+            move(map);
+            move_timer = TICKS_PER_SECOND / speed;
+        }
     }
 }

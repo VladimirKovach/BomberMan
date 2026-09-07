@@ -2,10 +2,12 @@
 #include "game.hpp"
 #include "menu.hpp"
 #include <ncurses.h>
+#include <iostream>
+
+using namespace std;
 
 App::App() {
     running = true;
-
     initscr();
     cbreak();
     noecho();
@@ -15,31 +17,25 @@ App::App() {
 }
 
 // Verifica che il terminale sia abbastanza grande.
-// Un programma ncurses non puo' ridimensionare la finestra che lo ospita:
-// l'unica cosa corretta da fare e' avvisare l'utente e uscire.
 bool App::terminal_too_small() {
-    int h, w;
-    getmaxyx(stdscr, h, w);
+    int lines, cols;
+    getmaxyx(stdscr, lines, cols);
 
-    if (h >= MIN_LINES && w >= MIN_COLS) {
+    if (lines >= MIN_LINES && cols >= MIN_COLS) {
         return false;
     }
+    else {
+        endwin();
 
-    mvprintw(0, 0, "Terminale troppo piccolo.");
-    mvprintw(1, 0, "Dimensione minima: %d x %d (righe x colonne).", MIN_LINES, MIN_COLS);
-    mvprintw(2, 0, "Dimensione attuale: %d x %d.", h, w);
-    mvprintw(4, 0, "Ingrandisci la finestra e riavvia il gioco.");
-    mvprintw(5, 0, "Premi un tasto per uscire...");
+        // Uso cout invece di printw per evitare di scrivere fuori dallo schermo
+        // (Non ho la certezza di avere abbastanza spazio per il messaggio di errore)
+        cout << "Terminale troppo piccolo.\n";
+        cout << "Dimensione minima: " << MIN_LINES << " x " << MIN_COLS << " (righe x colonne).\n";
+        cout << "Dimensione corrente: " << lines << " x " << cols << " (righe x colonne).\n";
+        cout << "Ingrandisci la finestra e riavvia il gioco.\n";
 
-    refresh();
-
-    // il costruttore ha messo nodelay(TRUE): senza questo getch() non aspetterebbe
-    nodelay(stdscr, FALSE);
-    getch();
-
-    endwin();
-
-    return true;
+        return true;
+    }
 }
 
 void App::run() {
@@ -54,7 +50,7 @@ void App::run() {
         switch (choice) {
             case NEW_GAME:
             {
-                // Game viene costruito qui dentro. La pulizia viene fatta da Game::run() prima di uscire
+                // Game viene costruito qui dentro. La pulizia viene fatta da Game::run() prima di uscire.
                 // La prossima volta costruisce un Game nuovo di zecca, senza bisogno di un reset esplicito.
                 Game game;
                 game.run();

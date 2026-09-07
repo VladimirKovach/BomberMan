@@ -10,7 +10,7 @@ app.o: src/app.cpp src/app.hpp src/game.hpp src/menu.hpp
 bomb.o: src/bomb.cpp src/bomb.hpp src/map.hpp src/position.hpp src/time.hpp
 	g++ -c src/bomb.cpp
 
-chaser.o: src/chaser.cpp src/chaser.hpp src/map.hpp src/position.hpp src/time.hpp
+chaser.o: src/chaser.cpp src/chaser.hpp src/enemy.hpp src/map.hpp src/position.hpp src/time.hpp
 	g++ -c src/chaser.cpp
 
 enemy.o: src/enemy.cpp src/enemy.hpp src/map.hpp src/position.hpp src/time.hpp
@@ -43,13 +43,13 @@ player.o: src/player.cpp src/player.hpp src/item.hpp src/map.hpp src/position.hp
 position.o: src/position.cpp src/position.hpp
 	g++ -c src/position.cpp
 
-renderer.o: src/renderer.cpp src/renderer.hpp src/bomb.hpp src/item.hpp src/level_manager.hpp src/level.hpp src/player.hpp src/position.hpp
+renderer.o: src/renderer.cpp src/renderer.hpp src/item.hpp src/level.hpp src/player.hpp src/position.hpp
 	g++ -c src/renderer.cpp
 
-roamer.o: src/roamer.cpp src/roamer.hpp src/map.hpp src/position.hpp src/time.hpp
+roamer.o: src/roamer.cpp src/roamer.hpp src/enemy.hpp src/map.hpp src/position.hpp src/time.hpp
 	g++ -c src/roamer.cpp
 
-walker.o: src/walker.cpp src/walker.hpp src/map.hpp src/position.hpp src/time.hpp
+walker.o: src/walker.cpp src/walker.hpp src/enemy.hpp src/map.hpp src/position.hpp src/time.hpp
 	g++ -c src/walker.cpp
 
 clean:

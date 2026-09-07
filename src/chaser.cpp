@@ -1,15 +1,16 @@
 #include "chaser.hpp"
+#include "enemy.hpp"
 #include "map.hpp"
 #include "position.hpp"
 #include "time.hpp"
 #include <cstdlib>
 
-// distanza di Manhattan
+// Distanza di Manhattan
 int Chaser::distance(Position a, Position b) {
     return abs(a.y - b.y) + abs(a.x - b.x);
 }
 
-// selection sort
+// Selection Sort
 void Chaser::sort_directions(Position player_p) {
     for (int i = 0; i < DIRECTIONS_COUNT - 1; i++) {
         int min = i;
@@ -49,10 +50,10 @@ Chaser::Chaser(Position _p, int _speed) : Enemy(_p, _speed) {}
 void Chaser::update(Map& map, Position player_p) {
     if (move_timer > 0) {
         move_timer--;
-    }
 
-    if (move_timer == 0) {
-        move(map, player_p);
-        move_timer = TICKS_PER_SECOND / speed;
+        if (move_timer == 0) {
+            move(map, player_p);
+            move_timer = TICKS_PER_SECOND / speed;
+        }
     }
 }

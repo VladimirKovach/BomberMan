@@ -23,14 +23,14 @@ void Map::shuffle_spawns() {
         int j = rand() % (i + 1);
 
         if (j != i) {
-            Position p = spawns[i];
+            Position tmp = spawns[i];
             spawns[i] = spawns[j];
-            spawns[j] = p;
+            spawns[j] = tmp;
         }
     }
 }
 
-// SAFE ZONE - zona in cui non si possono spawnare nemici
+// Zona in cui non si possono spawnare nemici
 bool Map::safe_zone(Position p) {
     if (p.y < 0 || p.y >= SAFE_ZONE_SIZE) {
         return false;
@@ -79,15 +79,15 @@ void Map::place_destructible_walls(int percentage) {
         }
     }
 
-    // I due punti di ingresso al livello devono essere sempre agibili
+    // I due punti di ingresso devono essere sempre agibili
 
-    // Angolo sinistro (spawn iniziale e rientro dalla porta 'next')
+    // Angolo sinistro
     grid[1][1] = EMPTY;
     grid[1][2] = EMPTY;
     grid[2][1] = EMPTY;
     grid[1][3] = EMPTY;
 
-    // Angolo destro (rientro dalla porta 'prev')
+    // Angolo destro
     grid[1][MAP_WIDTH - 2] = EMPTY;
     grid[1][MAP_WIDTH - 3] = EMPTY;
     grid[2][MAP_WIDTH - 2] = EMPTY;

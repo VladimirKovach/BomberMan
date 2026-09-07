@@ -10,7 +10,7 @@ enum ItemType {
     ITEM_RANGE,  // aumenta temporaneamente il raggio delle bombe
     ITEM_LIFE,   // aggiunge una vita (effetto istantaneo)
     ITEM_SCORE,  // aggiunge punti al punteggio (effetto istantaneo)
-    ITEM_TIME,   // aggiunge tempo al timer (effetto istantaneo)
+    ITEM_TIME    // aggiunge tempo al timer (effetto istantaneo)
 };
 
 // Parametri degli effetti

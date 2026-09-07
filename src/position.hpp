@@ -5,7 +5,7 @@ enum Direction {
     UP,
     LEFT,
     DOWN,
-    RIGHT,
+    RIGHT
 };
 
 const int DIRECTIONS_COUNT = 4;
@@ -15,7 +15,8 @@ struct Position {
     int x;
 };
 
-const Position POSITION_NONE = {-1, -1};  // posizione non valida, fuori dalla mappa
+// Posizione non valida, fuori dalla mappa
+const Position POSITION_NONE = {-1, -1};
 
 bool equal(Position a, Position b);
 

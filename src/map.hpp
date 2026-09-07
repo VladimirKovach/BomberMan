@@ -10,7 +10,7 @@ enum Cell {
     WALL_DESTRUCTIBLE,
     DOOR_PREV,
     DOOR_NEXT,
-    BOMB,
+    BOMB
 };
 
 const int MAP_HEIGHT = 21;

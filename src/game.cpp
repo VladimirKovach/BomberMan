@@ -12,6 +12,7 @@ Game::Game() {
     timer = GAME_TIMER_START;
     score = 0;
     level_score = 0;
+    reset = false;
 }
 
 bool Game::win() {
@@ -24,6 +25,7 @@ bool Game::lose() {
 
 void Game::handle_collisions() {
     Level& level = level_manager.get_current_level();
+    Position player_p = player.get_position();
 
     if (handle_level_change(level)) {
         return;
@@ -38,13 +40,12 @@ void Game::handle_collisions() {
 
     level.bombs_explosions_collisions();
 
-    Position player_p = player.get_position();
-
     if (level.player_enemies_collisions(player_p) || level.player_explosions_collisions(player_p)) {
         player.lose_life();
-        player.reset();
-        level.reset();
-        score = level_score;
+
+        if (!player.is_dead()) {
+            reset = true;
+        }
     }
 }
 
@@ -61,7 +62,7 @@ bool Game::handle_level_change(Level& level) {
             level_manager.go_to_next_level();
         }
 
-        player.set_spawn({1, 1});
+        player.spawn({1, 1});
         level_score = score;
 
         return true;
@@ -75,7 +76,7 @@ bool Game::handle_level_change(Level& level) {
             level_manager.go_to_prev_level();
         }
 
-        player.set_spawn({1, MAP_WIDTH - 2});
+        player.spawn({1, MAP_WIDTH - 2});
         level_score = score;
 
         return true;
@@ -110,21 +111,19 @@ void Game::handle_item_collection(Level& level) {
     }
 }
 
-
 void Game::handle_input() {
     Level& level = level_manager.get_current_level();
     Map& map = level.get_map();
 
-    // La tastiera in auto-repeat genera piu' eventi di quanti frame
-    // consumiamo (~30/s contro ~20 fps), quindi i tasti si accumulano nel
-    // buffer e il personaggio continua a muoversi dopo il rilascio.
+    // La tastiera in auto-repeat genera piu' eventi di quanti frame consumiamo (~30/s contro ~20 FPS),
+    // quindi i tasti si accumulano nel buffer e il giocatore continua a muoversi dopo il rilascio.
     // Svuotiamo tutto il buffer: bomba e uscita vengono gestite subito,
     // per il movimento conta solo l'ultimo tasto letto.
 
-    //move_key: è un appunto.
-    //Durante la lettura del buffer non muoviamo nessuno — ci segniamo solo l'ultimo tasto di movimento che abbiamo visto.
-    //Tre D nel buffer → l'appunto viene sovrascritto tre volte, alla fine dice semplicemente "D".
-    //Poi, a buffer vuoto, guardiamo l'appunto e facciamo un movimento.
+    // move_key: è un appunto.
+    // Durante la lettura del buffer non muoviamo nessuno, ci segniamo solo l'ultimo tasto di movimento che abbiamo visto.
+    // Tre D nel buffer → l'appunto viene sovrascritto tre volte, alla fine dice semplicemente "D".
+    // Poi, a buffer vuoto, guardiamo l'appunto e facciamo un movimento.
     int move_key = ERR;
     int key = getch();
 
@@ -184,9 +183,7 @@ void Game::update() {
 
     player.update_buff();
     level_manager.update_doors();
-
-    Level& level = level_manager.get_current_level();
-    level.update(player.get_position());
+    level_manager.get_current_level().update(player.get_position());
 
     handle_collisions();
 
@@ -200,7 +197,17 @@ void Game::run() {
         handle_input();
         update();
 
-        renderer.render(level_manager, player, score, timer / TICKS_PER_SECOND);
+        renderer.render(level_manager.get_current_level(), player, score, timer / TICKS_PER_SECOND);
+
+        // Effettuo il reset dopo il disegno,
+        // per visualizzare la collisione tra il giocatore e un'esplosiione o un nemico
+        if (reset) {
+            player.reset();
+            level_manager.get_current_level().reset();
+            score = level_score;
+            reset = false;
+        }
+
         napms(DELAY);
     }
 
@@ -210,9 +217,9 @@ void Game::run() {
     }
 
     // Pulizia esplicita
-    // libera i nodi della lista dei livelli e le finestre ncurses.
-    // Va fatta qui perchè è l'ultimo punto in cui la partita è ancora viva:
-    // subito dopo, App distrugge l'oggetto Game.
+    // Libera i nodi della lista dei livelli e le finestre ncurses.
+    // Va fatta qui perche' e' l'ultimo punto in cui la partita e' ancora viva:
+    // subito dopo, App distrugge Game.
     level_manager.free_levels();
     renderer.free_windows();
 }

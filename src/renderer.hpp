@@ -1,8 +1,6 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
-#include "enemy.hpp"
-#include "level_manager.hpp"
 #include "level.hpp"
 #include "player.hpp"
 #include "position.hpp"
@@ -13,12 +11,12 @@ const int INFO_WIDTH = 20;
 
 enum {
     COLOR_DEFAULT = -1,
-    COLOR_GREY = 244,
+    COLOR_GREY = 244
 };
 
 enum {
-    CP_NONE,
-    CP_SCREEN,
+    CP_DEFAULT,
+    CP_EMPTY,
     CP_WALL_SOLID,
     CP_WALL_DESTRUCTIBLE,
     CP_DOOR,
@@ -28,7 +26,7 @@ enum {
     CP_BOMB_BLINK,
     CP_EXPLOSION,
     CP_ITEM,
-    CP_TITLE,
+    CP_TITLE
 };
 
 class Renderer {
@@ -60,7 +58,7 @@ public:
     // la chiama Game::run() a fine partita.
     void free_windows();
 
-    void render(LevelManager& level_manager, Player& player, int score, int time);
+    void render(Level& level, Player& player, int score, int time);
 };
 
 #endif

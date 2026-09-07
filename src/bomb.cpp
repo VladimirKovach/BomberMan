@@ -105,25 +105,23 @@ void Bomb::update(Map& map) {
     if (!exploding) {
         if (blink_timer > 0) {
             blink_timer--;
+
+            if (blink_timer == 0) {
+                blink = !blink;
+                blink_timer = BLINK_TIMER_START;
+            }
         }
 
         if (exploding_timer > 0) {
             exploding_timer--;
-        }
 
-        if (blink_timer == 0) {
-            blink = !blink;
-            blink_timer = BLINK_TIMER_START;
-        }
-
-        if (exploding_timer == 0) {
-            explode(map);
+            if (exploding_timer == 0) {
+                explode(map);
+            }
         }
     }
-    else {
-        if (explosion_timer > 0) {
-            explosion_timer--;
-        }
+    else if (explosion_timer > 0) {
+        explosion_timer--;
 
         if (explosion_timer == 0) {
             map.unset_explosion(p);

@@ -17,10 +17,16 @@ protected:
     int score;
 
     // Punteggio al momento dell'ingresso nel livello corrente.
-    // Alla morte del giocatore il punteggio torna a questo valore
-    // cosi' i punti fatti nel tentativo fallito non restano acquisiti
+    // Quando il giocatore perde una vita il punteggio torna a questo valore,
+    // cosi' i punti fatti nel tentativo fallito non restano acquisiti.
     // (il livello viene resettato).
     int level_score;
+
+    // Quando il giocatore perde una vita, viene impostato a true,
+    // cosi' da effettuare il reset dopo il disegno,
+    // per poter visualizzare la collisione con un'esplosione o un nemico
+    // (il disegno avviene dopo l'aggiornamento)
+    bool reset;
 
     LevelManager level_manager;
     Player player;
@@ -29,15 +35,13 @@ protected:
     bool win();
     bool lose();
 
-    // Ritorna true se il livello corrente è cambiato (o è stato rimosso):
-    // in quel caso il Level& del chiamante non è piu' valido e le altre
-    // collisioni vanno saltate fino al frame successivo.
+    // Restituisce true se il livello corrente e' cambiato (o è stato rimosso):
+    // in quel caso il livello del chiamante non e' piu' valido
+    // e le altre collisioni vanno saltate fino al frame successivo.
     bool handle_level_change(Level& level);
 
     void handle_item_collection(Level& level);
-
     void handle_collisions();
-
     void handle_input();
 
     void update();
