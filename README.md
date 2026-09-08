@@ -52,5 +52,7 @@ Esegui il programma:
 
 ## Autori
 
-- Simone Coppola
-- Vladimir Covaci
+| Nome | Cognome | Mail | Matricola |
+| :--- | :--- | :--- | :--- |
+| Simone | Coppola | simone.coppola4@studio.unibo.it | 0001212139 |
+| Vladimir | Covaci | vladimir.covaci@studio.unibo.it | 0001222965 |
