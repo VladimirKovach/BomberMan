@@ -8,7 +8,6 @@
 class Chaser : public Enemy {
 protected:
     int distance(Position a, Position b);
-
     void sort_directions(Position player_p);
 
     void move(Map& map, Position player_p);

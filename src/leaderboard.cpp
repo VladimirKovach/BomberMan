@@ -115,7 +115,8 @@ ScoreEntry* Leaderboard::load() {
         for (int i = sep_pos + 1; line[i] != '\0'; i++) {
             if (line[i] >= '0' && line[i] <= '9') {
                 score = score * 10 + (line[i] - '0');
-            } else {
+            }
+            else {
                 break;
             }
         }

@@ -173,7 +173,7 @@ void Renderer::display_lives(int lives) {
 
 void Renderer::display_effect(int buff_remaining) {
     if (buff_remaining > 0) {
-        int seconds = (buff_remaining + TICKS_PER_SECOND - 1) / TICKS_PER_SECOND;  // ???
+        int seconds = (buff_remaining + TICKS_PER_SECOND - 1) / TICKS_PER_SECOND;
         mvwprintw(info_window, 5, 1, "EFFECT: RANGE %d S", seconds);
     }
     else {

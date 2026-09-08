@@ -200,7 +200,7 @@ void Game::run() {
         renderer.render(level_manager.get_current_level(), player, score, timer / TICKS_PER_SECOND);
 
         // Effettuo il reset dopo il disegno,
-        // per visualizzare la collisione tra il giocatore e un'esplosiione o un nemico
+        // per poter visualizzare la collisione tra il giocatore e un'esplosiione o un nemico
         if (reset) {
             player.reset();
             level_manager.get_current_level().reset();

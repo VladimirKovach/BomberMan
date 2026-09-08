@@ -111,7 +111,7 @@ Map::Map(int difficulty) {
     }
 
     place_solid_walls();
-    place_destructible_walls(BASE_WALL_PERCENTAGE + (difficulty * 5));
+    place_destructible_walls(BASE_WALL_PERCENTAGE + difficulty * 5);
     save_start_grid();
 
     save_spawns();

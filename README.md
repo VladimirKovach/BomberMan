@@ -1,6 +1,6 @@
 # Bomberman
 
-Un gioco Bomberman scritto in C++ usando la libreria ncurses.
+Un gioco ispirato a Bomberman scritto in C++ utilizzando la libreria ncurses.
 
 ## Dipendenze
 
